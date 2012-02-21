@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <title>Stabby UI</title>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"
+            type="text/javascript"></script>
+    </head>
+    <body>
+        <p>Testing...</p>
+    </body>
+    <script>
+        console.log("Running RPC call");
+        $.getJSON('/rpc', "stafoo", function(data) {
+          var items = [];
+          console.log("in rpc function");
+
+          $.each(data, function(key, val) {
+            console.log("pushing...");
+            items.push('<li id="' + key + '">' + val + '</li>');
+          });
+
+          console.log("makin list");
+          $('<ul/>', {
+            'class': 'my-new-list',
+            html: items.join('')
+          }).appendTo('body');
+          console.log("appended to body");
+        });
+    </script>
+</html>
