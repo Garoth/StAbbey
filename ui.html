@@ -9,21 +9,8 @@
     </body>
     <script>
         console.log("Running RPC call");
-        $.getJSON('/rpc', "stafoo", function(data) {
-          var items = [];
-          console.log("in rpc function");
-
-          $.each(data, function(key, val) {
-            console.log("pushing...");
-            items.push('<li id="' + key + '">' + val + '</li>');
-          });
-
-          console.log("makin list");
-          $('<ul/>', {
-            'class': 'my-new-list',
-            html: items.join('')
-          }).appendTo('body');
-          console.log("appended to body");
+        $.get('/connect', "", function(data) {
+            $("body").append($.parseJSON(data)["id"]);
         });
     </script>
 </html>
