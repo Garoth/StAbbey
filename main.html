@@ -8,18 +8,23 @@
     <body>
         <p>Testing...</p>
 
+        <p id="test-send">CLICK ME TO SEND TEST</p>
+
         <script>
             me = "{me}";
             token = "{token}";
             gamekey = "{gamekey}";
 
-            console.log(me);
-            console.log(token);
-            console.log(gamekey);
+            console.log("me: " + me);
+            console.log("token: " + token);
+            console.log("gamekey: " + gamekey);
 
             channel = new goog.appengine.Channel(token);
             socket = channel.open();
-            socket.onopen = socketOpen;
+            socket.onopen = socketOpened;
+            socket.onclosed = socketClosed;
+            socket.onerror = socketErrored;
+            socket.onmessage = socketMessaged;
         </script>
     </body>
 </html>
