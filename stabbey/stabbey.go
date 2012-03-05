@@ -12,7 +12,8 @@ import (
     "appengine/channel"
 )
 
-var MAIN_TEMPLATE = template.MustParseFile("main.html", nil)
+var SETUP_TEMPLATE = template.MustParseFile("setup.html", nil)
+var MAIN_TEMPLATE  = template.MustParseFile("main.html", nil)
 
 func init() {
     http.HandleFunc("/", initSetup)
@@ -21,6 +22,13 @@ func init() {
 }
 
 func initSetup(w http.ResponseWriter, r *http.Request) {
+    context := appengine.NewContext(r)
+
+    err := SETUP_TEMPLATE.Execute(w, map[string]string{})
+
+    if err != nil {
+        context.Errorf("setupTemplate: %v", err)
+    }
 }
 
 func connectSetup(w http.ResponseWriter, r *http.Request) {
