@@ -38,44 +38,18 @@ func connectSetup(w http.ResponseWriter, r *http.Request) {
     user := user.Current(context)
     gamekey := r.FormValue("gamekey")
     newgame := gamekey == ""
+    game := NewGame()
 
     if newgame {
         gamekey = user.Id
         fmt.Println("Making new game,", gamekey)
-    }
-
-    err := datastore.RunInTransaction(context, func(context appengine.Context) os.Error {
-        key := datastore.NewKey(context, "Game", gamekey, 0, nil)
-
-        game := new(Game)
-        if newgame {
-            game.P1 = user.Id
-        } else {
-            /* Load game, or error if we can't find it */
-            if err := datastore.Get(context, key, game); err != nil {
-                return err
-            }
-
-            /* Both players are in the game already */
-            if game.P2 != "" {
-                return nil
-            }
-
-            /* This is second player connecting, add them */
-            if game.P1 != user.Id {
-                game.P2 = user.Id
-            }
-        }
-
-        /* Store the created or updated Game to the Datastore */
-        _, err := datastore.Put(context, key, game)
-        return err
-    }, nil)
-
-    if err != nil {
-        http.Error(w, "Couldn't load Game", http.StatusInternalServerError)
-        context.Errorf("setting up: %v", err)
-        return
+        game.AddPlayer(NewPlayer(user.Id))
+        game.Save(context, gamekey)
+    } else {
+        game.Load(context, gamekey)
+        fmt.Println("Game exists, adding player", user.Id)
+        game.AddPlayer(NewPlayer(user.Id))
+        game.Save(context, gamekey)
     }
 
     fmt.Println("Making channel of:", user.Id + gamekey)
@@ -126,9 +100,20 @@ func updateRequest(w http.ResponseWriter, r *http.Request) {
     }
 
     // Send the game state to both clients.
-    for _, uId := range []string{game.P1, game.P2} {
-        fmt.Println("Sending msg to user", uId, "channel is", uId + gamekey)
-        err = channel.SendJSON(context, uId + gamekey, game)
+    for _, Id := range game.Players {
+        p := NewPlayer(Id)
+        e := p.Load(context, gamekey)
+
+        if e != nil {
+            fmt.Println("Error in getting player", e,
+            "Id:", Id,
+            "context:", context)
+        } else {
+            fmt.Println("Player", Id, "loaded successfully!")
+        }
+
+        fmt.Println("Sending msg to user", p.Id, "channel is", p.Id + gamekey)
+        err = channel.SendJSON(context, p.Id + gamekey, game)
         if err != nil {
             context.Errorf("sending Game: %v", err)
         }
