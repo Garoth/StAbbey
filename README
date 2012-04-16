@@ -1,0 +1,11 @@
+Running Test Server
+===================
+
+1. Download the GoogleAppEngine development server stuff.
+https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Go
+
+2. Put it dev_appserver.py in your PATH
+
+3. Run ```dev_appserver.py .'''
+
+4. Connect to localhost:8080
