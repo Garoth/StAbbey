@@ -41,6 +41,10 @@ func connectSetup(w http.ResponseWriter, r *http.Request) {
         fmt.Println("Making new game,", gamekey)
         gamekey = user.Id
         game.AddPlayer(player)
+        board := NewBoard(0)
+        board.MakeTestBoard()
+        board.Save(context, gamekey)
+        game.AddBoard(board)
         game.Save(context, gamekey)
     } else {
         fmt.Println("Game exists, adding player", user.Id)
@@ -49,6 +53,7 @@ func connectSetup(w http.ResponseWriter, r *http.Request) {
         game.Save(context, gamekey)
     }
 
+    player.Save(context, gamekey)
     tok, _ := player.OpenChannel(context, gamekey)
 
     err := MAIN_TEMPLATE.Execute(w, map[string]string{

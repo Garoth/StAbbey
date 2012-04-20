@@ -8,6 +8,7 @@ import (
 
 type Game struct {
     Players []string
+    Boards []int
 }
 
 func NewGame() *Game {
@@ -17,6 +18,11 @@ func NewGame() *Game {
 /* Adds a player to the current game. Call once per player per game */
 func (game *Game) AddPlayer(p *Player) {
     game.Players = append(game.Players, p.Id)
+}
+
+/* Adds a board to the current game. Call once per board per game */
+func (game *Game) AddBoard(b *Board) {
+    game.Boards = append(game.Boards, b.Id)
 }
 
 /* Gets the database key for the game */
@@ -30,14 +36,9 @@ func (game *Game) GetKey(context appengine.Context,
 func (game *Game) Save(context appengine.Context, gamekey string) os.Error {
     _, e := datastore.Put(context, game.GetKey(context, gamekey), game)
 
-    if e != nil{
+    if e != nil {
         context.Errorf("Error saving Game: %v", e)
         return e
-    }
-
-    for _, Id := range game.Players {
-        p := NewPlayer(Id)
-        p.Save(context, gamekey)
     }
 
     return nil
