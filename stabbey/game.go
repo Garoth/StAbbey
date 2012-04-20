@@ -14,16 +14,24 @@ func NewGame() *Game {
     return &Game{}
 }
 
+/* Adds a player to the current game. Call once per player per game */
 func (game *Game) AddPlayer(p *Player) {
     game.Players = append(game.Players, p.Id)
 }
 
-func (game *Game) GetKey(context appengine.Context, gamekey string) *datastore.Key {
+/* Gets the database key for the game */
+func (game *Game) GetKey(context appengine.Context,
+        gamekey string) *datastore.Key {
+
     return datastore.NewKey(context, "Game", gamekey, 0, nil)
 }
 
+/* Saves the game to the database */
 func (game *Game) Save(context appengine.Context, gamekey string) os.Error {
-    if _, e := datastore.Put(context, game.GetKey(context, gamekey), game); true {
+    _, e := datastore.Put(context, game.GetKey(context, gamekey), game)
+
+    if e != nil{
+        context.Errorf("Error saving Game: %v", e)
         return e
     }
 
@@ -35,6 +43,13 @@ func (game *Game) Save(context appengine.Context, gamekey string) os.Error {
     return nil
 }
 
+/* Loads the game from the database */
 func (game *Game) Load(context appengine.Context, gamekey string) os.Error {
-    return datastore.Get(context, game.GetKey(context, gamekey), game)
+    e := datastore.Get(context, game.GetKey(context, gamekey), game)
+
+    if e != nil {
+        context.Errorf("Error loading game: %v", e)
+    }
+
+    return e
 }
