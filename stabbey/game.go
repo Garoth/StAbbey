@@ -3,11 +3,19 @@ package stabbey
 import (
     "appengine"
     "appengine/datastore"
+    "encoding/json"
 )
 
+/* Internal, GAE struct for database storing */
 type Game struct {
     Players []string
     Boards []int
+}
+
+/* Object used for JSON serialization */
+type jsonGame struct {
+    Players []*Player
+    Boards []*Board
 }
 
 func NewGame() *Game {
@@ -52,4 +60,26 @@ func (game *Game) Load(context appengine.Context, gamekey string) error {
     }
 
     return e
+}
+
+/* Gets the JSON gamestate for the given player's perspective */
+func (game *Game) JSONGamestate(context appengine.Context, gamekey string,
+        p *Player) string {
+    jg := jsonGame{};
+
+    for _, ID := range game.Players {
+        p := NewPlayer(ID)
+        p.Load(context, gamekey)
+        jg.Players = append(jg.Players, p)
+    }
+
+    for _, ID := range game.Boards {
+        b := NewBoard(ID)
+        b.Load(context, gamekey)
+        jg.Boards = append(jg.Boards, b)
+    }
+
+    b, _ := json.Marshal(jg)
+
+    return string(b)
 }

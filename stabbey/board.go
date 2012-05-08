@@ -1,7 +1,6 @@
 package stabbey
 
 import (
-    "fmt"
     "appengine"
     "appengine/datastore"
 )
@@ -20,22 +19,22 @@ func NewBoard(level int) *Board {
     b.Id = level
     b.Width = 16
     b.Height = 12
+    b.MakeTestBoard();
     return b
 }
 
 func (b *Board) MakeTestBoard() {
-    fmt.Println("Making test board")
     b.Layers = append(b.Layers, []string{"xxxxxxxxxxxxxxxx",
-                                         "xxxxxxxxxxxxxxxx",
-                                         "xxxxxxxxxxxxxxxx",
-                                         "xxxxxxxxxxxxxxxx",
-                                         "xxxxxxxxxxxxxxxx",
-                                         "xxxxxxxxxxxxxxxx",
-                                         "xxxxxxxxxxxxxxxx",
-                                         "xxxxxxxxxxxxxxxx",
-                                         "xxxxxxxxxxxxxxxx",
-                                         "xxxxxxxxxxxxxxxx",
-                                         "xxxxxxxxxxxxxxxx",
+                                         "x  x           x",
+                                         "x  x           x",
+                                         "x  x           x",
+                                         "x  x xxxxxxxxxxx",
+                                         "x              x",
+                                         "x              x",
+                                         "xxxxxxxxxxxxx  x",
+                                         "x              x",
+                                         "x           x  x",
+                                         "x           x  x",
                                          "xxxxxxxxxxxxxxxx"})
 }
 

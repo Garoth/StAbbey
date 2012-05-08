@@ -64,10 +64,11 @@ func (p *Player) OpenChannel(context appengine.Context,
 }
 
 /* Send a JSON message to the player */
-func (p *Player) SendJSON(context appengine.Context, gamekey string,
-        value interface{}) error {
+func (p *Player) SendGamestate(context appengine.Context, gamekey string,
+        game *Game) error {
 
-    e := channel.SendJSON(context, p.getChannelKey(gamekey), value)
+    e := channel.Send(context, p.getChannelKey(gamekey),
+        game.JSONGamestate(context, gamekey, p))
 
     if e != nil {
         context.Errorf("Error sending JSON: %v", e)

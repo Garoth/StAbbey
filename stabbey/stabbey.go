@@ -79,6 +79,6 @@ func updateRequest(w http.ResponseWriter, r *http.Request) {
     for _, Id := range game.Players {
         p := NewPlayer(Id)
         p.Load(context, gamekey)
-        p.SendJSON(context, gamekey, game)
+        p.SendGamestate(context, gamekey, game)
     }
 }
