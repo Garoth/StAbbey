@@ -1,7 +1,6 @@
 package stabbey
 
 import (
-    "os"
     "fmt"
     "appengine"
     "appengine/datastore"
@@ -48,7 +47,7 @@ func (b *Board) GetKey(context appengine.Context,
 }
 
 /* Save the board to the database */
-func (b *Board) Save(context appengine.Context, gamekey string) os.Error {
+func (b *Board) Save(context appengine.Context, gamekey string) error {
     _, e := datastore.Put(context, b.GetKey(context, gamekey), b)
 
     if e != nil {
@@ -59,7 +58,7 @@ func (b *Board) Save(context appengine.Context, gamekey string) os.Error {
 }
 
 /* Load a board from the database */
-func (b *Board) Load(context appengine.Context, gamekey string) os.Error {
+func (b *Board) Load(context appengine.Context, gamekey string) error {
     e := datastore.Get(context, b.GetKey(context, gamekey), b)
 
     if e != nil {

@@ -1,16 +1,18 @@
-/* Barebones server */
 package stabbey
 
 import (
     "fmt"
-    "http"
-    "old/template"
+    "net/http"
+    "html/template"
     "appengine"
     "appengine/user"
 )
 
-var SETUP_TEMPLATE = template.MustParseFile("setup.html", nil)
-var MAIN_TEMPLATE  = template.MustParseFile("main.html", nil)
+type MainTemplate struct {
+    Me string
+    Token string
+    Gamekey string
+}
 
 /* Configures what virtual urls map to what functions */
 func init() {
@@ -23,7 +25,8 @@ func init() {
 func initSetup(w http.ResponseWriter, r *http.Request) {
     context := appengine.NewContext(r)
 
-    if err := SETUP_TEMPLATE.Execute(w, map[string]string{}); err != nil {
+    setupTemplate, _ := template.ParseFiles("setup.html")
+    if err := setupTemplate.Execute(w, map[string]string{}); err != nil {
         context.Errorf("Error executing setup template: %v", err)
     }
 }
@@ -35,11 +38,11 @@ func connectSetup(w http.ResponseWriter, r *http.Request) {
     gamekey := r.FormValue("gamekey")
     newgame := gamekey == ""
     game    := NewGame()
-    player  := NewPlayer(user.Id)
+    player  := NewPlayer(user.ID)
 
     if newgame {
         fmt.Println("Making new game,", gamekey)
-        gamekey = user.Id
+        gamekey = user.ID
         game.AddPlayer(player)
         board := NewBoard(0)
         board.MakeTestBoard()
@@ -47,7 +50,7 @@ func connectSetup(w http.ResponseWriter, r *http.Request) {
         game.AddBoard(board)
         game.Save(context, gamekey)
     } else {
-        fmt.Println("Game exists, adding player", user.Id)
+        fmt.Println("Game exists, adding player", user.ID)
         game.Load(context, gamekey)
         game.AddPlayer(player)
         game.Save(context, gamekey)
@@ -56,11 +59,8 @@ func connectSetup(w http.ResponseWriter, r *http.Request) {
     player.Save(context, gamekey)
     tok, _ := player.OpenChannel(context, gamekey)
 
-    err := MAIN_TEMPLATE.Execute(w, map[string]string{
-        "token"   : tok,
-        "me"      : user.Id,
-        "gamekey" : gamekey,
-    })
+    mainTemplate, _ := template.ParseFiles("main.html")
+    err := mainTemplate.Execute(w, MainTemplate{user.ID, tok, gamekey})
 
     if err != nil {
         context.Errorf("Error executing main template: %v", err)

@@ -1,7 +1,6 @@
 package stabbey
 
 import (
-    "os"
     "fmt"
     "appengine"
     "appengine/datastore"
@@ -24,7 +23,7 @@ func (p *Player) GetKey(context appengine.Context,
 }
 
 /* Save the player to the database */
-func (p *Player) Save(context appengine.Context, gamekey string) os.Error {
+func (p *Player) Save(context appengine.Context, gamekey string) error {
     _, e := datastore.Put(context, p.GetKey(context, gamekey), p)
 
     if e != nil {
@@ -35,7 +34,7 @@ func (p *Player) Save(context appengine.Context, gamekey string) os.Error {
 }
 
 /* Load a player from the database */
-func (p *Player) Load(context appengine.Context, gamekey string) os.Error {
+func (p *Player) Load(context appengine.Context, gamekey string) error {
     e := datastore.Get(context, p.GetKey(context, gamekey), p)
 
     if e != nil {
@@ -52,7 +51,7 @@ func (p *Player) getChannelKey(gamekey string) string {
 
 /* Opens the communications channel to the the JS client */
 func (p *Player) OpenChannel(context appengine.Context,
-        gamekey string) (string, os.Error) {
+        gamekey string) (string, error) {
 
     fmt.Println("Making channel of:", p.getChannelKey(gamekey))
     tok, e := channel.Create(context, p.getChannelKey(gamekey))
@@ -66,7 +65,7 @@ func (p *Player) OpenChannel(context appengine.Context,
 
 /* Send a JSON message to the player */
 func (p *Player) SendJSON(context appengine.Context, gamekey string,
-        value interface{}) os.Error {
+        value interface{}) error {
 
     e := channel.SendJSON(context, p.getChannelKey(gamekey), value)
 
