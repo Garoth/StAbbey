@@ -1,7 +1,6 @@
 package stabbey
 
 import (
-    "appengine"
     "appengine/datastore"
 )
 
@@ -23,6 +22,24 @@ func NewBoard(level int) *Board {
     return b
 }
 
+/* Returns the database key for the board */
+func GetBoardKey(c *Context, boardId string) *datastore.Key {
+    return datastore.NewKey(c.GAEContext, "Board" + boardId,
+        c.Gamekey, 0, nil)
+}
+
+/* Load a board from the database */
+func LoadBoard(c *Context, level string) *Board {
+    b := &Board{}
+    e := datastore.Get(c.GAEContext, GetBoardKey(c, level), b)
+
+    if e != nil {
+        c.GAEContext.Errorf("Error loading Board: %v", e)
+    }
+
+    return b
+}
+
 func (b *Board) MakeTestBoard() {
     b.Layers = append(b.Layers, []string{"xxxxxxxxxxxxxxxx",
                                          "x  x           x",
@@ -38,31 +55,13 @@ func (b *Board) MakeTestBoard() {
                                          "xxxxxxxxxxxxxxxx"})
 }
 
-/* Returns the database key for the board */
-func (b *Board) GetKey(context appengine.Context,
-        gamekey string) *datastore.Key {
-
-    return datastore.NewKey(context, "Board" + string(b.Id), gamekey, 0, nil)
-}
-
 /* Save the board to the database */
-func (b *Board) Save(context appengine.Context, gamekey string) error {
-    _, e := datastore.Put(context, b.GetKey(context, gamekey), b)
+func (b *Board) Save(c *Context) error {
+    _, e := datastore.Put(c.GAEContext, GetBoardKey(c, string(b.Id)), b)
 
     if e != nil {
-        context.Errorf("Error saving Board: %v", e)
+        c.GAEContext.Errorf("Error saving Board: %v", e)
     }
 
     return e;
-}
-
-/* Load a board from the database */
-func (b *Board) Load(context appengine.Context, gamekey string) error {
-    e := datastore.Get(context, b.GetKey(context, gamekey), b)
-
-    if e != nil {
-        context.Errorf("Error loading Board: %v", e)
-    }
-
-    return e
 }

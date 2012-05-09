@@ -33,52 +33,39 @@ func initSetup(w http.ResponseWriter, r *http.Request) {
 
 /* Creates game if necessary, connects players to it */
 func connectSetup(w http.ResponseWriter, r *http.Request) {
-    context := appengine.NewContext(r)
-    user    := user.Current(context)
-    gamekey := r.FormValue("gamekey")
-    newgame := gamekey == ""
+    c       := NewContext(appengine.NewContext(r), r.FormValue("gamekey"))
+    newgame := c.Gamekey == ""
     game    := NewGame()
-    player  := NewPlayer(user.ID)
+    player  := NewPlayer(user.Current(c.GAEContext).ID)
 
     if newgame {
-        fmt.Println("Making new game,", gamekey)
-        gamekey = user.ID
+        fmt.Println("Making new game,", c.Gamekey)
+        c.Gamekey = player.Id
         game.AddPlayer(player)
         board := NewBoard(0)
-        board.MakeTestBoard()
-        board.Save(context, gamekey)
+        board.Save(c)
         game.AddBoard(board)
-        game.Save(context, gamekey)
+        game.Save(c)
     } else {
-        fmt.Println("Game exists, adding player", user.ID)
-        game.Load(context, gamekey)
+        fmt.Println("Game exists, adding player", player.Id)
+        game := LoadGame(c);
         game.AddPlayer(player)
-        game.Save(context, gamekey)
+        game.Save(c)
     }
 
-    player.Save(context, gamekey)
-    tok, _ := player.OpenChannel(context, gamekey)
+    player.Save(c)
+    tok, _ := player.OpenChannel(c)
 
     mainTemplate, _ := template.ParseFiles("main.html")
-    err := mainTemplate.Execute(w, MainTemplate{user.ID, tok, gamekey})
-
-    if err != nil {
-        context.Errorf("Error executing main template: %v", err)
-    }
+    mainTemplate.Execute(w, MainTemplate{player.Id, tok, c.Gamekey})
 }
 
 /* Replies to the clients' update requests by resending the game state */
 func updateRequest(w http.ResponseWriter, r *http.Request) {
-    context := appengine.NewContext(r)
-    gamekey := r.FormValue("gamekey")
+    c := NewContext(appengine.NewContext(r), r.FormValue("gamekey"))
+    game := LoadGame(c)
 
-    game := new(Game)
-    game.Load(context, gamekey)
-
-    // Send the game state to both clients.
     for _, Id := range game.Players {
-        p := NewPlayer(Id)
-        p.Load(context, gamekey)
-        p.SendGamestate(context, gamekey, game)
+        LoadPlayer(c, Id).SendGamestate(c, game)
     }
 }

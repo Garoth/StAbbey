@@ -2,7 +2,6 @@ package stabbey
 
 import (
     "fmt"
-    "appengine"
     "appengine/datastore"
     "appengine/channel"
 )
@@ -16,63 +15,59 @@ func NewPlayer(id string) *Player {
     return &Player{id, "NONAME", 0, 0, 0, -1}
 }
 
-/* Returns the database key for the player */
-func (p *Player) GetKey(context appengine.Context,
-        gamekey string) *datastore.Key {
+func LoadPlayer(c *Context, id string) *Player {
+    p := &Player{}
+    e := datastore.Get(c.GAEContext, GetPlayerKey(c, id), p)
 
-    return datastore.NewKey(context, "Player" + p.Id, gamekey, 0, nil)
+    if e != nil {
+        c.GAEContext.Errorf("Error loading Player: %v", e)
+    }
+
+    return p
+}
+
+/* Returns the database key for the player */
+func GetPlayerKey(c *Context, id string) *datastore.Key {
+    return datastore.NewKey(c.GAEContext, "Player" + id, c.Gamekey, 0, nil)
 }
 
 /* Save the player to the database */
-func (p *Player) Save(context appengine.Context, gamekey string) error {
-    _, e := datastore.Put(context, p.GetKey(context, gamekey), p)
+func (p *Player) Save(c *Context) error {
+    _, e := datastore.Put(c.GAEContext, GetPlayerKey(c, p.Id), p)
 
     if e != nil {
-        context.Errorf("Error saving Player: %v", e)
+        c.GAEContext.Errorf("Error saving Player: %v", e)
     }
 
     return e;
 }
 
-/* Load a player from the database */
-func (p *Player) Load(context appengine.Context, gamekey string) error {
-    e := datastore.Get(context, p.GetKey(context, gamekey), p)
-
-    if e != nil {
-        context.Errorf("Error loading Player: %v", e)
-    }
-
-    return e
-}
-
 /* Returns the key for the JS communication channel */
-func (p *Player) getChannelKey(gamekey string) string {
-    return p.Id + "/" + gamekey
+func (p *Player) getChannelKey(c *Context) string {
+    return p.Id + "/" + c.Gamekey
 }
 
 /* Opens the communications channel to the the JS client */
-func (p *Player) OpenChannel(context appengine.Context,
-        gamekey string) (string, error) {
+func (p *Player) OpenChannel(c *Context) (string, error) {
 
-    fmt.Println("Making channel of:", p.getChannelKey(gamekey))
-    tok, e := channel.Create(context, p.getChannelKey(gamekey))
+    fmt.Println("Making channel of:", p.getChannelKey(c))
+    tok, e := channel.Create(c.GAEContext, p.getChannelKey(c))
 
     if e != nil {
-        context.Errorf("Error opening channel: %v", e)
+        c.GAEContext.Errorf("Error opening channel: %v", e)
     }
 
     return tok, e
 }
 
 /* Send a JSON message to the player */
-func (p *Player) SendGamestate(context appengine.Context, gamekey string,
-        game *Game) error {
+func (p *Player) SendGamestate(c *Context, game *Game) error {
 
-    e := channel.Send(context, p.getChannelKey(gamekey),
-        game.JSONGamestate(context, gamekey, p))
+    e := channel.Send(c.GAEContext, p.getChannelKey(c),
+        game.JSONGamestate(c, p))
 
     if e != nil {
-        context.Errorf("Error sending JSON: %v", e)
+        c.GAEContext.Errorf("Error sending JSON: %v", e)
     }
 
     return e
