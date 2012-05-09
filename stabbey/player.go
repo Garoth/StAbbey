@@ -8,11 +8,12 @@ import (
 )
 
 type Player struct {
-    Id string
+    Id, Name string
+    BoardId, X, Y, EntityId int
 }
 
 func NewPlayer(id string) *Player {
-    return &Player{id}
+    return &Player{id, "NONAME", 0, 0, 0, -1}
 }
 
 /* Returns the database key for the player */
@@ -76,3 +77,31 @@ func (p *Player) SendGamestate(context appengine.Context, gamekey string,
 
     return e
 }
+
+/*** Implement Entity ***/
+func (p *Player) GetPosition() Position {
+    return Position{p.BoardId, p.X, p.Y}
+}
+
+func (p *Player) SetPosition(pos Position) {
+    p.BoardId = pos.BoardId
+    p.X = pos.X
+    p.Y = pos.Y
+}
+
+func (p *Player) SetName(name string) {
+    p.Name = name
+}
+
+func (p *Player) GetName() string {
+    return p.Name
+}
+
+func (p *Player) SetEntityID(id int) {
+    p.EntityId = id
+}
+
+func (p *Player) GetEntityID() int {
+    return p.EntityId
+}
+/*** End Implement Entity ***/
