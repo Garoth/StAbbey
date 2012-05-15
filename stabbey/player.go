@@ -2,17 +2,20 @@ package stabbey
 
 import (
     "fmt"
+    "time"
+    "appengine"
     "appengine/datastore"
     "appengine/channel"
 )
 
 type Player struct {
     Id, Name string
-    BoardId, X, Y, EntityId int
+    BoardId, X, Y, EntityId, LastTick int
+    LastTickTime time.Time
 }
 
 func NewPlayer(id string) *Player {
-    return &Player{id, "NONAME", 0, 0, 0, -1}
+    return &Player{id, "NONAME", 0, 0, 0, -1, -1, time.Unix(0,0)}
 }
 
 func LoadPlayer(c *Context, id string) *Player {
@@ -71,6 +74,17 @@ func (p *Player) SendGamestate(c *Context, game *Game) error {
     }
 
     return e
+}
+
+/* Updates last tick */
+func PlayerUpdateLastTick(c *Context, id string, newtick int) {
+    datastore.RunInTransaction(c.GAEContext, func(x appengine.Context) error {
+        p := LoadPlayer(c, id)
+        p.LastTick = newtick
+        p.LastTickTime = time.Now()
+        p.Save(c)
+        return nil // TODO
+    }, nil)
 }
 
 /*** Implement Entity ***/

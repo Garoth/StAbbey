@@ -1,6 +1,7 @@
 package stabbey
 
 import (
+    "appengine"
     "appengine/datastore"
     "encoding/json"
 )
@@ -9,16 +10,22 @@ import (
 type Game struct {
     Players []string
     Boards []int
+    LastTick int
+    GameRunning bool
 }
 
 /* Object used for JSON serialization */
 type jsonGame struct {
     Players []*Player
     Boards []*Board
+    LastTick int
 }
 
 func NewGame() *Game {
-    return &Game{}
+    g := &Game{}
+    g.LastTick = 0
+    g.GameRunning = false
+    return g
 }
 
 /* Loads the game from the database */
@@ -72,7 +79,27 @@ func (game *Game) JSONGamestate(c *Context, p *Player) string {
         jg.Boards = append(jg.Boards, LoadBoard(c, string(ID)))
     }
 
+    jg.LastTick = game.LastTick
+
     b, _ := json.Marshal(jg)
 
     return string(b)
+}
+
+func GameUpdateLastTick(c *Context) {
+    datastore.RunInTransaction(c.GAEContext, func(x appengine.Context) error {
+        g := LoadGame(c)
+        g.LastTick += 1
+        g.Save(c)
+        return nil // TODO
+    }, nil)
+}
+
+func GameSetRunning(c *Context, running bool) {
+    datastore.RunInTransaction(c.GAEContext, func(x appengine.Context) error {
+        g := LoadGame(c)
+        g.GameRunning = running;
+        g.Save(c)
+        return nil // TODO
+    }, nil)
 }

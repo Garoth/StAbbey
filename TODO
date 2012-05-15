@@ -1,0 +1,2 @@
+* Hide "Save" function of various objects, and provide functions to atomically
+  alter the objects safely in the database

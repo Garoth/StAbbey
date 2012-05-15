@@ -2,6 +2,7 @@ package stabbey
 
 import (
     "fmt"
+    "strconv"
     "net/http"
     "html/template"
     "appengine"
@@ -16,13 +17,13 @@ type MainTemplate struct {
 
 /* Configures what virtual urls map to what functions */
 func init() {
-    http.HandleFunc("/", initSetup)
-    http.HandleFunc("/connect", connectSetup)
-    http.HandleFunc("/update", updateRequest)
+    http.HandleFunc("/", InitSetup)
+    http.HandleFunc("/connect", ConnectSetup)
+    http.HandleFunc("/update", UpdateRequest)
 }
 
 /* Serves the new game / connect page */
-func initSetup(w http.ResponseWriter, r *http.Request) {
+func InitSetup(w http.ResponseWriter, r *http.Request) {
     context := appengine.NewContext(r)
 
     setupTemplate, _ := template.ParseFiles("setup.html")
@@ -32,7 +33,7 @@ func initSetup(w http.ResponseWriter, r *http.Request) {
 }
 
 /* Creates game if necessary, connects players to it */
-func connectSetup(w http.ResponseWriter, r *http.Request) {
+func ConnectSetup(w http.ResponseWriter, r *http.Request) {
     c       := NewContext(appengine.NewContext(r), r.FormValue("gamekey"))
     newgame := c.Gamekey == ""
     game    := NewGame()
@@ -61,11 +62,10 @@ func connectSetup(w http.ResponseWriter, r *http.Request) {
 }
 
 /* Replies to the clients' update requests by resending the game state */
-func updateRequest(w http.ResponseWriter, r *http.Request) {
+// TODO validate client input here
+func UpdateRequest(w http.ResponseWriter, r *http.Request) {
     c := NewContext(appengine.NewContext(r), r.FormValue("gamekey"))
-    game := LoadGame(c)
-
-    for _, Id := range game.Players {
-        LoadPlayer(c, Id).SendGamestate(c, game)
-    }
+    ticknum, _ := strconv.Atoi(r.FormValue("ticknum"))
+    PlayerUpdateLastTick(c, r.FormValue("player"), ticknum)
+    RunGame(c)
 }
