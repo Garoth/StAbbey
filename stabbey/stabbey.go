@@ -1,7 +1,6 @@
 package stabbey
 
 import (
-    "fmt"
     "strconv"
     "net/http"
     "html/template"
@@ -40,7 +39,7 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
     player  := NewPlayer(user.Current(c.GAEContext).ID)
 
     if newgame {
-        fmt.Println("Making new game,", c.Gamekey)
+        c.GAEContext.Infof("Making new game, %v", c.Gamekey)
         c.Gamekey = player.Id
         game.AddPlayer(player)
         board := NewBoard(0)
@@ -48,14 +47,14 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
         game.AddBoard(board)
         game.Save(c)
     } else {
-        fmt.Println("Game exists, adding player", player.Id)
+        c.GAEContext.Infof("Game exists, adding player %v", player.Id)
         game := LoadGame(c);
         game.AddPlayer(player)
         game.Save(c)
     }
 
     player.Save(c)
-    tok, _ := player.OpenChannel(c)
+    tok, _ := player.ChannelOpen(c)
 
     mainTemplate, _ := template.ParseFiles("main.html")
     mainTemplate.Execute(w, MainTemplate{player.Id, tok, c.Gamekey})

@@ -32,7 +32,7 @@ func RunGame(c *Context) {
             GameUpdateLastTick(c)
             game := LoadGame(c)
             for _, playerID := range game.Players {
-                LoadPlayer(c, playerID).SendGamestate(c, game);
+                LoadPlayer(c, playerID).ChannelSendGame(c, game);
             }
         }
 

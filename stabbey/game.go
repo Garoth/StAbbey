@@ -14,13 +14,6 @@ type Game struct {
     GameRunning bool
 }
 
-/* Object used for JSON serialization */
-type jsonGame struct {
-    Players []*Player
-    Boards []*Board
-    LastTick int
-}
-
 func NewGame() *Game {
     g := &Game{}
     g.LastTick = 0
@@ -68,21 +61,9 @@ func (game *Game) Save(c *Context) error {
 }
 
 /* Gets the JSON gamestate for the given player's perspective */
-func (game *Game) JSONGamestate(c *Context, p *Player) string {
-    jg := jsonGame{};
-
-    for _, ID := range game.Players {
-        jg.Players = append(jg.Players, LoadPlayer(c, ID))
-    }
-
-    for _, ID := range game.Boards {
-        jg.Boards = append(jg.Boards, LoadBoard(c, string(ID)))
-    }
-
-    jg.LastTick = game.LastTick
-
-    b, _ := json.Marshal(jg)
-
+func (game *Game) JSON(c *Context, p *Player) string {
+    sg := NewSerializableGame(c, game)
+    b, _ := json.Marshal(sg)
     return string(b)
 }
 
