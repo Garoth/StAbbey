@@ -37,18 +37,18 @@ func LoadBoard(c *Context, level string) *Board {
 }
 
 func (b *Board) MakeTestBoard() {
-    b.Layer0 = "xxxxxxxxxxxxxxxx" +
-               "x  x           x" +
-               "x  x           x" +
-               "x  x           x" +
-               "x  x xxxxxxxxxxx" +
-               "x              x" +
-               "x              x" +
-               "xxxxxxxxxxxxx  x" +
-               "x              x" +
-               "x           x  x" +
-               "x           x  x" +
-               "xxxxxxxxxxxxxxxx"
+    b.Layer0 = "L--------------L" +
+               "|  |           |" +
+               "|  |           |" +
+               "|  |           |" +
+               "|  | ----------|" +
+               "|              |" +
+               "|              |" +
+               "|-----------L  |" +
+               "|           |  |" +
+               "|              |" +
+               "|           |  |" +
+               "L--------------L"
 }
 
 /* Save the board to the database */
