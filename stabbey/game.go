@@ -9,7 +9,7 @@ import (
 /* Internal, GAE struct for database storing */
 type Game struct {
     Players []string
-    Boards []int
+    Boards []string
     LastTick int
     GameRunning bool
 }

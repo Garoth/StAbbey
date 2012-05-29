@@ -42,8 +42,7 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
         c.GAEContext.Infof("Making new game, %v", c.Gamekey)
         c.Gamekey = player.Id
         game.AddPlayer(player)
-        board := NewBoard(0)
-        board.Save(c)
+        board := NewBoard(c, "0")
         game.AddBoard(board)
         game.Save(c)
     } else {

@@ -5,7 +5,7 @@ import (
 
 type SerializableBoard struct {
     /* Unique game level number (i.e. floor number) */
-    Id int
+    Id string
     /* Rendering layers of the map, going up in z-index */
     Layers [BOARD_NUM_LAYERS][BOARD_HEIGHT]string
 }
