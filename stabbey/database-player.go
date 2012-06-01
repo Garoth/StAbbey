@@ -7,7 +7,7 @@ import (
 
 type DatabasePlayer struct {
     /* Player Data */
-    Id string
+    Id int
     LastTick int
     LastTickTime time.Time
     /* Entity Data */
@@ -42,14 +42,14 @@ func (dp *DatabasePlayer) Save(c *Context) error {
     return e;
 }
 
-func LoadDatabasePlayer(c *Context, id string) *DatabasePlayer {
+func LoadDatabasePlayer(c *Context, id int) *DatabasePlayer {
     dp := &DatabasePlayer{}
     e := datastore.Get(c.GAEContext, GetPlayerKey(c, id), dp)
 
     if e != nil {
         c.GAEContext.Errorf("Error loading Player: %v", e)
     } else {
-        //c.GAEContext.Infof("Successfully loaded player %v", id)
+        c.GAEContext.Infof("Successfully loaded player %v", id)
     }
 
     return dp;

@@ -4,26 +4,29 @@ import (
     "appengine"
     "appengine/channel"
     "appengine/datastore"
+    "strconv"
     "time"
 )
 
 type Player struct {
     EntityPosition
-    Id string
+    Id int
     LastTick int
     LastTickTime time.Time
 }
 
-func NewPlayer(id string) *Player {
+func NewPlayer(c *Context, id int) *Player {
     p := &Player{}
     p.Id = id
     p.Name = "NONAME"
     p.LastTick = -1
     p.LastTickTime = time.Unix(0, 0)
     p.BoardId = -1
+    p.Save(c)
     return p
 }
 
+/* Creates a player object based on a database player object */
 func NewPlayerFromDatabase(dp *DatabasePlayer) *Player {
     p := &Player{}
 
@@ -39,13 +42,15 @@ func NewPlayerFromDatabase(dp *DatabasePlayer) *Player {
     return p
 }
 
-func LoadPlayer(c *Context, id string) *Player {
+/* Loads the given player from the database */
+func LoadPlayer(c *Context, id int) *Player {
     return NewPlayerFromDatabase(LoadDatabasePlayer(c, id));
 }
 
 /* Returns the database key for the player */
-func GetPlayerKey(c *Context, id string) *datastore.Key {
-    return datastore.NewKey(c.GAEContext, "Player" + id, c.Gamekey, 0, nil)
+func GetPlayerKey(c *Context, id int) *datastore.Key {
+    return datastore.NewKey(c.GAEContext, "Player" + strconv.Itoa(id),
+        c.Gamekey, 0, nil)
 }
 
 /* Save the player to the database */
@@ -54,8 +59,15 @@ func (p *Player) Save(c *Context) error {
     return dp.Save(c)
 }
 
+/* Checks to see if two players are equal */
+func (p *Player) Equals(p2 *Player) bool {
+    return p.Id == p2.Id || p.LastTick == p2.LastTick ||
+        p.EntityId == p2.EntityId || p.BoardId == p2.BoardId ||
+        p.X == p2.X || p.Y == p2.Y || p.Name == p2.Name
+}
+
 /* Updates last tick */
-func PlayerUpdateLastTick(c *Context, id string, newtick int) {
+func PlayerUpdateLastTick(c *Context, id int, newtick int) {
     datastore.RunInTransaction(c.GAEContext, func(x appengine.Context) error {
         p := LoadPlayer(c, id)
         p.LastTick = newtick
@@ -71,7 +83,7 @@ func PlayerUpdateLastTick(c *Context, id string, newtick int) {
 
 /* Returns the key for the JS communication channel */
 func (p *Player) getChannelKey(c *Context) string {
-    return p.Id + "/" + c.Gamekey
+    return strconv.Itoa(p.Id) + "/" + c.Gamekey
 }
 
 /* Opens the communications channel to the the JS client */

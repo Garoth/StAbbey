@@ -9,7 +9,7 @@ import (
 )
 
 type MainTemplate struct {
-    Me string
+    Me int
     Token string
     Gamekey string
 }
@@ -19,6 +19,7 @@ func init() {
     http.HandleFunc("/", InitSetup)
     http.HandleFunc("/connect", ConnectSetup)
     http.HandleFunc("/update", UpdateRequest)
+    http.HandleFunc("/tests", RunTests)
 }
 
 /* Serves the new game / connect page */
@@ -33,30 +34,27 @@ func InitSetup(w http.ResponseWriter, r *http.Request) {
 
 /* Creates game if necessary, connects players to it */
 func ConnectSetup(w http.ResponseWriter, r *http.Request) {
-    c       := NewContext(appengine.NewContext(r), r.FormValue("gamekey"))
+    c := NewContext(appengine.NewContext(r), r.FormValue("gamekey"))
     newgame := c.Gamekey == ""
-    game    := NewGame()
-    player  := NewPlayer(user.Current(c.GAEContext).ID)
+    playerId, _ := strconv.Atoi(user.Current(c.GAEContext).ID[0:9])
 
     if newgame {
-        c.GAEContext.Infof("Making new game, %v", c.Gamekey)
-        c.Gamekey = player.Id
-        game.AddPlayer(player)
-        board := NewBoard(c, "0")
-        game.AddBoard(board)
-        game.Save(c)
+        c.Gamekey = strconv.Itoa(playerId)
+        player := NewPlayer(c, playerId)
+        NewGame(c)
+        GameAddPlayer(c, player)
+        GameAddBoard(c, NewBoard(c, 0))
+        tok, _ := player.ChannelOpen(c)
+        mainTemplate, _ := template.ParseFiles("main.html")
+        mainTemplate.Execute(w, MainTemplate{player.Id, tok, c.Gamekey})
     } else {
+        player := NewPlayer(c, playerId)
         c.GAEContext.Infof("Game exists, adding player %v", player.Id)
-        game := LoadGame(c);
-        game.AddPlayer(player)
-        game.Save(c)
+        GameAddPlayer(c, player)
+        tok, _ := player.ChannelOpen(c)
+        mainTemplate, _ := template.ParseFiles("main.html")
+        mainTemplate.Execute(w, MainTemplate{player.Id, tok, c.Gamekey})
     }
-
-    player.Save(c)
-    tok, _ := player.ChannelOpen(c)
-
-    mainTemplate, _ := template.ParseFiles("main.html")
-    mainTemplate.Execute(w, MainTemplate{player.Id, tok, c.Gamekey})
 }
 
 /* Replies to the clients' update requests by resending the game state */
@@ -64,6 +62,13 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
 func UpdateRequest(w http.ResponseWriter, r *http.Request) {
     c := NewContext(appengine.NewContext(r), r.FormValue("gamekey"))
     ticknum, _ := strconv.Atoi(r.FormValue("ticknum"))
-    PlayerUpdateLastTick(c, r.FormValue("player"), ticknum)
+    playerId, _ := strconv.Atoi(r.FormValue("player"))
+    PlayerUpdateLastTick(c, playerId, ticknum)
     RunGame(c)
+}
+
+/* Runs unit tests */
+func RunTests(w http.ResponseWriter, r *http.Request) {
+    c := NewContext(appengine.NewContext(r), "TEST")
+    RunPlayerTests(c)
 }

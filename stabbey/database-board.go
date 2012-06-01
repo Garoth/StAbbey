@@ -5,7 +5,7 @@ import (
 )
 
 type DatabaseBoard struct {
-    Id string
+    Id int
     Layer0, Layer1, Layer2, Layer3, Layer4, Layer5, Layer6, Layer7 string
 }
 
@@ -26,18 +26,18 @@ func NewDatabaseBoard(b *Board) *DatabaseBoard {
 }
 
 func (db *DatabaseBoard) Save(c *Context) error {
-    _, e := datastore.Put(c.GAEContext, GetBoardKey(c, string(db.Id)), db)
+    _, e := datastore.Put(c.GAEContext, GetBoardKey(c, db.Id), db)
 
     if e != nil {
         c.GAEContext.Errorf("Error saving Board: %v", e)
     } else {
-        c.GAEContext.Infof("Successfully saved board %d", db.Id)
+        c.GAEContext.Infof("Successfully saved board %v", db.Id)
     }
 
     return e;
 }
 
-func LoadDatabaseBoard(c *Context, id string) *DatabaseBoard {
+func LoadDatabaseBoard(c *Context, id int) *DatabaseBoard {
     db := &DatabaseBoard{}
     e := datastore.Get(c.GAEContext, GetBoardKey(c, id), db)
 

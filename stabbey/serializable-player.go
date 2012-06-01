@@ -5,7 +5,7 @@ import (
 
 type SerializablePlayer struct {
     /* Player Data */
-    Id string
+    Id int
     /* Entity Data */
     EntityId, X, Y int
     Name string

@@ -18,7 +18,7 @@ func NewSerializableGame(c *Context, game *Game) *SerializableGame {
     }
 
     for _, ID := range game.Boards {
-        sg.Boards = append(sg.Boards, NewSerializableBoard(LoadBoard(c, string(ID))))
+        sg.Boards = append(sg.Boards, NewSerializableBoard(LoadBoard(c, ID)))
     }
 
     sg.LastTick = game.LastTick

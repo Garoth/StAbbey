@@ -1,2 +1,1 @@
-* Hide "Save" function of various objects, and provide functions to atomically
-  alter the objects safely in the database
+* Make per-game player ids just 0, 1, 2, ... & do something similar with gamekeys

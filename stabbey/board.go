@@ -1,23 +1,23 @@
 package stabbey
 
 import (
-    "appengine"
     "appengine/datastore"
+    "strconv"
 )
 
 type Board struct {
     /* Unique game level number (i.e. floor number) */
-    Id string
+    Id int
     /* Rendering layers of the map, going up in z-index */
     Layer0, Layer1, Layer2, Layer3, Layer4, Layer5, Layer6, Layer7 string
 }
 
 /* Creates a brand new board, for level "id" -- 0, 1, 2, etc */
-func NewBoard(c *Context, id string) *Board {
+func NewBoard(c *Context, id int) *Board {
     b := &Board{}
     b.Id = id
+    b.MakeTestBoard()
     NewDatabaseBoard(b).Save(c)
-    b.MakeTestBoard(c, string(id))
     return b
 }
 
@@ -38,8 +38,8 @@ func NewBoardFromDatabase(db *DatabaseBoard) *Board {
 }
 
 /* Returns the database key for the board */
-func GetBoardKey(c *Context, boardId string) *datastore.Key {
-    return datastore.NewKey(c.GAEContext, "Board" + boardId,
+func GetBoardKey(c *Context, boardId int) *datastore.Key {
+    return datastore.NewKey(c.GAEContext, "Board" + strconv.Itoa(boardId),
         c.Gamekey, 0, nil)
 }
 
@@ -49,26 +49,22 @@ func (b *Board) Save(c *Context) error {
 }
 
 /* Load a board from the database -- by level id: 0, 1, 2, 3, etc */
-func LoadBoard(c *Context, id string) *Board {
+func LoadBoard(c *Context, id int) *Board {
     return NewBoardFromDatabase(LoadDatabaseBoard(c, id))
 }
 
-func (b *Board) MakeTestBoard(c *Context, id string) {
-    datastore.RunInTransaction(c.GAEContext, func(x appengine.Context) error {
-        b := LoadBoard(c, id)
-        b.Layer0 = "L--------------L" +
-                   "|  |           |" +
-                   "|  |           |" +
-                   "|  |           |" +
-                   "|  | ----------|" +
-                   "|              |" +
-                   "|              |" +
-                   "|-----------L  |" +
-                   "|           |  |" +
-                   "|              |" +
-                   "|           |  |" +
-                   "L--------------L"
-        b.Save(c)
-        return nil // TODO
-    }, nil)
+/* Creates a static board for testing */
+func (b *Board) MakeTestBoard() {
+    b.Layer0 = "L--------------L" +
+               "|  |           |" +
+               "|  |           |" +
+               "|  |           |" +
+               "|  | ----------|" +
+               "|              |" +
+               "|              |" +
+               "|-----------L  |" +
+               "|           |  |" +
+               "|              |" +
+               "|           |  |" +
+               "L--------------L"
 }
