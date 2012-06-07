@@ -6,7 +6,6 @@ import (
     "encoding/json"
 )
 
-/* Internal, GAE struct for database storing */
 type Game struct {
     Players []int
     Boards []int

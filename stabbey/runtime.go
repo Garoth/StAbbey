@@ -6,11 +6,34 @@ import (
     "appengine/datastore"
 )
 
+func Move(c *Context, entity Entity, command string) {
+    bid, x, y := entity.GetPosition()
+    if command == "mr" {
+        entity.SetPosition(bid, x + 1, y)
+    } else if command == "ml" {
+        entity.SetPosition(bid, x - 1, y)
+    } else if command == "mu" {
+        entity.SetPosition(bid, x, y - 1)
+    } else if command == "md" {
+        entity.SetPosition(bid, x, y + 1)
+    }
+}
+
 /* THIS IS THE MAIN ENTRY POINT FOR THE RUNNING GAME
  * This function will update the game state as per the
  * game mechanics, update objects, tell clients about updates, etc.
  */
-func RunGame(c *Context) {
+func RunGame(c *Context, commandcode, playerId, ticknum int, queue []string) {
+
+    if commandcode == 1 {
+        PlayerUpdateLastTick(c, playerId, ticknum)
+    } else if commandcode == 2 {
+        // TODO figure out how to run this in a transaction well
+        p := LoadPlayer(c, playerId)
+        Move(c, p, queue[0])
+        p.Save(c);
+    }
+
     everyone_up_to_date := true
 
     datastore.RunInTransaction(c.GAEContext, func(x appengine.Context) error {

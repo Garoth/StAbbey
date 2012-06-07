@@ -34,10 +34,10 @@ func (ep *EntityPosition) GetName() string {
     return ep.Name
 }
 
-func (ep *EntityPosition) SetEntityID(id int) {
+func (ep *EntityPosition) SetEntityId(id int) {
     ep.EntityId = id
 }
 
-func (ep *EntityPosition) GetEntityID() int {
+func (ep *EntityPosition) GetEntityId() int {
     return ep.EntityId
 }

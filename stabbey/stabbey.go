@@ -2,10 +2,10 @@ package stabbey
 
 import (
     "strconv"
+    "strings"
     "net/http"
     "html/template"
     "appengine"
-    "appengine/user"
 )
 
 type MainTemplate struct {
@@ -22,6 +22,12 @@ func init() {
     http.HandleFunc("/tests", RunTests)
 }
 
+/* Runs unit tests */
+func RunTests(w http.ResponseWriter, r *http.Request) {
+    c := NewContext(appengine.NewContext(r), "TEST")
+    RunPlayerTests(c)
+}
+
 /* Serves the new game / connect page */
 func InitSetup(w http.ResponseWriter, r *http.Request) {
     context := appengine.NewContext(r)
@@ -36,19 +42,23 @@ func InitSetup(w http.ResponseWriter, r *http.Request) {
 func ConnectSetup(w http.ResponseWriter, r *http.Request) {
     c := NewContext(appengine.NewContext(r), r.FormValue("gamekey"))
     newgame := c.Gamekey == ""
-    playerId, _ := strconv.Atoi(user.Current(c.GAEContext).ID[0:9])
 
     if newgame {
-        c.Gamekey = strconv.Itoa(playerId)
-        player := NewPlayer(c, playerId)
+        c.Gamekey = "0" // Temporary gamekey, should be changed immediately
+        GetUidGenerator(c, UID_GENERATOR_GAME)
+        c.Gamekey = strconv.Itoa(UidGeneratorGetUid(c, UID_GENERATOR_GAME))
+        NewUidGenerator(c, UID_GENERATOR_PLAYER)
+        player := NewPlayer(c, UidGeneratorGetUid(c, UID_GENERATOR_PLAYER))
+
         NewGame(c)
         GameAddPlayer(c, player)
         GameAddBoard(c, NewBoard(c, 0))
+
         tok, _ := player.ChannelOpen(c)
         mainTemplate, _ := template.ParseFiles("main.html")
         mainTemplate.Execute(w, MainTemplate{player.Id, tok, c.Gamekey})
     } else {
-        player := NewPlayer(c, playerId)
+        player := NewPlayer(c, UidGeneratorGetUid(c, UID_GENERATOR_PLAYER))
         c.GAEContext.Infof("Game exists, adding player %v", player.Id)
         GameAddPlayer(c, player)
         tok, _ := player.ChannelOpen(c)
@@ -61,14 +71,10 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
 // TODO validate client input here
 func UpdateRequest(w http.ResponseWriter, r *http.Request) {
     c := NewContext(appengine.NewContext(r), r.FormValue("gamekey"))
+    // TODO validate ints
     ticknum, _ := strconv.Atoi(r.FormValue("ticknum"))
     playerId, _ := strconv.Atoi(r.FormValue("player"))
-    PlayerUpdateLastTick(c, playerId, ticknum)
-    RunGame(c)
-}
-
-/* Runs unit tests */
-func RunTests(w http.ResponseWriter, r *http.Request) {
-    c := NewContext(appengine.NewContext(r), "TEST")
-    RunPlayerTests(c)
+    commandcode, _ := strconv.Atoi(r.FormValue("commandcode"))
+    queue := strings.Split(r.FormValue("queue"), "-")
+    RunGame(c, commandcode, playerId, ticknum, queue)
 }
