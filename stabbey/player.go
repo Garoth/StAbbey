@@ -9,7 +9,7 @@ import (
 )
 
 type Player struct {
-    EntityPosition
+    EntityStruct
     Id int
     LastTick int
     LastTickTime time.Time
@@ -22,6 +22,9 @@ func NewPlayer(c *Context, id int) *Player {
     p.LastTick = -1
     p.LastTickTime = time.Unix(0, 0)
     p.BoardId = -1
+    p.SetEntityId(UidGeneratorGetUid(c, UID_GENERATOR_ENTITY))
+    p.SetType(ENTITY_TYPE_PLAYER)
+    p.EntityStruct.Save(c)
     p.Save(c)
     return p
 }

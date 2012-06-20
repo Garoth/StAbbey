@@ -9,6 +9,7 @@ import (
 type Game struct {
     Players []int
     Boards []int
+    Entities []int
     LastTick int
     GameRunning bool
 }
@@ -19,7 +20,7 @@ func NewGame(c *Context) *Game {
     g := &Game{}
     g.LastTick = 0
     g.GameRunning = false
-    g.Save(c);
+    g.Save(c)
     return g
 }
 
@@ -34,6 +35,9 @@ func NewGameFromDatabase(dg *DatabaseGame) *Game {
     }
     for _, board := range(dg.Boards) {
         g.Boards = append(g.Boards, board)
+    }
+    for _, entity := range(dg.Entities) {
+        g.Entities = append(g.Entities, entity)
     }
 
     return g
@@ -54,6 +58,16 @@ func LoadGame(c *Context) *Game {
     return NewGameFromDatabase(LoadDatabaseGame(c))
 }
 
+/* Adds an entity to the current game (includes players) */
+func GameAddEntity(c *Context, e Entity) {
+    datastore.RunInTransaction(c.GAEContext, func(x appengine.Context) error {
+        g := LoadGame(c)
+        g.Entities = append(g.Entities, e.GetEntityId())
+        g.Save(c)
+        return nil // TODO
+    }, nil)
+}
+
 /* Adds a player to the current game. Call once per player per game */
 func GameAddPlayer(c *Context, p *Player) {
     datastore.RunInTransaction(c.GAEContext, func(x appengine.Context) error {
@@ -62,6 +76,8 @@ func GameAddPlayer(c *Context, p *Player) {
         g.Save(c)
         return nil // TODO
     }, nil)
+
+    GameAddEntity(c, p);
 }
 
 /* Adds a board to the current game. Call once per board per game */

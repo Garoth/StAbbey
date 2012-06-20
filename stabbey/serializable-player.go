@@ -7,7 +7,7 @@ type SerializablePlayer struct {
     /* Player Data */
     Id int
     /* Entity Data */
-    EntityId, X, Y int
+    EntityId int
     Name string
 }
 
@@ -16,8 +16,6 @@ func NewSerializablePlayer(p *Player) *SerializablePlayer {
 
     sp.Id = p.Id
     sp.EntityId = p.EntityId
-    sp.X = p.X
-    sp.Y = p.Y
     sp.Name = p.Name
 
     return sp

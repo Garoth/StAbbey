@@ -31,6 +31,7 @@ func RunGame(c *Context, commandcode, playerId, ticknum int, queue []string) {
         // TODO figure out how to run this in a transaction well
         p := LoadPlayer(c, playerId)
         Move(c, p, queue[0])
+        p.EntityStruct.Save(c);
         p.Save(c);
     }
 
@@ -51,9 +52,9 @@ func RunGame(c *Context, commandcode, playerId, ticknum int, queue []string) {
 
     datastore.RunInTransaction(c.GAEContext, func(x appengine.Context) error {
         if everyone_up_to_date {
-            fmt.Println("Everyone's up to date, send next tick")
             GameUpdateLastTick(c)
             game := LoadGame(c)
+            fmt.Println("Everyone's up to date, send next tick", game.LastTick)
             for _, playerID := range game.Players {
                 LoadPlayer(c, playerID).ChannelSendGame(c, game);
             }

@@ -7,6 +7,7 @@ import (
 type DatabaseGame struct {
     Players []int
     Boards []int
+    Entities []int
     LastTick int
     GameRunning bool
 }
@@ -21,6 +22,9 @@ func NewDatabaseGame(g *Game) *DatabaseGame {
     }
     for _, board := range(g.Boards) {
         dg.Boards = append(dg.Boards, board)
+    }
+    for _, entity := range(g.Entities) {
+        dg.Entities = append(dg.Entities, entity)
     }
 
     return dg

@@ -47,7 +47,9 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
         c.Gamekey = "0" // Temporary gamekey, should be changed immediately
         GetUidGenerator(c, UID_GENERATOR_GAME)
         c.Gamekey = strconv.Itoa(UidGeneratorGetUid(c, UID_GENERATOR_GAME))
+        // Creating a new uid generator resets it, since we want per-game gens
         NewUidGenerator(c, UID_GENERATOR_PLAYER)
+        NewUidGenerator(c, UID_GENERATOR_ENTITY)
         player := NewPlayer(c, UidGeneratorGetUid(c, UID_GENERATOR_PLAYER))
 
         NewGame(c)

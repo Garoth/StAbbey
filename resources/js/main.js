@@ -22,7 +22,7 @@ socketMessaged = function(msg) {
   RESPONSE_TICK_NUM = jsObj.LastTick;
 
   entLayer = jsObj.Boards[0].Layers[0];
-  $.each(jsObj.Players, function(index, player) {
+  $.each(jsObj.Entities, function(index, player) {
     console.log("Player with " + player.Y + " " + player.X)
     entLayer[player.Y] = entLayer[player.Y].substr(0, player.X) + 'X' + entLayer[player.Y].substr(player.X + 1)
   });
