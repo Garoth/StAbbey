@@ -24,7 +24,8 @@ socketMessaged = function(msg) {
   entLayer = jsObj.Boards[0].Layers[0];
   $.each(jsObj.Entities, function(index, player) {
     console.log("Player with " + player.Y + " " + player.X)
-    entLayer[player.Y] = entLayer[player.Y].substr(0, player.X) + 'X' + entLayer[player.Y].substr(player.X + 1)
+    entLayer[player.Y] = entLayer[player.Y].substr(0, player.X) +
+      'X' + entLayer[player.Y].substr(player.X + 1)
   });
   $("#board").html(entLayer.join("<br/>"));
 }
@@ -32,23 +33,9 @@ socketMessaged = function(msg) {
 
 /* Send any message to the server */
 sendMessage = function(path, urlvars) {
-  urlvars.gamekey = gamekey;
-  urlvars.player = me;
-  var first = true
-  for (var variable in urlvars) {
-    if (first === true) {
-      path += "?";
-      first = false
-    } else {
-      path += "&";
-    }
-    path += variable + "=" + urlvars[variable];
-  }
-
-  var xhr = new XMLHttpRequest();
-  console.log("Sending message: " + path);
-  xhr.open("POST", path, true);
-  xhr.send();
+  urlvars.Gamekey = gamekey;
+  urlvars.Player = me;
+  conn.send(JSON.stringify(urlvars))
 }
 
 /* Send an order to the server */
@@ -94,12 +81,12 @@ COMMANDS = function() {
 
   /* Tells the server that client is ready to start the game */
   me.startGame = function() {
-    return { commandcode: START_GAME }
+    return { CommandCode: START_GAME }
   };
 
   /* Tells the server the client's current tick */
   me.tick = function(tick) {
-    return { commandcode: UPDATE_TICK, ticknum: tick };
+    return { CommandCode: UPDATE_TICK, ticknum: tick };
   };
 
   /* Overwrites the player's actions
@@ -107,7 +94,7 @@ COMMANDS = function() {
    * queue: array of command codes
    */
   me.queueActions = function(queue, tick) {
-    return { commandcode: SEND_QUEUE, queue: queue.join("-"), ticknum: tick };
+    return { CommandCode: SEND_QUEUE, queue: queue.join("-"), ticknum: tick };
   };
 
   return me;
@@ -128,7 +115,7 @@ $(function() {
   $("#start").click(function() {
     console.log("Trying to send message");
     sendCommand(COMMANDS.startGame())
-    tick();
+    //tick();
   });
 
   $("#move-right").click(function() {

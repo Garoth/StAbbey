@@ -1,9 +1,8 @@
 <html>
     <head>
         <title>Stabby UI</title>
-        <script src="/resources/js/jquery.1.7.1.min.js"></script>
-        <script src="/_ah/channel/jsapi"></script>
-        <script src="/resources/js/main.js"></script>
+        <script type="text/javascript" src="/resources/js/jquery.1.7.1.min.js"></script>
+        <script type="text/javascript" src="/resources/js/main.js"></script>
     </head>
     <body>
         <div id="board" style="font-family: monospace; margin: 8px;">
@@ -17,19 +16,21 @@
 
         <script>
             me = "{{.Me}}";
-            token = "{{.Token}}";
             gamekey = "{{.Gamekey}}";
+            websocket_path = "{{.Host}}";
 
             console.log("me: " + me);
-            console.log("token: " + token);
             console.log("gamekey: " + gamekey);
+            console.log("websocket: " + websocket_path);
 
-            channel = new goog.appengine.Channel(token);
-            socket = channel.open();
-            socket.onopen = socketOpened;
-            socket.onclosed = socketClosed;
-            socket.onerror = socketErrored;
-            socket.onmessage = socketMessaged;
+            if (window["WebSocket"] == null) {
+                console.log("Err: Your browser doesn't support WebSockets");
+                return
+            }
+
+            conn = new WebSocket(websocket_path);
+            conn.onclose = socketClosed;
+            conn.onmessage = socketMessaged;
         </script>
     </body>
 </html>

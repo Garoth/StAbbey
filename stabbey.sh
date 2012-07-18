@@ -1,6 +1,9 @@
 #!/bin/bash
 # Rebuilds & runs the server
 
+# TODO Figure out a good way to install dependencies with go get. Deps:
+#      - code.google.com/p/go.net/websocket
+
 export GOPATH="$(pwd)"
 export MYNAME="$0"
 
@@ -43,6 +46,7 @@ elif [[ "$1" == "runloop" ]]; then
         if [[ "$?" -ne "0" ]]; then
             break
         fi
+        sleep 1
     done
 elif [[ "$1" == "clean" ]]; then
     stabbey_clean

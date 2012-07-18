@@ -2,7 +2,8 @@ How To Run The Stabbey Server
 =============================
 
 1) ./stabbey.sh run
-2) Be happy that you can now get to work and not fuck around with the build
+2) Point your browser at localhost:8080
+3) Be happy that you can now get to work and not fuck around with the build
    system for 30 minutes.
 
 (View advanced options by typing ./stabbey.sh)
