@@ -1,11 +1,8 @@
-Running Test Server
-===================
+How To Run The Stabbey Server
+=============================
 
-1. Download the GoogleAppEngine development server stuff.
-https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Go
+1) ./stabbey.sh run
+2) Be happy that you can now get to work and not fuck around with the build
+   system for 30 minutes.
 
-2. Put it dev_appserver.py in your PATH
-
-3. Run ```dev_appserver.py .'''
-
-4. Connect to localhost:8080
+(View advanced options by typing ./stabbey.sh)
