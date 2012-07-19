@@ -1,7 +1,6 @@
 package uidgenerator
 
 type UidGenerator struct {
-    /* Communications Channel */
     channel chan int
 }
 
