@@ -117,14 +117,13 @@ func WebSocketConnect(ws *websocket.Conn) {
 
 /* Keep the player's websocket alive and continue reading from it forever */
 func KeepReading(p interfaces.Player, ws *websocket.Conn) {
-    playerOrder := struct {
-        CommandCode int
-        TickNum int
-        Queue []string
-    }{}
-
     for {
         var message string
+        playerOrder := struct {
+            CommandCode int
+            TickNum int
+            Queue []string
+        }{}
 
         if e := websocket.Message.Receive(ws, &message); e != nil {
             break
