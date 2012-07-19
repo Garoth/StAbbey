@@ -7,9 +7,9 @@ import (
 )
 
 type Game struct {
-    Players []interfaces.Player
-    //Boards []*Board
-    //Entities []Entity
+    Players map[int] interfaces.Player
+    Boards map[int] interfaces.Board
+    Entities map[int] interfaces.Entity
     LastTick int
     GameRunning bool
     Gamekey string
@@ -20,31 +20,42 @@ func NewGame(gamekey string) *Game {
     g := &Game{}
     g.GameRunning = false
     g.Gamekey = gamekey
+    g.Players = make(map[int] interfaces.Player, 10)
+    g.Boards = make(map[int] interfaces.Board, 10)
+    g.Entities = make(map[int] interfaces.Entity, 100)
     return g
 }
 
-func (game *Game) AddPlayer(player interfaces.Player) {
-    game.Players = append(game.Players, player)
+func (g *Game) AddPlayer(player interfaces.Player) {
+    g.Players[player.GetPlayerId()] = player
 }
 
-func (game *Game) GetPlayer(id int) interfaces.Player {
-    for _, player := range game.Players {
-        if (player.GetPlayerId() == id) {
-            return player
-        }
-    }
-    return nil;
+func (g *Game) GetPlayer(id int) interfaces.Player {
+    return g.Players[id]
+}
+
+func (g *Game) AddBoard(board interfaces.Board) {
+    g.Boards[board.GetLevel()] = board
+}
+
+func (g *Game) GetBoard(level int) interfaces.Board {
+    return g.Boards[level]
+}
+
+func (g *Game) AddEntity(entity interfaces.Entity) {
+    g.Entities[entity.GetEntityId()] = entity
+}
+
+func (g *Game) GetEntity(entid int) interfaces.Entity {
+    return g.Entities[entid]
 }
 
 /* Generates the gamestate for the given player's perspective */
-func (game *Game) Json(playerId int) string {
-    for _, player := range game.Players {
-        log.Printf("Player: %v", player.GetPlayerId())
-    }
-    util.Stub("game.Json")
-    return "";
+func (g *Game) Json(playerId int) string {
+    util.Stub("g.Json")
+    return ""
 }
 
-func (game *Game) Run() {
-    log.Printf("Game %v running", game.Gamekey)
+func (g *Game) Run() {
+    log.Printf("Game %v running", g.Gamekey)
 }
