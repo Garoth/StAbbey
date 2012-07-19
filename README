@@ -1,6 +1,7 @@
 How To Run The Stabbey Server
 =============================
 
+0) sudo go get code.google.com/p/go.net/websocket
 1) ./stabbey.sh run
 2) Point your browser at localhost:8080
 3) Be happy that you can now get to work and not fuck around with the build
