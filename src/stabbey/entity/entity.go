@@ -1,7 +1,10 @@
 package entity
 
 import (
+    "stabbey/uidgenerator"
 )
+
+var UIDG = uidgenerator.New();
 
 type Entity struct {
     EntityId, BoardId, X, Y int

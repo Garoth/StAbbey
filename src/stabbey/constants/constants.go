@@ -13,3 +13,6 @@ const FORMVAL_GAMEKEY string = "gamekey"
 const BOARD_WIDTH int        = 16
 const BOARD_HEIGHT int       = 12
 const BOARD_NUM_LAYERS int   = 8
+
+const ENTITY_TYPE_PLAYER     = "player"
+const ENTITY_TYPE_MONSTER    = "monster"

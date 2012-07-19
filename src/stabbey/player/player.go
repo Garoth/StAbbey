@@ -1,16 +1,20 @@
 package player
 
 import (
+    "strconv"
     "time"
 
     "code.google.com/p/go.net/websocket"
 
+    "stabbey/constants"
+    "stabbey/entity"
     "stabbey/uidgenerator"
 )
 
 var uidg = uidgenerator.New();
 
 type Player struct {
+    entity.Entity
     PlayerId int
     PlayerLastTick int
     PlayerLastTickTime time.Time
@@ -18,7 +22,20 @@ type Player struct {
 }
 
 func New() *Player {
-    return &Player{uidg.NextUid(), 0, time.Now(), nil}
+    p := &Player{}
+
+    /* Player stuff */
+    p.SetPlayerId(uidg.NextUid())
+    p.SetLastTickTime(time.Now())
+    p.SetWebSocketConnection(nil)
+
+    /* Entity stuff */
+    p.SetPosition(0, 8, 6)
+    p.SetEntityId(entity.UIDG.NextUid())
+    p.SetType(constants.ENTITY_TYPE_PLAYER)
+    p.SetName("Player" + strconv.Itoa(p.GetPlayerId()))
+
+    return p
 }
 
 func (p *Player) GetPlayerId() int {

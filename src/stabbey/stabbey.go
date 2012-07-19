@@ -66,7 +66,7 @@ func InitSetup(w http.ResponseWriter, req *http.Request) {
 /* Create the game, add players as they join */
 func ConnectSetup(w http.ResponseWriter, r *http.Request) {
     gamekey := r.FormValue(constants.FORMVAL_GAMEKEY)
-    var curPlayer interfaces.Player
+    var curPlayer *player.Player
 
     /* New game! */
     if gamekey == "" && GAME == nil {
@@ -79,6 +79,7 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
 
     curPlayer = player.New()
     GAME.AddPlayer(curPlayer)
+    GAME.AddEntity(curPlayer)
     log.Printf("Added player %v to game", curPlayer.GetPlayerId())
 
     if tmpl, e := template.ParseFiles(constants.FILE_MAIN_HTML); e != nil {
@@ -136,7 +137,7 @@ func KeepReading(p interfaces.Player, ws *websocket.Conn) {
 
             o := order.NewOrder(playerOrder.CommandCode, playerOrder.TickNum,
                 playerOrder.Queue, p)
-            OrderStream <- o
+            ORDER_STREAM <- o
         }
     }
     log.Printf("Closing socket for %v", p.GetPlayerId())

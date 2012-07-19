@@ -1,12 +1,16 @@
-package stabbey
+package serializable
 
-type SerializableEntity struct {
+import (
+    "stabbey/interfaces"
+)
+
+type Entity struct {
     EntityId, BoardId, X, Y int
     Name, Type string
 }
 
-func NewSerializableEntity(e Entity) *SerializableEntity {
-    se := &SerializableEntity{}
+func NewEntity(e interfaces.Entity) *Entity {
+    se := &Entity{}
     se.EntityId = e.GetEntityId();
     se.Name = e.GetName();
     se.Type = e.GetType();

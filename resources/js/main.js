@@ -115,7 +115,7 @@ $(function() {
   $("#start").click(function() {
     console.log("Sending start game message");
     sendMessage(COMMANDS.startGame())
-    //tick();
+    tick();
   });
 
   $("#move-right").click(function() {

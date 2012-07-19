@@ -1,9 +1,11 @@
 package game
 
 import (
+    "encoding/json"
     "log"
+
     "stabbey/interfaces"
-    "stabbey/util"
+    "stabbey/serializable"
 )
 
 type Game struct {
@@ -34,12 +36,20 @@ func (g *Game) GetPlayer(id int) interfaces.Player {
     return g.Players[id]
 }
 
+func (g *Game) GetPlayers() map[int] interfaces.Player {
+    return g.Players
+}
+
 func (g *Game) AddBoard(board interfaces.Board) {
     g.Boards[board.GetLevel()] = board
 }
 
 func (g *Game) GetBoard(level int) interfaces.Board {
     return g.Boards[level]
+}
+
+func (g *Game) GetBoards() map[int] interfaces.Board {
+    return g.Boards
 }
 
 func (g *Game) AddEntity(entity interfaces.Entity) {
@@ -50,10 +60,25 @@ func (g *Game) GetEntity(entid int) interfaces.Entity {
     return g.Entities[entid]
 }
 
+func (g *Game) GetEntities() map[int] interfaces.Entity {
+    return g.Entities
+}
+
+func (g *Game) GetLastTick() int {
+    return g.LastTick
+}
+
+func (g *Game) SetLastTick(tick int) {
+    g.LastTick = tick
+}
+
 /* Generates the gamestate for the given player's perspective */
-func (g *Game) Json(playerId int) string {
-    util.Stub("g.Json")
-    return ""
+func (g *Game) Json(player interfaces.Player) string {
+    b, e := json.Marshal(serializable.NewGame(g))
+    if e != nil {
+        log.Fatalf("Error serializing game: %v", e)
+    }
+    return string(b)
 }
 
 func (g *Game) Run() {
