@@ -13,11 +13,13 @@ import (
     "stabbey/constants"
     "stabbey/game"
     "stabbey/interfaces"
+    "stabbey/order"
     "stabbey/player"
     "stabbey/signalhandlers"
 )
 
 var ADDR = flag.String("addr", ":8080", "http service address")
+/* TODO ok it's not safe to have a global like this */
 var GAME *game.Game
 
 type MainPageTemplate struct {
@@ -26,6 +28,7 @@ type MainPageTemplate struct {
     Host string
 }
 
+/* Start the server and connect url paths to functions */
 func main() {
     flag.Parse()
 
@@ -44,12 +47,13 @@ func main() {
     }
 }
 
+/* Serve javascript files manually in order to set the content type */
 func JavascriptHandler(w http.ResponseWriter, r *http.Request) {
-    /* Serve javascript files manually in order to set the content type */
     w.Header().Set("Content-Type", "text/javascript");
     http.ServeFile(w, r, r.URL.Path[1:])
 }
 
+/* Send the basic page that just has the buttons to start/join games */
 func InitSetup(w http.ResponseWriter, req *http.Request) {
     if tmpl, e := template.ParseFiles(constants.FILE_SETUP_HTML); e != nil {
         log.Fatal("Parse error:", e)
@@ -58,19 +62,22 @@ func InitSetup(w http.ResponseWriter, req *http.Request) {
     }
 }
 
+/* Create the game, add players as they join */
 func ConnectSetup(w http.ResponseWriter, r *http.Request) {
     gamekey := r.FormValue(constants.FORMVAL_GAMEKEY)
-    newgame := gamekey == ""
     var curPlayer interfaces.Player
 
-    if newgame {
+    /* New game! */
+    if gamekey == "" && GAME == nil {
         gamekey = "0"
         GAME = game.NewGame(gamekey)
         GAME.Run();
-        curPlayer = player.New()
-        GAME.AddPlayer(curPlayer)
-    } else {
+        go ProcessOrders();
     }
+
+    curPlayer = player.New()
+    GAME.AddPlayer(curPlayer)
+    log.Printf("Added player %v to game", curPlayer.GetPlayerId())
 
     if tmpl, e := template.ParseFiles(constants.FILE_MAIN_HTML); e != nil {
         log.Fatal("Parse error:", e)
@@ -80,6 +87,7 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
     }
 }
 
+/* Initialize a websocket connection and pair it with the handshaking player */
 func WebSocketConnect(ws *websocket.Conn) {
     websocketConnection := struct {
         CommandCode int
@@ -99,9 +107,40 @@ func WebSocketConnect(ws *websocket.Conn) {
             playerId, _ := strconv.Atoi(websocketConnection.Player)
             p := GAME.GetPlayer(playerId)
             p.SetWebSocketConnection(ws)
+            KeepReading(p, ws)
         }
     }
 }
 
+/* Keep the player's websocket alive and continue reading from it forever */
+func KeepReading(p interfaces.Player, ws *websocket.Conn) {
+    playerOrder := struct {
+        CommandCode int
+        TickNum int
+        Queue []string
+    }{}
+
+    for {
+        var message string
+
+        if e := websocket.Message.Receive(ws, &message); e != nil {
+            break
+        } else {
+            err := json.Unmarshal([]byte(message), &playerOrder)
+            if err != nil {
+                log.Fatalf("Error Decoding Order: %v", e)
+                break
+            }
+
+            o := order.NewOrder(playerOrder.CommandCode, playerOrder.TickNum,
+                playerOrder.Queue, p)
+            OrderStream <- o
+        }
+    }
+    log.Printf("Closing socket for %v", p.GetPlayerId())
+    ws.Close()
+}
+
+/* Runs unit tests (lolno) */
 func RunTests(w http.ResponseWriter, req *http.Request) {
 }

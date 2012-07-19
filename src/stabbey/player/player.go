@@ -5,7 +5,6 @@ import (
 
     "code.google.com/p/go.net/websocket"
 
-    "stabbey/util"
     "stabbey/uidgenerator"
 )
 
@@ -55,5 +54,5 @@ func (p *Player) SetWebSocketConnection(conn *websocket.Conn) {
 }
 
 func (p *Player) SendMessage(json string) {
-    util.Stub("SendMessage")
+    websocket.Message.Send(p.WebSocketConnection, json)
 }

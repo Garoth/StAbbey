@@ -15,9 +15,9 @@
         <div id="move-down">MOVE DOWN</div>
 
         <script>
-            me = "{{.Me}}";
-            gamekey = "{{.Gamekey}}";
-            websocket_path = "{{.Host}}";
+            window.me = "{{.Me}}";
+            window.gamekey = "{{.Gamekey}}";
+            window.websocket_path = "{{.Host}}";
 
             console.log("me: " + me);
             console.log("gamekey: " + gamekey);
@@ -28,8 +28,10 @@
                 return
             }
 
-            conn = new WebSocket(websocket_path);
+            window.conn = new WebSocket(websocket_path);
+            conn.onopen = socketOpened;
             conn.onclose = socketClosed;
+            conn.onerror = socketErrored;
             conn.onmessage = socketMessaged;
         </script>
     </body>
