@@ -37,6 +37,7 @@ func main() {
     go signalhandlers.Quit()
 
     http.HandleFunc("/resources/js/",       JavascriptHandler)
+    http.HandleFunc("/resources/css/",      CssHandler)
     http.HandleFunc(constants.HTTP_ROOT,    InitSetup)
     http.HandleFunc(constants.HTTP_CONNECT, ConnectSetup)
     http.HandleFunc(constants.HTTP_TEST,    RunTests)
@@ -46,12 +47,6 @@ func main() {
     if err := http.ListenAndServe(*ADDR, nil); err != nil {
         log.Fatal("ListenAndServe:", err)
     }
-}
-
-/* Serve javascript files manually in order to set the content type */
-func JavascriptHandler(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "text/javascript");
-    http.ServeFile(w, r, r.URL.Path[1:])
 }
 
 /* Send the basic page that just has the buttons to start/join games */
@@ -145,4 +140,16 @@ func KeepReading(p interfaces.Player, ws *websocket.Conn) {
 
 /* Runs unit tests (lolno) */
 func RunTests(w http.ResponseWriter, req *http.Request) {
+}
+
+/* Serve javascript files manually in order to set the content type */
+func JavascriptHandler(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "text/javascript");
+    http.ServeFile(w, r, r.URL.Path[1:])
+}
+
+/* Serve javascript files manually in order to set the content type */
+func CssHandler(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "text/css");
+    http.ServeFile(w, r, r.URL.Path[1:])
 }

@@ -7,6 +7,22 @@
 export GOPATH="$(pwd)"
 export MYNAME="$0"
 
+function stabbey_compile_css() {
+    # Disabled for now, since we're using the client-side less js script
+    return
+
+    which lessc &> /dev/null
+    if [[ "$?" -ne 0 ]]; then
+        echo "Less compiler isn't installed! Skipping compilation of CSS files."
+        echo "(You need to have a lessc binary in your PATH)"
+    fi
+
+    find . -name "*.less" | while read line; do
+        local target="$(echo ${line} | sed 's/\.less/.css/')"
+        lessc "${line}" "${target}"
+    done
+}
+
 function stabbey_install() {
     pushd src/stabbey &> /dev/null
     go install
@@ -37,10 +53,12 @@ function stabbey_usage() {
 }
 
 if [[ "$1" == "run" ]]; then
+    stabbey_compile_css
     stabbey_install
     stabbey_run
 elif [[ "$1" == "runloop" ]]; then
     while true; do
+        stabbey_compile_css
         stabbey_install
         stabbey_run
         if [[ "$?" -ne "0" ]]; then

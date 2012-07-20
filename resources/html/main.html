@@ -1,38 +1,53 @@
 <html>
-    <head>
-        <title>Stabby UI</title>
-        <script type="text/javascript" src="/resources/js/jquery.1.7.1.min.js"></script>
-        <script type="text/javascript" src="/resources/js/main.js"></script>
-    </head>
-    <body>
-        <div id="board" style="font-family: monospace; margin: 8px;">
-            Map loading....
-        </div>
-        <div id="start">START GAME</div>
-        <div id="move-right">MOVE RIGHT</div>
-        <div id="move-left">MOVE LEFT</div>
-        <div id="move-up">MOVE UP</div>
-        <div id="move-down">MOVE DOWN</div>
+  <head>
+    <title>Stabby UI</title>
+    <link rel="stylesheet/less" type="text/css" href="/resources/css/main.less">
+    <script type="text/javascript" src="/resources/js/jquery.1.7.1.min.js"></script>
+    <script type="text/javascript" src="/resources/js/main.js"></script>
+    <script type="text/javascript" src="/resources/js/less-1.3.0.min.js"></script>
+  </head>
+  <body>
+    <div id="info">
+      <h3>Information</h3>
+      <div>
+        Turn:&nbsp;<div id="turn">0</div>
+      </div>
+    </div>
 
-        <script>
-            window.me = "{{.Me}}";
-            window.gamekey = "{{.Gamekey}}";
-            window.websocket_path = "{{.Host}}";
+    <div id="map">
+      <h3>Map</h3>
+      <div id="board">
+        Click start to load map...
+      </div>
+    </div>
 
-            console.log("me: " + me);
-            console.log("gamekey: " + gamekey);
-            console.log("websocket: " + websocket_path);
+    <div id="controls">
+      <h3>Controls</h3>
+      <div id="start">START GAME</div>
+      <div id="move-right">MOVE RIGHT</div>
+      <div id="move-left">MOVE LEFT</div>
+      <div id="move-up">MOVE UP</div>
+      <div id="move-down">MOVE DOWN</div>
+    </div>
 
-            if (window["WebSocket"] == null) {
-                console.log("Err: Your browser doesn't support WebSockets");
-                return
-            }
+    <script>
+      window.me = "{{.Me}}";
+      window.gamekey = "{{.Gamekey}}";
+      window.websocket_path = "{{.Host}}";
 
-            window.conn = new WebSocket(websocket_path);
-            conn.onopen = socketOpened;
-            conn.onclose = socketClosed;
-            conn.onerror = socketErrored;
-            conn.onmessage = socketMessaged;
-        </script>
-    </body>
+      console.log("me: " + me);
+      console.log("gamekey: " + gamekey);
+      console.log("websocket: " + websocket_path);
+
+      if (window["WebSocket"] == null) {
+          console.log("Err: Your browser doesn't support WebSockets");
+      } else {
+        window.conn = new WebSocket(websocket_path);
+        conn.onopen = socketOpened;
+        conn.onclose = socketClosed;
+        conn.onerror = socketErrored;
+        conn.onmessage = socketMessaged;
+      }
+    </script>
+  </body>
 </html>

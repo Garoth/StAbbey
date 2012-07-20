@@ -26,9 +26,8 @@ socketMessaged = function(e) {
 
   entLayer = jsObj.Boards[0].Layers[0];
   $.each(jsObj.Entities, function(index, player) {
-    console.log("Player with " + player.Y + " " + player.X)
     entLayer[player.Y] = entLayer[player.Y].substr(0, player.X) +
-      'X' + entLayer[player.Y].substr(player.X + 1)
+      'X' + entLayer[player.Y].substr(player.X + 1);
   });
   $("#board").html(entLayer.join("<br/>"));
 }
@@ -100,10 +99,15 @@ COMMANDS = function() {
   return me;
 }();
 
+increaseTick = function() {
+  TICK_NUM += 1;
+  $("#turn").text("" + TICK_NUM);
+}
+
 /* Represents each client's tick loop */
 tick = function() {
   if (TICK_NUM === RESPONSE_TICK_NUM) {
-    TICK_NUM += 1;
+    increaseTick();
   }
 
   sendMessage(COMMANDS.tick(TICK_NUM));

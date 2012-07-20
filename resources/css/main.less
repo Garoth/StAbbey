@@ -1,0 +1,37 @@
+@import "lib/base-import";
+
+.box-style() {
+  .inline-block();
+  .size(@column-width * 4, auto);
+  vertical-align: top;
+  padding: 8px;
+  margin-left: @column-width;
+
+  &:first-child {
+    margin-left: 0px;
+  }
+}
+
+#info {
+  .box-style();
+
+  #turn {
+    .inline-block();
+  }
+}
+
+#map {
+  .box-style();
+  #board {
+    font-family: monospace;
+  }
+}
+
+#controls {
+  .box-style();
+
+  div {
+    cursor: pointer;
+    .unselectable();
+  }
+}
