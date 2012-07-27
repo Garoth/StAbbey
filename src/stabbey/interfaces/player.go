@@ -16,6 +16,11 @@ type Player interface {
     /* Last Sent Tick Time Getters / Setters */
     GetLastTickTime() time.Time
     SetLastTickTime(t time.Time)
+    /* Queue Manipulation Getters / Setters */
+    GetActionQueue() []Action
+    GetStringActionQueue() []string
+    SetActionQueue([]Action)
+    PopAction() Action
     /* Websocket Connection Getters / Setters */
     GetWebSocketConnection() *websocket.Conn
     SetWebSocketConnection(conn *websocket.Conn)

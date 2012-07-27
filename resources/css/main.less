@@ -15,7 +15,7 @@
 #info {
   .box-style();
 
-  #turn {
+  #turn, #queue {
     .inline-block();
   }
 }
@@ -33,5 +33,9 @@
   div {
     cursor: pointer;
     .unselectable();
+
+    &.disabled {
+        color: #999999;
+    }
   }
 }

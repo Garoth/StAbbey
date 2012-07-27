@@ -28,6 +28,8 @@ func NewGame(gamekey string) *Game {
     return g
 }
 
+/* TODO make this also take the player's entity at the same time and ensure
+ *      That you can do a lookup between playerid and entityid */
 func (g *Game) AddPlayer(player interfaces.Player) {
     g.Players[player.GetPlayerId()] = player
 }

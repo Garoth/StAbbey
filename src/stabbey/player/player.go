@@ -9,6 +9,7 @@ import (
     "stabbey/constants"
     "stabbey/entity"
     "stabbey/uidgenerator"
+    "stabbey/interfaces"
 )
 
 var uidg = uidgenerator.New();
@@ -18,6 +19,7 @@ type Player struct {
     PlayerId int
     PlayerLastTick int
     PlayerLastTickTime time.Time
+    ActionQueue []interfaces.Action
     WebSocketConnection *websocket.Conn
 }
 
@@ -28,6 +30,7 @@ func New() *Player {
     p.SetPlayerId(uidg.NextUid())
     p.SetLastTickTime(time.Now())
     p.SetWebSocketConnection(nil)
+    p.ActionQueue = make([]interfaces.Action, 0, 10)
 
     /* Entity stuff */
     p.SetPosition(0, 8, 6)
@@ -60,6 +63,33 @@ func (p *Player) GetLastTickTime() time.Time {
 
 func (p *Player) SetLastTickTime(t time.Time) {
     p.PlayerLastTickTime = t
+}
+
+func (p *Player) GetActionQueue() []interfaces.Action {
+    return p.ActionQueue
+}
+
+func (p *Player) GetStringActionQueue() []string {
+    q := make([]string, len(p.GetActionQueue()))
+
+    for i := 0; i < len(p.GetActionQueue()); i++ {
+        q[i] = p.GetActionQueue()[i].ActionType()
+    }
+
+    return q
+}
+
+func (p *Player) SetActionQueue(aq []interfaces.Action) {
+    p.ActionQueue = aq
+}
+
+func (p *Player) PopAction() interfaces.Action {
+    if len(p.ActionQueue) > 0 {
+        a := p.ActionQueue[0]
+        p.ActionQueue = p.ActionQueue[1:]
+        return a
+    }
+    return nil
 }
 
 func (p *Player) GetWebSocketConnection() *websocket.Conn {

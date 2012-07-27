@@ -16,15 +16,17 @@ var COMMAND_CODES = map[int]string {
 func ProcessOrders() {
     for {
         order := <-ORDER_STREAM
-        log.Printf("Found Order: command:%v tick:%v actions:%v player:%v",
-            order.GetCommandCode(), order.GetTickNumber(), order.GetActions(),
-            order.GetPlayer().GetPlayerId())
 
         if COMMAND_CODES[order.GetCommandCode()] == "update tick" {
             UpdateTick(order)
         } else if COMMAND_CODES[order.GetCommandCode()] == "set queue" {
-            SetQueue(order)
+            order.GetPlayer().SetActionQueue(order.GetActions())
         }
+
+        log.Printf("Parsed Order: command:'%v' tick:%v actions:%v player:%v",
+            COMMAND_CODES[order.GetCommandCode()], order.GetTickNumber(),
+            order.GetPlayer().GetStringActionQueue(),
+            order.GetPlayer().GetPlayerId())
     }
 }
 
@@ -34,28 +36,38 @@ func UpdateTick(order interfaces.Order) {
     p.SetLastTick(order.GetTickNumber())
     p.SetLastTickTime(time.Now())
 
-    allReady := true
     for _, player := range GAME.GetPlayers() {
         /* Ready players are 1 ahead of the game's tick */
         if player.GetLastTick() <= GAME.GetLastTick() {
-            allReady = false
-            break
+            /* Not everyone's ready */
+            return
         }
     }
 
-    if allReady {
-        log.Printf("All players are ready, sending next tick")
-        GAME.SetLastTick(GAME.GetLastTick() + 1)
-        BroadcastGamestate()
+    for _, player := range GAME.GetPlayers() {
+        /* TODO this is fragile code that relies on playerid == entityid */
+        entity := GAME.GetEntity(player.GetPlayerId())
+
+        if entity == nil {
+            log.Fatal("Got nil entity for Player %v", player.GetPlayerId())
+        }
+
+        if action := player.PopAction(); action != nil {
+            MoveEntity(entity, action)
+        } else {
+            log.Printf("Player %v has empty queue", player.GetPlayerId())
+        }
     }
+
+    log.Printf("All players are ready, sending next tick")
+    GAME.SetLastTick(GAME.GetLastTick() + 1)
+    BroadcastGamestate()
 }
 
-/* Updates the player's queue of actions */
-/* TODO this function is just a demo */
-func SetQueue(order interfaces.Order) {
-    /* TODO this is fragile code that relies on playerid == entityid */
-    entity := GAME.GetEntity(order.GetPlayer().GetPlayerId())
-    command := order.GetActions()[0]
+/* Moves the entity according to the given action */
+/* TODO really want a more general version of this that handles any action */
+func MoveEntity(entity interfaces.Entity, action interfaces.Action) {
+    command := action.ActionType()
 
     bid, x, y := entity.GetPosition()
     if command == "mr" {
@@ -66,9 +78,9 @@ func SetQueue(order interfaces.Order) {
         entity.SetPosition(bid, x, y - 1)
     } else if command == "md" {
         entity.SetPosition(bid, x, y + 1)
+    } else {
+        log.Printf("Unknown order %v ignored!", command)
     }
-
-    BroadcastGamestate()
 }
 
 /* Sends the gamestate to everyone */
