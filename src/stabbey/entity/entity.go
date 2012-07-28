@@ -1,6 +1,7 @@
 package entity
 
 import (
+    "stabbey/interfaces"
     "stabbey/uidgenerator"
 )
 
@@ -9,11 +10,13 @@ var UIDG = uidgenerator.New();
 type Entity struct {
     EntityId, BoardId, X, Y int
     Name, Type string
+    ActionQueue []interfaces.Action
 }
 
 func New(entid int) *Entity {
     e := &Entity{}
     e.SetEntityId(entid)
+    e.ActionQueue = make([]interfaces.Action, 0, 10)
     return e
 }
 
@@ -50,3 +53,31 @@ func (e *Entity) SetType(t string) {
 func (e *Entity) GetType() string {
     return e.Type
 }
+
+func (e *Entity) GetActionQueue() []interfaces.Action {
+    return e.ActionQueue
+}
+
+func (e *Entity) GetStringActionQueue() []string {
+    q := make([]string, len(e.GetActionQueue()))
+
+    for i := 0; i < len(e.GetActionQueue()); i++ {
+        q[i] = e.GetActionQueue()[i].ActionType()
+    }
+
+    return q
+}
+
+func (e *Entity) SetActionQueue(aq []interfaces.Action) {
+    e.ActionQueue = aq
+}
+
+func (e *Entity) PopAction() interfaces.Action {
+    if len(e.ActionQueue) > 0 {
+        a := e.ActionQueue[0]
+        e.ActionQueue = e.ActionQueue[1:]
+        return a
+    }
+    return nil
+}
+

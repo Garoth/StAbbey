@@ -2,7 +2,7 @@ package interfaces
 
 type Game interface {
     /* Player Manipulation */
-    AddPlayer(player Player)
+    AddPlayer(player Player, entity Entity)
     GetPlayer(id int) Player
     GetPlayers() map[int] Player
     /* Board manipulation */
@@ -12,6 +12,7 @@ type Game interface {
     /* Entity manipulation */
     AddEntity(entity Entity)
     GetEntity(entid int) Entity
+    GetEntityByPlayer(player Player) Entity
     GetEntities() map[int] Entity
     /* Tick manipulation */
     GetLastTick() int

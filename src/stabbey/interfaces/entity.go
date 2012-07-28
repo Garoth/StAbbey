@@ -14,4 +14,9 @@ type Entity interface {
     GetName() string
     SetType(t string)
     GetType() string
+    /* Queue Manipulation Getters / Setters */
+    GetActionQueue() []Action
+    GetStringActionQueue() []string
+    SetActionQueue([]Action)
+    PopAction() Action
 }

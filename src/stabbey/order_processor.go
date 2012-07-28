@@ -20,14 +20,22 @@ func ProcessOrders() {
         if COMMAND_CODES[order.GetCommandCode()] == "update tick" {
             UpdateTick(order)
         } else if COMMAND_CODES[order.GetCommandCode()] == "set queue" {
-            order.GetPlayer().SetActionQueue(order.GetActions())
+            entity := GAME.GetEntityByPlayer(order.GetPlayer())
+            entity.SetActionQueue(order.GetActions())
         }
 
-        log.Printf("Parsed Order: command:'%v' tick:%v actions:%v player:%v",
-            COMMAND_CODES[order.GetCommandCode()], order.GetTickNumber(),
-            order.GetPlayer().GetStringActionQueue(),
-            order.GetPlayer().GetPlayerId())
+        DumpOrder(order)
     }
+}
+
+/* Prints the given order */
+func DumpOrder(order interfaces.Order) {
+    entity := GAME.GetEntityByPlayer(order.GetPlayer())
+
+    log.Printf("Parsed Order: command:'%v' tick:%v actions:%v player:%v",
+        COMMAND_CODES[order.GetCommandCode()], order.GetTickNumber(),
+        entity.GetStringActionQueue(),
+        order.GetPlayer().GetPlayerId())
 }
 
 /* Updates players' ticks and send out gamestate when everyone's ready */
@@ -45,14 +53,13 @@ func UpdateTick(order interfaces.Order) {
     }
 
     for _, player := range GAME.GetPlayers() {
-        /* TODO this is fragile code that relies on playerid == entityid */
-        entity := GAME.GetEntity(player.GetPlayerId())
+        entity := GAME.GetEntityByPlayer(player)
 
         if entity == nil {
             log.Fatal("Got nil entity for Player %v", player.GetPlayerId())
         }
 
-        if action := player.PopAction(); action != nil {
+        if action := entity.PopAction(); action != nil {
             MoveEntity(entity, action)
         } else {
             log.Printf("Player %v has empty queue", player.GetPlayerId())

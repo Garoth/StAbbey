@@ -73,8 +73,7 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
     }
 
     curPlayer = player.New()
-    GAME.AddPlayer(curPlayer)
-    GAME.AddEntity(curPlayer)
+    GAME.AddPlayer(curPlayer, curPlayer)
     log.Printf("Added player %v to game", curPlayer.GetPlayerId())
 
     if tmpl, e := template.ParseFiles(constants.FILE_MAIN_HTML); e != nil {
@@ -101,7 +100,7 @@ func WebSocketConnect(ws *websocket.Conn) {
         if err != nil {
             log.Fatal("Decoding Message Error:", err)
         } else {
-            log.Printf("Decode Successful: %+v", websocketConnection)
+            log.Printf("WebSocket Connected: %+v", websocketConnection)
             playerId, _ := strconv.Atoi(websocketConnection.Player)
             p := GAME.GetPlayer(playerId)
             p.SetWebSocketConnection(ws)

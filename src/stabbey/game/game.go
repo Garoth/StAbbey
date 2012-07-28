@@ -12,6 +12,7 @@ type Game struct {
     Players map[int] interfaces.Player
     Boards map[int] interfaces.Board
     Entities map[int] interfaces.Entity
+    PlayersToEntities map[interfaces.Player] interfaces.Entity
     LastTick int
     GameRunning bool
     Gamekey string
@@ -25,13 +26,14 @@ func NewGame(gamekey string) *Game {
     g.Players = make(map[int] interfaces.Player, 10)
     g.Boards = make(map[int] interfaces.Board, 10)
     g.Entities = make(map[int] interfaces.Entity, 100)
+    g.PlayersToEntities = make(map[interfaces.Player] interfaces.Entity, 10)
     return g
 }
 
-/* TODO make this also take the player's entity at the same time and ensure
- *      That you can do a lookup between playerid and entityid */
-func (g *Game) AddPlayer(player interfaces.Player) {
+func (g *Game) AddPlayer(player interfaces.Player, entity interfaces.Entity) {
     g.Players[player.GetPlayerId()] = player
+    g.AddEntity(entity)
+    g.PlayersToEntities[player] = entity
 }
 
 func (g *Game) GetPlayer(id int) interfaces.Player {
@@ -60,6 +62,10 @@ func (g *Game) AddEntity(entity interfaces.Entity) {
 
 func (g *Game) GetEntity(entid int) interfaces.Entity {
     return g.Entities[entid]
+}
+
+func (g *Game) GetEntityByPlayer(player interfaces.Player) interfaces.Entity {
+    return g.PlayersToEntities[player]
 }
 
 func (g *Game) GetEntities() map[int] interfaces.Entity {

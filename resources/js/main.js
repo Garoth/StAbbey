@@ -33,19 +33,22 @@ socketMessaged = function(e) {
     $("#board").html(entLayer.join("<br/>"));
 
     /* Probably could clobber what the player is trying to do. Beta-code */
+    /* TODO EntityId might not be PlayerId sometime. Player should prob.
+     *      report its EntityId as well as its Id */
     console.log("me is", parseInt(me))
-    if (jsObj.Players[parseInt(me)].ActionQueue.length > 0) {
-        increaseTick()
+    if (jsObj.Entities[parseInt(me)].ActionQueue.length > 0) {
+        increaseTick();
+        tick(true);
     }
-    setQueue(jsObj.Players[parseInt(me)].ActionQueue)
+    setQueue(jsObj.Entities[parseInt(me)].ActionQueue)
 }
 /**** End WebSocket Hooks ****/
 
 /* Send any message to the server */
-sendMessage = function(urlvars) {
-    urlvars.Gamekey = gamekey;
-    urlvars.Player = me;
-    msg = JSON.stringify(urlvars);
+sendMessage = function(vars) {
+    vars.Gamekey = gamekey;
+    vars.Player = me;
+    msg = JSON.stringify(vars);
     console.log("Sending message: " + msg);
     conn.send(msg);
 }
@@ -128,9 +131,16 @@ increaseTick = function() {
 }
 
 /* Represents each client's tick loop */
-tick = function() {
+tick = function(once) {
+    if (once == null) {
+        once = false
+    }
+
     sendMessage(COMMANDS.tick(TICK_NUM));
-    setTimeout(tick, TICK_DURATION);
+
+    if (once != true) {
+      setTimeout(tick, TICK_DURATION);
+    }
 }
 
 /* Stuff to run after the page has loaded */
@@ -167,5 +177,6 @@ $(function() {
         console.log("Queue ready!");
         sendMessage(COMMANDS.queueActions(QUEUE, TICK_NUM));
         increaseTick();
+        tick(true);
     })
 })
