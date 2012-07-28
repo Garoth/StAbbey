@@ -69,7 +69,6 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
         GAME = game.NewGame(gamekey)
         GAME.AddBoard(board.New(0))
         GAME.Run();
-        go ProcessOrders();
     }
 
     curPlayer = player.New()
@@ -82,6 +81,8 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
         tmpl.Execute(w, MainPageTemplate{curPlayer.GetPlayerId(), gamekey,
             "ws://" + r.Host + "/ws"})
     }
+
+    go ProcessOrders();
 }
 
 /* Initialize a websocket connection and pair it with the handshaking player */

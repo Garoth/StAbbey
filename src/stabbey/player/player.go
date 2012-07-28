@@ -1,6 +1,7 @@
 package player
 
 import (
+    "log"
     "strconv"
     "time"
 
@@ -71,5 +72,10 @@ func (p *Player) SetWebSocketConnection(conn *websocket.Conn) {
 }
 
 func (p *Player) SendMessage(json string) {
-    websocket.Message.Send(p.WebSocketConnection, json)
+    if p.WebSocketConnection != nil {
+        websocket.Message.Send(p.WebSocketConnection, json)
+    } else {
+        log.Printf("Attempt to use player %v's websocket before its ready",
+            p.GetPlayerId())
+    }
 }

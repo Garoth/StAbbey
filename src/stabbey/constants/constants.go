@@ -1,5 +1,8 @@
 package constants
 
+/* TODO this package could probably not exist (constants could be moved to
+ * their respective subpackages and used only there) */
+
 const FILE_SETUP_HTML string = "resources/html/setup.html"
 const FILE_MAIN_HTML string  = "resources/html/main.html"
 
