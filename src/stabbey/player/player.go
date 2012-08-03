@@ -7,9 +7,9 @@ import (
 
     "code.google.com/p/go.net/websocket"
 
-    "stabbey/constants"
     "stabbey/entity"
     "stabbey/uidgenerator"
+    "stabbey/interfaces"
 )
 
 var uidg = uidgenerator.New();
@@ -33,7 +33,7 @@ func New() *Player {
     /* Entity stuff */
     p.SetPosition(0, 8, 6)
     p.SetEntityId(entity.UIDG.NextUid())
-    p.SetType(constants.ENTITY_TYPE_PLAYER)
+    p.SetType(interfaces.ENTITY_TYPE_PLAYER)
     p.SetName("Player" + strconv.Itoa(p.GetPlayerId()))
 
     return p

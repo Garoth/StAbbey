@@ -3,6 +3,9 @@ package interfaces
 import (
 )
 
+const ENTITY_TYPE_PLAYER     = "player"
+const ENTITY_TYPE_MONSTER    = "monster"
+
 /* A monster, player, or some special thing of that sort */
 type Entity interface {
     /* Entity Ids must be unique */

@@ -11,7 +11,6 @@ import (
     "code.google.com/p/go.net/websocket"
 
     "stabbey/board"
-    "stabbey/constants"
     "stabbey/game"
     "stabbey/interfaces"
     "stabbey/order"
@@ -19,6 +18,13 @@ import (
     "stabbey/signalhandlers"
     "stabbey/runtime"
 )
+
+const FILE_SETUP_HTML string = "resources/html/setup.html"
+const FILE_MAIN_HTML string  = "resources/html/main.html"
+const HTTP_ROOT string       = "/"
+const HTTP_CONNECT string    = "/connect"
+const HTTP_WEBSOCKET string  = "/ws"
+const FORMVAL_GAMEKEY string = "gamekey"
 
 var ADDR = flag.String("addr", ":8080", "http service address")
 var GAME *game.Game
@@ -39,9 +45,9 @@ func main() {
 
     http.HandleFunc("/resources/js/",       JavascriptHandler)
     http.HandleFunc("/resources/css/",      CssHandler)
-    http.HandleFunc(constants.HTTP_ROOT,    InitSetup)
-    http.HandleFunc(constants.HTTP_CONNECT, ConnectSetup)
-    http.Handle(constants.HTTP_WEBSOCKET,   websocket.Handler(WebSocketConnect))
+    http.HandleFunc(HTTP_ROOT,    InitSetup)
+    http.HandleFunc(HTTP_CONNECT, ConnectSetup)
+    http.Handle(HTTP_WEBSOCKET,   websocket.Handler(WebSocketConnect))
 
     log.Println("Starting Server")
     if err := http.ListenAndServe(*ADDR, nil); err != nil {
@@ -51,7 +57,7 @@ func main() {
 
 /* Send the basic page that just has the buttons to start/join games */
 func InitSetup(w http.ResponseWriter, req *http.Request) {
-    if tmpl, e := template.ParseFiles(constants.FILE_SETUP_HTML); e != nil {
+    if tmpl, e := template.ParseFiles(FILE_SETUP_HTML); e != nil {
         log.Fatal("Parse error:", e)
     } else {
         tmpl.Execute(w, nil)
@@ -60,7 +66,7 @@ func InitSetup(w http.ResponseWriter, req *http.Request) {
 
 /* Create the game, add players as they join */
 func ConnectSetup(w http.ResponseWriter, r *http.Request) {
-    gamekey := r.FormValue(constants.FORMVAL_GAMEKEY)
+    gamekey := r.FormValue(FORMVAL_GAMEKEY)
     var curPlayer *player.Player
 
     /* New game! */
@@ -75,7 +81,7 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
     GAME.AddPlayer(curPlayer, curPlayer)
     log.Printf("Added player %v to game", curPlayer.GetPlayerId())
 
-    if tmpl, e := template.ParseFiles(constants.FILE_MAIN_HTML); e != nil {
+    if tmpl, e := template.ParseFiles(FILE_MAIN_HTML); e != nil {
         log.Fatal("Parse error:", e)
     } else {
         tmpl.Execute(w, MainPageTemplate{curPlayer.GetPlayerId(), gamekey,
