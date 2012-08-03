@@ -12,68 +12,104 @@ const COOLDOWN_DECREMENT int = 50
 const MIN_COOLDOWN int = 200
 const TURN_DELAY string = "1s"
 
+/* I'm a bit worried about race conditions around GAME in the future */
+var GAME interfaces.Game
+var COMMAND_CODES = map[int]string {
+    0: "start game",
+    1: "update tick",
+    2: "set queue" }
+
 type Runtime struct {
+    /* Reads from this to handle any orders */
+    orderStream chan interfaces.Order
     /* Reads from this to insert a new entity queue into the ordering */
     queueOrders chan interfaces.Order
     /* Collection of entities their last cooldown */
     watchedEntities map[interfaces.Entity]int
-    /* The game object */
-    game interfaces.Game
 }
 
 func New(game interfaces.Game) *Runtime {
     r := &Runtime{}
+    r.orderStream = make(chan interfaces.Order)
     r.queueOrders = make(chan interfaces.Order)
     r.watchedEntities = make(map[interfaces.Entity]int, 100)
-    r.game = game
-    go r.run()
+    GAME = game
+    go r.processOrders()
+    go r.acceptQueues()
+    go r.scheduleActions()
     return r
 }
 
-/* TODO any race conditions between the adding and manifesting threads? */
-func (r *Runtime) run() {
-    /* Read new orders in */
-    go func() {
-        for {
-            /* We only expect 'set queue' orders to come in */
-            order := <-r.queueOrders
+/* Goroutine to process incoming orders from players */
+func (r *Runtime) processOrders() {
+    for {
+        order := <-r.orderStream
 
-            entity := r.game.GetEntityByPlayer(order.GetPlayer())
-            r.watchedEntities[entity] = DEFAULT_COOLDOWN
+        if COMMAND_CODES[order.GetCommandCode()] == "update tick" {
+            updateTick(order)
+        } else if COMMAND_CODES[order.GetCommandCode()] == "set queue" {
+            entity := GAME.GetEntityByPlayer(order.GetPlayer())
+            entity.SetActionQueue(order.GetActions())
+            r.AddMoveQueue(order)
         }
-    }()
 
-    /* Occasionally manifest actions */
-    go func() {
-        for {
-            if duration, e := time.ParseDuration(TURN_DELAY); e == nil {
-                time.Sleep(duration)
-            } else {
-                log.Fatalf("Error parsing duration, %v", e)
-            }
+        entity := GAME.GetEntityByPlayer(order.GetPlayer())
 
-            allReady := true
-            for _, player := range r.game.GetPlayers() {
-                /* Ready players are 1 ahead of the game's tick */
-                if player.GetLastTick() <= r.game.GetLastTick() {
-                    allReady = false
-                }
-            }
-            if allReady == false {
-                continue
-            }
-
-            r.executeNext()
-
-            log.Printf("All players are ready, sending next tick")
-            r.game.SetLastTick(r.game.GetLastTick() + 1)
-            r.broadcastGamestate()
-        }
-    }()
+        log.Printf("Parsed Order: command:'%v' tick:%v actions:%v player:%v",
+            COMMAND_CODES[order.GetCommandCode()], order.GetTickNumber(),
+            entity.GetStringActionQueue(),
+            order.GetPlayer().GetPlayerId())
+    }
 }
 
-func (r *Runtime) Enqueue(order interfaces.Order) {
+/* Interfaces for the outside world to insert their orders */
+func (r *Runtime) AddOrder(order interfaces.Order) {
+    r.orderStream <- order
+}
+
+/* Goroutine to accept new move queues for the scheduler */
+func (r *Runtime) acceptQueues() {
+    for {
+        /* We only expect 'set queue' orders to come in */
+        order := <-r.queueOrders
+
+        entity := GAME.GetEntityByPlayer(order.GetPlayer())
+        r.watchedEntities[entity] = DEFAULT_COOLDOWN
+    }
+}
+
+/* Interface for the outside world to add queues to the scheduler */
+func (r *Runtime) AddMoveQueue(order interfaces.Order) {
     r.queueOrders <- order
+}
+
+/* Goroutine to run queued actions & send updates to players */
+func (r *Runtime) scheduleActions() {
+    for {
+        if duration, e := time.ParseDuration(TURN_DELAY); e == nil {
+            time.Sleep(duration)
+        } else {
+            log.Fatalf("Error parsing duration, %v", e)
+        }
+
+        allReady := true
+        for _, player := range GAME.GetPlayers() {
+            /* Ready players are 1 ahead of the game's tick */
+            if player.GetLastTick() <= GAME.GetLastTick() {
+                allReady = false
+            }
+        }
+        if allReady == false {
+            continue
+        }
+
+        r.executeNext()
+
+        log.Printf("All players are ready, sending next tick")
+        GAME.SetLastTick(GAME.GetLastTick() + 1)
+        broadcastGamestate()
+    }
+
 }
 
 func (r *Runtime) executeNext() {
@@ -89,7 +125,7 @@ func (r *Runtime) executeNext() {
 
     if nextEntity != nil {
         if action := nextEntity.PopAction(); action != nil {
-            Act(nextEntity, action)
+            act(nextEntity, action)
             r.reduceCooldown(nextEntity)
         } else {
             delete(r.watchedEntities, nextEntity)
@@ -108,26 +144,3 @@ func (r *Runtime) reduceCooldown(entity interfaces.Entity) {
     }
 }
 
-/* Sends the gamestate to everyone */
-func (r *Runtime) broadcastGamestate() {
-    for _, player := range r.game.GetPlayers() {
-        player.SendMessage(r.game.Json(player))
-    }
-}
-
-func Act(entity interfaces.Entity, action interfaces.Action) {
-    command := action.ActionType()
-
-    boardId, x, y := entity.GetPosition()
-    if command == "mr" {
-        entity.SetPosition(boardId, x + 1, y)
-    } else if command == "ml" {
-        entity.SetPosition(boardId, x - 1, y)
-    } else if command == "mu" {
-        entity.SetPosition(boardId, x, y - 1)
-    } else if command == "md" {
-        entity.SetPosition(boardId, x, y + 1)
-    } else {
-        log.Printf("Unknown order %v ignored!", command)
-    }
-}

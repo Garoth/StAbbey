@@ -1,6 +1,3 @@
-* Merge order_processor into runtime
-* As a result of moving order_processor into runtime, can get rid of the global
-  GAME variable in main
 * Get rid of the constants module and just import those constants into their
   respective modules
 * Fix the queue cooldown to take the lowest cooldown rather than the round-robin

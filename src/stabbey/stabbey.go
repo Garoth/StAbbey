@@ -17,11 +17,12 @@ import (
     "stabbey/order"
     "stabbey/player"
     "stabbey/signalhandlers"
+    "stabbey/runtime"
 )
 
 var ADDR = flag.String("addr", ":8080", "http service address")
-/* TODO ok it's not safe to have a global like this */
 var GAME *game.Game
+var RUNTIME *runtime.Runtime
 
 type MainPageTemplate struct {
     Me int
@@ -40,7 +41,6 @@ func main() {
     http.HandleFunc("/resources/css/",      CssHandler)
     http.HandleFunc(constants.HTTP_ROOT,    InitSetup)
     http.HandleFunc(constants.HTTP_CONNECT, ConnectSetup)
-    http.HandleFunc(constants.HTTP_TEST,    RunTests)
     http.Handle(constants.HTTP_WEBSOCKET,   websocket.Handler(WebSocketConnect))
 
     log.Println("Starting Server")
@@ -82,7 +82,7 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
             "ws://" + r.Host + "/ws"})
     }
 
-    go ProcessOrders();
+    RUNTIME = runtime.New(GAME)
 }
 
 /* Initialize a websocket connection and pair it with the handshaking player */
@@ -131,15 +131,11 @@ func KeepReading(p interfaces.Player, ws *websocket.Conn) {
 
             o := order.NewOrder(playerOrder.CommandCode, playerOrder.TickNum,
                 playerOrder.Queue, p)
-            ORDER_STREAM <- o
+            RUNTIME.AddOrder(o)
         }
     }
     log.Printf("Closing socket for %v", p.GetPlayerId())
     ws.Close()
-}
-
-/* Runs unit tests (lolno) */
-func RunTests(w http.ResponseWriter, req *http.Request) {
 }
 
 /* Serve javascript files manually in order to set the content type */
