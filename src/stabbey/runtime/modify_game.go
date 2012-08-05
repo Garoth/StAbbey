@@ -7,6 +7,17 @@ import (
     "stabbey/interfaces"
 )
 
+/* Checks whether all players are ready (done queueing) */
+func allPlayersReady() bool {
+    for _, player := range GAME.GetPlayers() {
+        /* Ready players are 1 ahead of the game's tick */
+        if player.GetLastTick() <= GAME.GetLastTick() {
+            return false
+        }
+    }
+    return true
+}
+
 /* Sends the gamestate to everyone */
 func broadcastGamestate() {
     for _, player := range GAME.GetPlayers() {

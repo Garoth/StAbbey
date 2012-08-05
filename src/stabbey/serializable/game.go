@@ -15,14 +15,14 @@ type Game struct {
 func NewGame(game interfaces.Game) *Game {
     g := &Game{}
 
-    for _, player := range game.GetPlayers() {
-        g.Players = append(g.Players, NewPlayer(player))
+    for k := 0; k < len(game.GetPlayers()); k++ {
+        g.Players = append(g.Players, NewPlayer(game.GetPlayers()[k]))
     }
-    for _, board := range game.GetBoards() {
-        g.Boards = append(g.Boards, NewBoard(board))
+    for k := 0; k < len(game.GetBoards()); k++ {
+        g.Boards = append(g.Boards, NewBoard(game.GetBoards()[k]))
     }
-    for _, entity := range game.GetEntities() {
-        g.Entities = append(g.Entities, NewEntity(entity))
+    for k := 0; k < len(game.GetEntities()); k++ {
+        g.Entities = append(g.Entities, NewEntity(game.GetEntities()[k]))
     }
 
     g.LastTick = game.GetLastTick()

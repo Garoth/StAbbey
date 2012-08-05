@@ -15,7 +15,7 @@ func New(level int) *Board {
     b := &Board{}
     b.Level = level
     b.Layers = make(map[int] []string, 10)
-    b.MakeTestBoard()
+    NewGrowingGenerator().Apply(b)
     return b
 }
 
@@ -33,21 +33,4 @@ func (b *Board) GetLayers() map[int] []string {
 
 func (b *Board) SetLayer(layer int, layout []string) {
     b.Layers[layer] = layout
-}
-
-
-/* Creates a static board for testing */
-func (b *Board) MakeTestBoard() {
-    b.Layers[0] = []string {"L--------------L",
-                            "|..|...........|",
-                            "|..|...........|",
-                            "|..|...........|",
-                            "|..|.----------|",
-                            "|..............|",
-                            "|..............|",
-                            "|-----------L..|",
-                            "|...........|..|",
-                            "|..............|",
-                            "|...........|..|",
-                            "L--------------L"}
 }

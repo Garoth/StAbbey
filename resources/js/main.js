@@ -127,7 +127,7 @@ clearQueue = function() {
 
 increaseTick = function() {
     TICK_NUM += 1;
-    $("#turn").text("" + TICK_NUM);
+    $("#tick").text("" + TICK_NUM);
 }
 
 /* Represents each client's tick loop */
