@@ -4,7 +4,7 @@ import (
 )
 
 const BOARD_WIDTH int = 16
-const BOAD_HEIGHT int = 12
+const BOARD_HEIGHT int = 12
 
 type Board interface {
     GetLevel() int
