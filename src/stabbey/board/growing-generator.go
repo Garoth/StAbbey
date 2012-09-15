@@ -3,7 +3,6 @@ package board
 import (
     "log"
     "math/rand"
-    "strconv"
     "time"
 
     "stabbey/interfaces"
@@ -133,7 +132,7 @@ func (rl *roomlist) Apply(b interfaces.Board) {
                        "|..............|",
                        "L--------------L"}
 
-    for k, room := range rl.list {
+    for _, room := range rl.list {
         /* Draw the top wall */
         spY := room.startingPointY - room.top
         spX := room.startingPointX
@@ -191,10 +190,6 @@ func (rl *roomlist) Apply(b interfaces.Board) {
             room.startingPointY + room.bottom, "L")
         layer, _ = setTile(layer, room.startingPointX + room.right,
             room.startingPointY + room.bottom, "L")
-
-        /* Draw the room number for debugging */
-        layer, _ = setTile(layer, room.startingPointX, room.startingPointY,
-            strconv.Itoa(k))
     }
 
     b.SetLayer(0, layer)

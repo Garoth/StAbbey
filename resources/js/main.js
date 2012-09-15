@@ -31,6 +31,7 @@ socketMessaged = function(e) {
             'X' + entLayer[player.Y].substr(player.X + 1);
     });
     $("#board").html(entLayer.join("<br/>"));
+    drawBoard(jsObj);
 
     /* Probably could clobber what the player is trying to do. Beta-code */
     /* TODO EntityId might not be PlayerId sometime. Player should prob.
@@ -44,6 +45,39 @@ socketMessaged = function(e) {
 }
 /**** End WebSocket Hooks ****/
 
+/* Draws the Canvas based map */
+drawBoard = function(serverState) {
+    var layers = serverState.Boards[0].Layers[0];
+    var canvas = document.getElementById("canvas-board");
+    var canvasWidth = $("#canvas-board").width();
+    var canvasHeight = $("#canvas-board").height();
+    var tileSize = Math.round(canvasHeight / layers.length);
+    var ctx = canvas.getContext("2d");
+
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+    for (var x = 0; x < layers.length; x++) {
+        var layer = layers[x];
+        for (var i = 0; i < layer.length; i++) {
+            ctx.strokeRect(i * tileSize, x * tileSize, tileSize, tileSize);
+
+            /* Draw walls */
+            if (layer[i] === "-" || layer[i] === "L" || layer[i] === "|") {
+                ctx.fillStyle = "rgb(0, 0, 0)";
+                ctx.fillRect(i * tileSize + 1, x * tileSize + 1,
+                        tileSize - 2, tileSize - 2);
+            }
+        }
+    }
+
+    $.each(serverState.Entities, function(index, player) {
+        ctx.fillStyle = "rgb(0, 0, 200)";
+        ctx.fillRect(player.X * tileSize + 1, player.Y * tileSize + 1,
+                tileSize - 2, tileSize - 2);
+    });
+
+};
+
 /* Send any message to the server */
 sendMessage = function(vars) {
     vars.Gamekey = gamekey;
@@ -51,7 +85,7 @@ sendMessage = function(vars) {
     msg = JSON.stringify(vars);
     console.log("Sending message: " + msg);
     conn.send(msg);
-}
+};
 
 /* Various actions that could be sent to the server */
 ACTIONS = function() {
