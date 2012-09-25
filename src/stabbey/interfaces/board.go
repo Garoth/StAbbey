@@ -11,6 +11,7 @@ type Board interface {
     SetLevel(level int)
     GetLayers() map[int] []string
     SetLayer(layer int, layout []string)
+    GetRandomSpawnPoint() (int, int)
 }
 
 type BoardGenerator interface {

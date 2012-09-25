@@ -1,6 +1,9 @@
 package board
 
 import (
+    "math/rand"
+    "time"
+    "stabbey/interfaces"
 )
 
 type Board struct {
@@ -17,6 +20,25 @@ func New(level int) *Board {
     b.Layers = make(map[int] []string, 10)
     NewGrowingGenerator().Apply(b)
     return b
+}
+
+/* Picks a random spawn point. TODO: should be in Game so that things can't
+ * spawn over entities */
+func (b *Board) GetRandomSpawnPoint() (int, int) {
+    maxAttempts := 1000
+    rand.Seed(time.Now().Unix())
+
+    for x := 0; x < maxAttempts; x++ {
+        x := rand.Intn(interfaces.BOARD_WIDTH);
+        y := rand.Intn(interfaces.BOARD_HEIGHT);
+
+        if b.Layers[0][y][x] == '.' {
+            return x, y;
+        }
+    }
+
+    /* TODO should never happen */
+    return 0, 0
 }
 
 func (b *Board) GetLevel() int {

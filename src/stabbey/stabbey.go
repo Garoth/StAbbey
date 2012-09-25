@@ -78,8 +78,11 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
     }
 
     curPlayer = player.New()
+    pX, pY := GAME.GetBoard(0).GetRandomSpawnPoint()
+    curPlayer.SetPosition(0, pX, pY)
     GAME.AddPlayer(curPlayer, curPlayer)
-    log.Printf("Added player %v to game", curPlayer.GetPlayerId())
+    log.Printf("Added player %v to game at %v, %v ", curPlayer.GetPlayerId(),
+        pX, pY)
 
     if tmpl, e := template.ParseFiles(FILE_MAIN_HTML); e != nil {
         log.Fatal("Parse error:", e)

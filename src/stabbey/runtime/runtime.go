@@ -55,15 +55,18 @@ func (r *Runtime) processOrders() {
             entity := GAME.GetEntityByPlayer(order.GetPlayer())
             entity.SetActionQueue(order.GetActions())
             r.AddMoveQueue(order)
+            printOrder(order)
         }
-
-        entity := GAME.GetEntityByPlayer(order.GetPlayer())
-
-        log.Printf("Parsed Order: command:'%v' tick:%v actions:%v player:%v",
-            COMMAND_CODES[order.GetCommandCode()], order.GetTickNumber(),
-            entity.GetStringActionQueue(),
-            order.GetPlayer().GetPlayerId())
     }
+}
+
+/* Dumps the given order to the console */
+func printOrder(order interfaces.Order) {
+    entity := GAME.GetEntityByPlayer(order.GetPlayer())
+    log.Printf("Parsed Order: command:'%v' tick:%v actions:%v player:%v",
+        COMMAND_CODES[order.GetCommandCode()], order.GetTickNumber(),
+        entity.GetStringActionQueue(),
+        order.GetPlayer().GetPlayerId())
 }
 
 /* Interfaces for the outside world to insert their orders */
@@ -115,8 +118,8 @@ func (r *Runtime) scheduleActions() {
             }
         }
 
-        log.Printf("All players are ready, sending next tick")
         GAME.SetLastTick(GAME.GetLastTick() + 1)
+        log.Printf("All players are ready, sending tick %v", GAME.GetLastTick());
         broadcastGamestate()
     }
 }
