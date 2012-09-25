@@ -187,7 +187,7 @@ $(function() {
         $("#start").toggleClass("disabled").off()
     });
 
-   $("#move-right").click(function() {
+    $("#move-right").click(function() {
         console.log("Sending order to move right");
         addToQueue(ACTIONS.move(ACTIONS.DIRECTIONS.RIGHT))
     });
@@ -213,4 +213,27 @@ $(function() {
         increaseTick();
         tick(true);
     })
+
+    $(document).keydown(function(e){
+        if (e.keyCode == 37) {
+            $("#move-left").click();
+            return false;
+        }
+        if (e.keyCode == 38) {
+            $("#move-up").click();
+            return false;
+        }
+        if (e.keyCode == 39) {
+            $("#move-right").click();
+            return false;
+        }
+        if (e.keyCode == 40) {
+            $("#move-down").click();
+            return false;
+        }
+        if (e.keyCode == 13) {
+            $("#ready").click();
+            return false;
+        }
+    });
 })
