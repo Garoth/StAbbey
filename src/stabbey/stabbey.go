@@ -45,6 +45,7 @@ func main() {
 
     http.HandleFunc("/resources/js/",       JavascriptHandler)
     http.HandleFunc("/resources/css/",      CssHandler)
+    http.HandleFunc("/resources/img/",      ImgHandler)
     http.HandleFunc(HTTP_ROOT,    InitSetup)
     http.HandleFunc(HTTP_CONNECT, ConnectSetup)
     http.Handle(HTTP_WEBSOCKET,   websocket.Handler(WebSocketConnect))
@@ -156,5 +157,11 @@ func JavascriptHandler(w http.ResponseWriter, r *http.Request) {
 /* Serve javascript files manually in order to set the content type */
 func CssHandler(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "text/css");
+    http.ServeFile(w, r, r.URL.Path[1:])
+}
+
+/* Serve image files manually in order to set the content type */
+func ImgHandler(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "image/png");
     http.ServeFile(w, r, r.URL.Path[1:])
 }

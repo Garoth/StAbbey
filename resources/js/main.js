@@ -45,6 +45,51 @@ socketMessaged = function(e) {
 }
 /**** End WebSocket Hooks ****/
 
+tileImages = {}
+IMAGES_LOADED = false;
+/* Loads the tiles for the map so that they are ready to be drawn */
+loadTiles = function() {
+    var imgPath = "/resources/img/"
+
+    tileImages.floor = new Image();
+    var floorDef = $.Deferred();
+    tileImages.floor.onload = function() {
+        console.log("Floor image loaded");
+        floorDef.resolve();
+    };
+    tileImages.floor.src = imgPath + "Floor.png";
+
+    tileImages.column = new Image();
+    var columnDef = $.Deferred();
+    tileImages.column.onload = function() {
+        console.log("Column image loaded");
+        columnDef.resolve();
+    };
+    tileImages.column.src = imgPath + "Column.png";
+
+    tileImages.bluePlayer = new Image();
+    var bluePlayerDef = $.Deferred();
+    tileImages.bluePlayer.onload = function() {
+        console.log("Blue Player image loaded");
+        bluePlayerDef.resolve();
+    };
+    tileImages.bluePlayer.src = imgPath + "Player-blue.png";
+
+    tileImages.greenPlayer = new Image();
+    var greenPlayerDef = $.Deferred();
+    tileImages.greenPlayer.onload = function() {
+        console.log("Green Player image loaded");
+        greenPlayerDef.resolve();
+    };
+    tileImages.greenPlayer.src = imgPath + "Player-green.png";
+
+    $.when(floorDef, columnDef, bluePlayerDef, greenPlayerDef).then(function() {
+        IMAGES_LOADED = true;
+        console.log("ALL IMAGES LOADED!");
+    });
+};
+loadTiles();
+
 /* Draws the Canvas based map */
 drawBoard = function(serverState) {
     var layers = serverState.Boards[0].Layers[0];
@@ -60,20 +105,40 @@ drawBoard = function(serverState) {
         var layer = layers[x];
         for (var i = 0; i < layer.length; i++) {
             ctx.strokeRect(i * tileSize, x * tileSize, tileSize, tileSize);
+            if (IMAGES_LOADED) {
+                ctx.drawImage(tileImages.floor, i * tileSize, x * tileSize,
+                        tileSize, tileSize);
+            }
 
             /* Draw walls */
             if (layer[i] === "-" || layer[i] === "L" || layer[i] === "|") {
                 ctx.fillStyle = "rgb(0, 0, 0)";
-                ctx.fillRect(i * tileSize + 1, x * tileSize + 1,
-                        tileSize - 2, tileSize - 2);
+                ctx.fillRect(i * tileSize, x * tileSize,
+                        tileSize, tileSize);
+                if (IMAGES_LOADED) {
+                    ctx.drawImage(tileImages.column, i * tileSize,
+                            x * tileSize, tileSize, tileSize);
+                }
             }
         }
     }
 
     $.each(serverState.Entities, function(index, player) {
         ctx.fillStyle = "rgb(0, 0, 200)";
-        ctx.fillRect(player.X * tileSize + 1, player.Y * tileSize + 1,
+        ctx.fillRect(player.X * tileSize, player.Y * tileSize,
                 tileSize - 2, tileSize - 2);
+        if (IMAGES_LOADED) {
+            var playerImg = null;
+
+            if (player.EntityId === 0) {
+                playerImg = tileImages.bluePlayer;
+            } else if (player.EntityId === 1) {
+                playerImg = tileImages.greenPlayer;
+            }
+
+            ctx.drawImage(playerImg, player.X * tileSize,
+                player.Y * tileSize, tileSize - 2, tileSize - 2);
+        }
     });
 
 };
