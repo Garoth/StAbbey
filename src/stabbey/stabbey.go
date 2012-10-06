@@ -92,7 +92,9 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
             "ws://" + r.Host + "/ws"})
     }
 
-    RUNTIME = runtime.New(GAME)
+    if RUNTIME == nil {
+        RUNTIME = runtime.New(GAME)
+    }
 }
 
 /* Initialize a websocket connection and pair it with the handshaking player */

@@ -36,12 +36,13 @@ socketMessaged = function(e) {
     /* Probably could clobber what the player is trying to do. Beta-code */
     /* TODO EntityId might not be PlayerId sometime. Player should prob.
      *      report its EntityId as well as its Id */
-    console.log("me is", parseInt(me))
-    if (jsObj.Entities[parseInt(me)].ActionQueue.length > 0) {
+    console.log("me is", parseInt(me));
+    var myEntityId = jsObj.Players[parseInt(me)].EntityId;
+    if (jsObj.Entities[myEntityId].ActionQueue.length > 0) {
         increaseTick();
         tick(true);
     }
-    setQueue(jsObj.Entities[parseInt(me)].ActionQueue)
+    setQueue(jsObj.Entities[myEntityId].ActionQueue)
 }
 /**** End WebSocket Hooks ****/
 
@@ -83,7 +84,16 @@ loadTiles = function() {
     };
     tileImages.greenPlayer.src = imgPath + "Player-green.png";
 
-    $.when(floorDef, columnDef, bluePlayerDef, greenPlayerDef).then(function() {
+    tileImages.genericMonster = new Image();
+    var genericMonsterDef = $.Deferred();
+    tileImages.genericMonster.onload = function() {
+        console.log("Generic Monster image loaded");
+        genericMonsterDef.resolve();
+    };
+    tileImages.genericMonster.src = imgPath + "Generic-Monster.png";
+
+    $.when(floorDef, columnDef, bluePlayerDef,
+            greenPlayerDef, genericMonsterDef).then(function() {
         IMAGES_LOADED = true;
         console.log("ALL IMAGES LOADED!");
     });
@@ -123,22 +133,28 @@ drawBoard = function(serverState) {
         }
     }
 
-    $.each(serverState.Entities, function(index, player) {
+    $.each(serverState.Entities, function(index, entity) {
         ctx.fillStyle = "rgb(0, 0, 200)";
-        ctx.fillRect(player.X * tileSize, player.Y * tileSize,
+        ctx.fillRect(entity.X * tileSize, entity.Y * tileSize,
                 tileSize - 2, tileSize - 2);
-        if (IMAGES_LOADED) {
-            var playerImg = null;
-
-            if (player.EntityId === 0) {
-                playerImg = tileImages.bluePlayer;
-            } else if (player.EntityId === 1) {
-                playerImg = tileImages.greenPlayer;
-            }
-
-            ctx.drawImage(playerImg, player.X * tileSize,
-                player.Y * tileSize, tileSize - 2, tileSize - 2);
+        if (IMAGES_LOADED === false) {
+            return;
         }
+
+        var entityImg = null;
+
+        if (entity.Type === "player") {
+            if (entity.Name === "Player 0") {
+                entityImg = tileImages.bluePlayer;
+            } else if (entity.Name === "Player 1") {
+                entityImg = tileImages.greenPlayer;
+            }
+        } else if (entity.Type === "monster") {
+            entityImg = tileImages.genericMonster;
+        }
+
+        ctx.drawImage(entityImg, entity.X * tileSize,
+            entity.Y * tileSize, tileSize - 2, tileSize - 2);
     });
 
 };

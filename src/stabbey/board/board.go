@@ -19,6 +19,7 @@ func New(level int) *Board {
     b.Level = level
     b.Layers = make(map[int] []string, 10)
     NewGrowingGenerator().Apply(b)
+    rand.Seed(time.Now().Unix())
     return b
 }
 
@@ -26,7 +27,6 @@ func New(level int) *Board {
  * spawn over entities */
 func (b *Board) GetRandomSpawnPoint() (int, int) {
     maxAttempts := 1000
-    rand.Seed(time.Now().Unix())
 
     for x := 0; x < maxAttempts; x++ {
         x := rand.Intn(interfaces.BOARD_WIDTH);

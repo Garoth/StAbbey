@@ -5,7 +5,21 @@ import (
     "time"
 
     "stabbey/interfaces"
+    "stabbey/monsters"
 )
+
+/* Initializes game-logic stuff for a particular game level */
+func initLevel(levelId int) {
+    board := GAME.GetBoard(levelId)
+
+    /* Spawn some starting monsters */
+    for i := 0; i < 3; i++ {
+        m := monsters.New(monsters.GargoyleBuilder)
+        x, y := board.GetRandomSpawnPoint()
+        m.SetPosition(levelId, x, y)
+        GAME.AddEntity(m)
+    }
+}
 
 /* Checks whether all players are ready (done queueing) */
 func allPlayersReady() bool {

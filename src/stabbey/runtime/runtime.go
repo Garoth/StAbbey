@@ -34,13 +34,19 @@ type Runtime struct {
 
 func New(game interfaces.Game) *Runtime {
     r := &Runtime{}
+    log.Println("CREATING NEW GAME RUNTIME")
+
     r.orderStream = make(chan interfaces.Order)
     r.queueOrders = make(chan interfaces.Order)
     r.watchedEntities = make(map[interfaces.Entity] *timer, 100)
+
     GAME = game
+    initLevel(0)
+
     go r.processOrders()
     go r.acceptQueues()
     go r.scheduleActions()
+
     return r
 }
 

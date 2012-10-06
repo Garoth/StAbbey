@@ -10,6 +10,7 @@ type Player interface {
     /* Unique Game ID Getters / Setters */
     GetPlayerId() int
     SetPlayerId(id int)
+    GetEntityId() int
     /* Last Sent Tick Getters / Setters */
     GetLastTick() int
     SetLastTick(tickNum int)

@@ -34,7 +34,7 @@ func New() *Player {
     p.SetPosition(0, 8, 6)
     p.SetEntityId(entity.UIDG.NextUid())
     p.SetType(interfaces.ENTITY_TYPE_PLAYER)
-    p.SetName("Player" + strconv.Itoa(p.GetPlayerId()))
+    p.SetName("Player " + strconv.Itoa(p.GetPlayerId()))
 
     return p
 }
@@ -45,6 +45,10 @@ func (p *Player) GetPlayerId() int {
 
 func (p *Player) SetPlayerId(id int) {
     p.PlayerId = id
+}
+
+func (p *Player) GetEntityId() int {
+    return p.Entity.GetEntityId()
 }
 
 func (p *Player) GetLastTick() int {
