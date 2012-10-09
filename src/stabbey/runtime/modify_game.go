@@ -17,7 +17,18 @@ func initLevel(levelId int) {
         m := monsters.New(monsters.GargoyleBuilder)
         x, y := board.GetRandomSpawnPoint()
         m.SetPosition(levelId, x, y)
-        GAME.AddEntity(m)
+        GAME.AddMonster(m)
+    }
+}
+
+/* Starting point for every tick of the world */
+func worldTick() {
+    /* Inform non-player entities */
+    for _, ent := range GAME.GetEntities() {
+        if (ent.GetType() == interfaces.ENTITY_TYPE_MONSTER) {
+            monster := GAME.GetMonsterByEntityId(ent.GetEntityId())
+            monster.WorldTick(GAME.GetLastTick())
+        }
     }
 }
 

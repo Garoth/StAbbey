@@ -124,6 +124,8 @@ func (r *Runtime) scheduleActions() {
             }
         }
 
+        worldTick()
+
         GAME.SetLastTick(GAME.GetLastTick() + 1)
         log.Printf("All players are ready, sending tick %v", GAME.GetLastTick());
         broadcastGamestate()

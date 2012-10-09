@@ -14,6 +14,9 @@ type Game interface {
     GetEntity(entid int) Entity
     GetEntityByPlayer(player Player) Entity
     GetEntities() map[int] Entity
+    /* Monster manipulation */
+    AddMonster(monster Monster)
+    GetMonsterByEntityId(entid int) Monster
     /* Tick manipulation */
     GetLastTick() int
     SetLastTick(tick int)

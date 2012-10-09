@@ -13,6 +13,7 @@ var uidg = uidgenerator.New();
 type Monster struct {
     entity.Entity
     MonsterId int
+    TickFunction func(int)
 }
 
 /* Generates a particular type of monster using a monster builder */
@@ -26,8 +27,10 @@ func New(monsterBuilder func(*Monster)) *Monster {
 func newGeneric() *Monster {
     me := &Monster{}
 
-    /* Player stuff */
+    /* Monster stuff */
     me.MonsterId = uidg.NextUid();
+    me.TickFunction = func(tick int) {
+    }
 
     /* Entity stuff */
     me.SetPosition(0, 8, 6)
@@ -44,4 +47,8 @@ func (me *Monster) GetMonsterId() int {
 
 func (me *Monster) SetMonsterId(id int) {
     me.MonsterId = id
+}
+
+func (me *Monster) WorldTick(tick int) {
+    me.TickFunction(tick)
 }
