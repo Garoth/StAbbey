@@ -8,12 +8,15 @@ const BOARD_HEIGHT int = 12
 
 type Board interface {
     GetLevel() int
-    SetLevel(level int)
-    GetLayers() map[int] []string
-    SetLayer(layer int, layout []string)
+    SetLevel(int)
+    GetWidth() int
+    SetWidth(int)
+    GetHeight() int
+    SetHeight(int)
     GetRandomSpawnPoint() (int, int)
+    GetRender() []string
 }
 
 type BoardGenerator interface {
-    Apply(board Board)
+    Apply()
 }

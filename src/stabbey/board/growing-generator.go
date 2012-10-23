@@ -1,7 +1,6 @@
 package board
 
 import (
-    "log"
     "math/rand"
     "time"
 
@@ -12,21 +11,15 @@ import (
 const max_wall_rooms int = 3
 const max_rooms int = (max_wall_rooms - 1) * 4 + 1
 
-type room struct {
-    startingPointX, startingPointY, left, right, top, bottom int
-    constrainedLeft, constrainedRight, constrainedTop, constainedBottom bool
+type growingGen struct {
+    board *Board
 }
 
-type roomlist struct {
-    list map[int]*room
+func NewGrowingGenerator(b *Board) interfaces.BoardGenerator {
+    return &growingGen{b}
 }
 
-func NewGrowingGenerator() interfaces.BoardGenerator {
-    rl := &roomlist{make(map[int]*room)}
-    return rl
-}
-
-func (rl *roomlist) Apply(b interfaces.Board) {
+func (me *growingGen) Apply() {
     rand.Seed(time.Now().Unix())
     totalRooms := 0
 
@@ -43,11 +36,11 @@ func (rl *roomlist) Apply(b interfaces.Board) {
             x = -1
             y = 0
         } else if wall == 1 {
-            x = interfaces.BOARD_WIDTH - 1
+            x = me.board.GetWidth() - 1
             y = -1
         } else if wall == 2 {
             x = -1
-            y = interfaces.BOARD_HEIGHT - 1
+            y = me.board.GetHeight() - 1
         } else if wall == 3 {
             x = 0
             y = -1
@@ -55,35 +48,35 @@ func (rl *roomlist) Apply(b interfaces.Board) {
 
         for nRooms := rand.Intn(max_wall_rooms) - 1; nRooms >= 0; nRooms-- {
             for {
-                r := &room{}
+                r := &Room{}
 
                 if x != -1 {
-                    r.startingPointX = x
+                    r.StartingPointX = x
                     if x == 0 {
-                        r.constrainedLeft = true
+                        r.ConstrainedLeft = true
                     } else {
-                        r.constrainedRight = true
+                        r.ConstrainedRight = true
                     }
                 } else {
-                    r.startingPointX = rand.Intn(interfaces.BOARD_WIDTH)
+                    r.StartingPointX = rand.Intn(me.board.GetWidth())
                 }
 
                 if y != -1 {
-                    r.startingPointY = y
+                    r.StartingPointY = y
                     if y == 0 {
-                        r.constrainedTop = true
+                        r.ConstrainedTop = true
                     } else {
-                        r.constainedBottom = true
+                        r.ConstrainedBottom = true
                     }
                 } else {
-                    r.startingPointY = rand.Intn(interfaces.BOARD_HEIGHT)
+                    r.StartingPointY = rand.Intn(me.board.GetHeight())
                 }
 
-                if rl.AlreadyRoomThere(r) == false {
-                    rl.list[totalRooms] = r
+                if me.AlreadyRoomThere(r) == false {
+                    me.board.RoomList[totalRooms] = r
                     /* expand the room by 1 in every direciton right away */
                     for i := 0; i < 4; i++ {
-                        rl.TryGrowRoom(totalRooms, i, 1)
+                        me.TryGrowRoom(totalRooms, i, 1)
                     }
                     totalRooms++
                     break
@@ -95,15 +88,15 @@ func (rl *roomlist) Apply(b interfaces.Board) {
     /* Now generate some extra rooms in random places */
     for nRooms := rand.Intn(max_rooms-totalRooms + 1); nRooms >= 0; nRooms-- {
         for {
-            r := &room{}
-            r.startingPointX = rand.Intn(interfaces.BOARD_WIDTH)
-            r.startingPointY = rand.Intn(interfaces.BOARD_HEIGHT)
+            r := &Room{}
+            r.StartingPointX = rand.Intn(me.board.GetWidth())
+            r.StartingPointY = rand.Intn(me.board.GetHeight())
 
-            if rl.AlreadyRoomThere(r) == false {
-                rl.list[totalRooms] = r
+            if me.AlreadyRoomThere(r) == false {
+                me.board.RoomList[totalRooms] = r
                 /* expand the room by 1 in every direciton right away */
                 for i := 0; i < 4; i++ {
-                    rl.TryGrowRoom(totalRooms, i, 1)
+                    me.TryGrowRoom(totalRooms, i, 1)
                 }
                 totalRooms++
                 break
@@ -113,103 +106,22 @@ func (rl *roomlist) Apply(b interfaces.Board) {
 
     /* Randomly grow the rooms a bit, define walls */
     for i := 0; i < 5; i++ {
-        for k, _ := range rl.list {
-            rl.TryGrowRoom(k, rand.Intn(4), 1)
+        for k, _ := range me.board.RoomList {
+            me.TryGrowRoom(k, rand.Intn(4), 1)
         }
     }
-
-    /* And finally, write the rooms to the board */
-    layer := []string {"L--------------L",
-                       "|..............|",
-                       "|..............|",
-                       "|..............|",
-                       "|..............|",
-                       "|..............|",
-                       "|..............|",
-                       "|..............|",
-                       "|..............|",
-                       "|..............|",
-                       "|..............|",
-                       "L--------------L"}
-
-    for _, room := range rl.list {
-        /* Draw the top wall */
-        spY := room.startingPointY - room.top
-        spX := room.startingPointX
-        // Not efficient, but I don't care
-        for x := spX - room.left; x <= spX + room.right; x++ {
-            var e error
-            // TODO magic character
-            if layer, e = setTile(layer, x, spY, "-"); e != nil {
-                log.Fatalf("%v", e)
-            }
-        }
-
-        /* Draw the bottom wall */
-        spY = room.startingPointY + room.bottom
-        spX = room.startingPointX
-        // Not efficient, but I don't care
-        for x := spX - room.left; x <= spX + room.right; x++ {
-            var e error
-            // TODO magic character
-            if layer, e = setTile(layer, x, spY, "-"); e != nil {
-                log.Fatalf("%v", e)
-            }
-        }
-
-        /* Draw the left wall */
-        spY = room.startingPointY
-        spX = room.startingPointX - room.left
-        // Not efficient, but I don't care
-        for y := spY - room.top; y <= spY + room.bottom; y++ {
-            var e error
-            // TODO magic character
-            if layer, e = setTile(layer, spX, y, "|"); e != nil {
-                log.Fatalf("%v", e)
-            }
-        }
-
-        /* Draw the right wall */
-        spY = room.startingPointY
-        spX = room.startingPointX + room.right
-        // Not efficient, but I don't care
-        for y := spY - room.top; y <= spY + room.bottom; y++ {
-            var e error
-            // TODO magic character
-            if layer, e = setTile(layer, spX, y, "|"); e != nil {
-                log.Fatalf("%v", e)
-            }
-        }
-
-        /* Draw the L corners */
-        layer, _ = setTile(layer, room.startingPointX - room.left,
-            room.startingPointY - room.top, "L")
-        layer, _ = setTile(layer, room.startingPointX + room.right,
-            room.startingPointY - room.top, "L")
-        layer, _ = setTile(layer, room.startingPointX - room.left,
-            room.startingPointY + room.bottom, "L")
-        layer, _ = setTile(layer, room.startingPointX + room.right,
-            room.startingPointY + room.bottom, "L")
-    }
-
-    b.SetLayer(0, layer)
-    rl.DumpRooms()
 }
 
 /* Checks if a room's spawn point is close to any other room. Currently,
  * rooms must be at least 3 spaces away to count as sufficiently far away. */
-func (rl *roomlist) AlreadyRoomThere(r *room) bool {
+func (me *growingGen) AlreadyRoomThere(r *Room) bool {
     minDist := 3
 
-    for _, room := range rl.list {
-        if r.startingPointX >= room.startingPointX - minDist &&
-                r.startingPointX <= room.startingPointX + minDist &&
-                r.startingPointY >= room.startingPointY - minDist &&
-                r.startingPointY <= room.startingPointY + minDist {
-
-            //log.Printf("Room generation collision for (%v, %v) with (%v, %v)",
-            //    r.startingPointX, r.startingPointY,
-            //    room.startingPointY, room.startingPointX)
+    for _, room := range me.board.RoomList {
+        if r.StartingPointX >= room.StartingPointX - minDist &&
+                r.StartingPointX <= room.StartingPointX + minDist &&
+                r.StartingPointY >= room.StartingPointY - minDist &&
+                r.StartingPointY <= room.StartingPointY + minDist {
 
             return true
         }
@@ -219,36 +131,24 @@ func (rl *roomlist) AlreadyRoomThere(r *room) bool {
 }
 
 /* Attempts to expand the given room by the given amount if possible */
-func (rl *roomlist) TryGrowRoom(roomNumber, direction, amount int) bool {
-    room := rl.list[roomNumber]
-    //log.Printf("Trying to grow room (%v, %v) in direction %v",
-    //    room.startingPointX, room.startingPointY, direction)
+func (me *growingGen) TryGrowRoom(roomNumber, direction, amount int) bool {
+    room := me.board.RoomList[roomNumber]
 
     /* top */
-    if direction == 0 && room.startingPointY - room.top > 0 {
-        room.top += 1
+    if direction == 0 && room.StartingPointY - room.Top > 0 {
+        room.Top += 1
     /* right */
     } else if direction == 1 &&
-            room.startingPointX + room.right < interfaces.BOARD_WIDTH - 1 {
-        room.right += 1
+            room.StartingPointX + room.Right < me.board.GetWidth() - 1 {
+        room.Right += 1
     /* bottom */
     } else if direction == 2 &&
-            room.startingPointY + room.bottom < interfaces.BOARD_HEIGHT - 1 {
-        room.bottom += 1
+            room.StartingPointY + room.Bottom < me.board.GetHeight() - 1 {
+        room.Bottom += 1
     /* left */
-    } else if direction == 3 && room.startingPointX - room.left > 0 {
-        room.left += 1
+    } else if direction == 3 && room.StartingPointX - room.Left > 0 {
+        room.Left += 1
     }
 
     return false
-}
-
-func (rl *roomlist) DumpRooms() {
-    log.Printf("--- List of Rooms ---")
-    for k, room := range rl.list {
-        log.Printf("Room %v: at (%v, %v) with size (%v, %v, %v, %v)", k,
-            room.startingPointX, room.startingPointY, room.top, room.right,
-            room.bottom, room.left)
-    }
-    log.Printf("--- End List of Rooms ---")
 }

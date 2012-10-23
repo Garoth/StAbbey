@@ -15,10 +15,8 @@ func NewBoard(b interfaces.Board) *Board {
     sb := &Board{}
 
     sb.Level = b.GetLevel()
-    sb.Layers = make([][]string, len(b.GetLayers()))
-    for k, layer := range b.GetLayers() {
-        sb.Layers[k] = layer
-    }
+    sb.Layers = make([][]string, 1)
+    sb.Layers[0] = b.GetRender()
 
     return sb
 }
