@@ -12,7 +12,7 @@ import (
     "stabbey/interfaces"
 )
 
-var uidg = uidgenerator.New();
+var uidg = uidgenerator.New()
 
 type Player struct {
     entity.Entity

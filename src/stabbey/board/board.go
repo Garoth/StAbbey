@@ -29,11 +29,11 @@ func (b *Board) GetRandomSpawnPoint() (int, int) {
     maxAttempts := 1000
 
     for x := 0; x < maxAttempts; x++ {
-        x := rand.Intn(interfaces.BOARD_WIDTH);
-        y := rand.Intn(interfaces.BOARD_HEIGHT);
+        x := rand.Intn(interfaces.BOARD_WIDTH)
+        y := rand.Intn(interfaces.BOARD_HEIGHT)
 
         if b.Layers[0][y][x] == '.' {
-            return x, y;
+            return x, y
         }
     }
 

@@ -8,7 +8,7 @@ import (
     "stabbey/interfaces"
 )
 
-var uidg = uidgenerator.New();
+var uidg = uidgenerator.New()
 
 type Monster struct {
     entity.Entity
@@ -28,7 +28,7 @@ func newGeneric() *Monster {
     me := &Monster{}
 
     /* Monster stuff */
-    me.MonsterId = uidg.NextUid();
+    me.MonsterId = uidg.NextUid()
     me.TickFunction = func(tick int) {
     }
 

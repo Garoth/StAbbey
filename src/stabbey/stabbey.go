@@ -75,7 +75,7 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
         gamekey = "0"
         GAME = game.NewGame(gamekey)
         GAME.AddBoard(board.New(0))
-        GAME.Run();
+        GAME.Run()
     }
 
     curPlayer = player.New()
@@ -105,7 +105,7 @@ func WebSocketConnect(ws *websocket.Conn) {
         Player string
     }{}
 
-    var message string;
+    var message string
     if err := websocket.Message.Receive(ws, &message); err != nil {
         log.Fatal("Reading Socket Error:", err)
     } else {
@@ -152,18 +152,18 @@ func KeepReading(p interfaces.Player, ws *websocket.Conn) {
 
 /* Serve javascript files manually in order to set the content type */
 func JavascriptHandler(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "text/javascript");
+    w.Header().Set("Content-Type", "text/javascript")
     http.ServeFile(w, r, r.URL.Path[1:])
 }
 
 /* Serve javascript files manually in order to set the content type */
 func CssHandler(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "text/css");
+    w.Header().Set("Content-Type", "text/css")
     http.ServeFile(w, r, r.URL.Path[1:])
 }
 
 /* Serve image files manually in order to set the content type */
 func ImgHandler(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "image/png");
+    w.Header().Set("Content-Type", "image/png")
     http.ServeFile(w, r, r.URL.Path[1:])
 }

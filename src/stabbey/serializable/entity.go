@@ -17,5 +17,5 @@ func NewEntity(e interfaces.Entity) *Entity {
     se.Type = e.GetType()
     se.BoardId, se.X, se.Y = e.GetPosition()
     se.ActionQueue = e.GetStringActionQueue()
-    return se;
+    return se
 }
