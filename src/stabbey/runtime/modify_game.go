@@ -73,5 +73,4 @@ func updateTick(order interfaces.Order) {
     p := order.GetPlayer()
     p.SetLastTick(order.GetTickNumber())
     p.SetLastTickTime(time.Now())
-
 }
