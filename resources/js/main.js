@@ -114,7 +114,10 @@ drawBoard = function(serverState) {
     for (var x = 0; x < layers.length; x++) {
         var layer = layers[x];
         for (var i = 0; i < layer.length; i++) {
+            /* Draw tile outlines */
             ctx.strokeRect(i * tileSize, x * tileSize, tileSize, tileSize);
+
+            /* Draw floor everywhere */
             if (IMAGES_LOADED) {
                 ctx.drawImage(tileImages.floor, i * tileSize, x * tileSize,
                         tileSize, tileSize);
@@ -122,9 +125,6 @@ drawBoard = function(serverState) {
 
             /* Draw walls */
             if (layer[i] === "-" || layer[i] === "L" || layer[i] === "|") {
-                ctx.fillStyle = "rgb(0, 0, 0)";
-                ctx.fillRect(i * tileSize, x * tileSize,
-                        tileSize, tileSize);
                 if (IMAGES_LOADED) {
                     ctx.drawImage(tileImages.column, i * tileSize,
                             x * tileSize, tileSize, tileSize);
@@ -134,23 +134,20 @@ drawBoard = function(serverState) {
     }
 
     $.each(serverState.Entities, function(index, entity) {
-        ctx.fillStyle = "rgb(0, 0, 200)";
-        ctx.fillRect(entity.X * tileSize, entity.Y * tileSize,
-                tileSize - 2, tileSize - 2);
         if (IMAGES_LOADED === false) {
             return;
         }
 
         var entityImg = null;
 
-        if (entity.Type === "player") {
+        if (entity.Type === "monster") {
+            entityImg = tileImages.genericMonster;
+        } else if (entity.Type === "player") {
             if (entity.Name === "Player 0") {
                 entityImg = tileImages.bluePlayer;
             } else if (entity.Name === "Player 1") {
                 entityImg = tileImages.greenPlayer;
             }
-        } else if (entity.Type === "monster") {
-            entityImg = tileImages.genericMonster;
         }
 
         ctx.drawImage(entityImg, entity.X * tileSize,
