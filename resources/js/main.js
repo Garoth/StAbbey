@@ -176,7 +176,8 @@ ACTIONS = function() {
      * The base codes below are used to create full codes.
      */
     var base_code_verbs = {
-        move: "m"
+        move: "m",
+        push: "p"
     }
 
     me.DIRECTIONS = {
@@ -188,6 +189,10 @@ ACTIONS = function() {
 
     me.move = function(direction) {
         return base_code_verbs.move + direction
+    }
+
+    me.push = function(direction) {
+        return base_code_verbs.push + direction
     }
 
     return me;
@@ -283,6 +288,26 @@ $(function() {
     $("#move-down").click(function() {
         console.log("Sending order to move down");
         addToQueue(ACTIONS.move(ACTIONS.DIRECTIONS.DOWN))
+    });
+
+    $("#push-right").click(function() {
+        console.log("Sending order to push right");
+        addToQueue(ACTIONS.push(ACTIONS.DIRECTIONS.RIGHT))
+    });
+
+    $("#push-left").click(function() {
+        console.log("Sending order to push left");
+        addToQueue(ACTIONS.push(ACTIONS.DIRECTIONS.LEFT))
+    });
+
+    $("#push-up").click(function() {
+        console.log("Sending order to push up");
+        addToQueue(ACTIONS.push(ACTIONS.DIRECTIONS.UP))
+    });
+
+    $("#push-down").click(function() {
+        console.log("Sending order to push down");
+        addToQueue(ACTIONS.push(ACTIONS.DIRECTIONS.DOWN))
     });
 
     $("#ready").click(function() {

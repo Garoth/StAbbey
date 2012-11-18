@@ -13,6 +13,7 @@ type Game interface {
     AddEntity(entity Entity)
     GetEntity(entid int) Entity
     GetEntityByPlayer(player Player) Entity
+    GetEntityByLocation(boardId, x, y int) Entity
     GetEntities() map[int] Entity
     /* Monster manipulation */
     AddMonster(monster Monster)

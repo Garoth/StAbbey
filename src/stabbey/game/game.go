@@ -117,6 +117,17 @@ func (g *Game) GetEntityByPlayer(player interfaces.Player) interfaces.Entity {
     return g.PlayersToEntities[player]
 }
 
+func (g *Game) GetEntityByLocation(boardId, x, y int) interfaces.Entity {
+    for _, entity := range g.Entities {
+        boardId2, x2, y2 := entity.GetPosition()
+        if boardId2 == boardId && x == x2 && y == y2 {
+            return entity
+        }
+    }
+
+    return nil
+}
+
 func (g *Game) GetMonsterByEntityId(entid int) interfaces.Monster {
     return g.EntityIdToMonster[entid]
 }
