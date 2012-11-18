@@ -1,5 +1,22 @@
 package game
 
+/* Represents the overall game state, and hooks together all the various parts:
+ *  - Boards
+ *  - Entities
+ *  - Players
+ *  - Monsters
+ *  - Etc
+ *
+ * Can be queried somewhat like a database to find out about the game / change
+ * its state.
+ */
+
+/* FIXME This likely needs some big scary global-lock style mutexes, since
+ *       this is a central object that's referred to all over the place. I
+ *       can imagine nasty race conditions happening in the long run, so it's
+ *       probably best to just lock it down frequently.
+ */
+
 import (
     "encoding/json"
     "log"

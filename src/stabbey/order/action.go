@@ -8,6 +8,7 @@ import (
     "stabbey/interfaces"
 )
 
+/* Map of the base command string 'verbs' to which functions handle them */
 var ACTIONS = map[byte] func(partialAction *Action) {
     '.' : IdleAction,
     'm' : MoveAction,
@@ -26,8 +27,7 @@ func NewAction(at string) interfaces.Action {
     me := &Action{}
     me.actionString = at
     me.count = 0
-    me.act = func(e interfaces.Entity, g interfaces.Game) {
-    }
+    me.act = func(e interfaces.Entity, g interfaces.Game) { }
     ACTIONS[at[0]](me)
 
     return me
@@ -44,6 +44,7 @@ func (a *Action) Act(e interfaces.Entity, g interfaces.Game) {
 
 /* Makes you do nothing for one turn */
 func IdleAction(me *Action) {
+    /* Yep. */
 }
 
 /* Moves your entity over one */
