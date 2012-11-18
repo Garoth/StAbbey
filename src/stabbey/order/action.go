@@ -9,6 +9,7 @@ import (
 )
 
 var ACTIONS = map[byte] func(partialAction *Action) {
+    '.' : IdleAction,
     'm' : MoveAction,
     'p' : PushAction,
 }
@@ -25,6 +26,8 @@ func NewAction(at string) interfaces.Action {
     me := &Action{}
     me.actionString = at
     me.count = 0
+    me.act = func(e interfaces.Entity, g interfaces.Game) {
+    }
     ACTIONS[at[0]](me)
 
     return me
@@ -37,6 +40,10 @@ func (a *Action) ActionString() string {
 /* Wrapper around the act member to work with interfaces */
 func (a *Action) Act(e interfaces.Entity, g interfaces.Game) {
     a.act(e, g)
+}
+
+/* Makes you do nothing for one turn */
+func IdleAction(me *Action) {
 }
 
 /* Moves your entity over one */

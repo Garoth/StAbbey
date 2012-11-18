@@ -176,6 +176,7 @@ ACTIONS = function() {
      * The base codes below are used to create full codes.
      */
     var base_code_verbs = {
+        idle: ".",
         move: "m",
         push: "p"
     }
@@ -185,6 +186,10 @@ ACTIONS = function() {
         RIGHT : "r",
         UP    : "u",
         DOWN  : "d"
+    }
+
+    me.idle = function() {
+        return base_code_verbs.idle
     }
 
     me.move = function(direction) {
@@ -263,50 +268,55 @@ tick = function(once) {
 /* Stuff to run after the page has loaded */
 $(function() {
     $("#start").click(function() {
-        console.log("Sending start game message");
+        console.log("Sent start game message");
         sendMessage(COMMANDS.startGame())
         increaseTick();
         tick();
         $("#start").toggleClass("disabled").off()
     });
 
+    $("#idle").click(function() {
+        console.log("Queued order to do nothing");
+        addToQueue(ACTIONS.idle())
+    });
+
     $("#move-right").click(function() {
-        console.log("Sending order to move right");
+        console.log("Queued order to move right");
         addToQueue(ACTIONS.move(ACTIONS.DIRECTIONS.RIGHT))
     });
 
     $("#move-left").click(function() {
-        console.log("Sending order to move left");
+        console.log("Queued order to move left");
         addToQueue(ACTIONS.move(ACTIONS.DIRECTIONS.LEFT))
     });
 
     $("#move-up").click(function() {
-        console.log("Sending order to move up");
+        console.log("Queued order to move up");
         addToQueue(ACTIONS.move(ACTIONS.DIRECTIONS.UP))
     });
 
     $("#move-down").click(function() {
-        console.log("Sending order to move down");
+        console.log("Queued order to move down");
         addToQueue(ACTIONS.move(ACTIONS.DIRECTIONS.DOWN))
     });
 
     $("#push-right").click(function() {
-        console.log("Sending order to push right");
+        console.log("Queued order to push right");
         addToQueue(ACTIONS.push(ACTIONS.DIRECTIONS.RIGHT))
     });
 
     $("#push-left").click(function() {
-        console.log("Sending order to push left");
+        console.log("Queued order to push left");
         addToQueue(ACTIONS.push(ACTIONS.DIRECTIONS.LEFT))
     });
 
     $("#push-up").click(function() {
-        console.log("Sending order to push up");
+        console.log("Queued order to push up");
         addToQueue(ACTIONS.push(ACTIONS.DIRECTIONS.UP))
     });
 
     $("#push-down").click(function() {
-        console.log("Sending order to push down");
+        console.log("Queued order to push down");
         addToQueue(ACTIONS.push(ACTIONS.DIRECTIONS.DOWN))
     });
 
