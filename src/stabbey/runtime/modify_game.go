@@ -10,12 +10,10 @@ import (
 
 /* Initializes game-logic stuff for a particular game level */
 func initLevel(levelId int) {
-    board := GAME.GetBoard(levelId)
-
     /* Spawn some starting monsters */
     for i := 0; i < 3; i++ {
         m := monsters.New(monsters.GargoyleBuilder)
-        x, y := board.GetRandomSpawnPoint()
+        x, y := GAME.GetRandomEmptySpace()
         m.SetPosition(levelId, x, y)
         GAME.AddMonster(m)
     }
@@ -55,16 +53,16 @@ func act(entity interfaces.Entity, action interfaces.Action) {
     command := action.ActionType()
 
     boardId, x, y := entity.GetPosition()
-    if command == "mr" {
+    if command == "mr" && GAME.IsSpaceEmpty(x + 1, y) {
         entity.SetPosition(boardId, x + 1, y)
-    } else if command == "ml" {
+    } else if command == "ml" && GAME.IsSpaceEmpty(x - 1, y) {
         entity.SetPosition(boardId, x - 1, y)
-    } else if command == "mu" {
+    } else if command == "mu" && GAME.IsSpaceEmpty(x, y - 1) {
         entity.SetPosition(boardId, x, y - 1)
-    } else if command == "md" {
+    } else if command == "md" && GAME.IsSpaceEmpty(x, y + 1) {
         entity.SetPosition(boardId, x, y + 1)
     } else {
-        log.Printf("Unknown order %v ignored!", command)
+        log.Printf("Order %v did nothing.", command)
     }
 }
 

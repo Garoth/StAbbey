@@ -15,6 +15,8 @@ type growingGen struct {
     board *Board
 }
 
+/* Idea of this generator is to pick semi-random starting seeds for
+ * a bunch of rooms, and then randomly grow them out until they collide */
 func NewGrowingGenerator(b *Board) interfaces.BoardGenerator {
     return &growingGen{b}
 }

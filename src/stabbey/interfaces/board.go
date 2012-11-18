@@ -13,7 +13,6 @@ type Board interface {
     SetWidth(int)
     GetHeight() int
     SetHeight(int)
-    GetRandomSpawnPoint() (int, int)
     GetRender() []string
 }
 

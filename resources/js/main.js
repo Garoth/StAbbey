@@ -124,7 +124,7 @@ drawBoard = function(serverState) {
             }
 
             /* Draw walls */
-            if (layer[i] === "-" || layer[i] === "L" || layer[i] === "|") {
+            if (layer[i] === "#") {
                 if (IMAGES_LOADED) {
                     ctx.drawImage(tileImages.column, i * tileSize,
                             x * tileSize, tileSize, tileSize);

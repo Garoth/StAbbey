@@ -2,8 +2,6 @@ package board
 
 import (
     "log"
-    "math/rand"
-    "time"
     "stabbey/interfaces"
 )
 
@@ -12,11 +10,17 @@ type Room struct {
     ConstrainedLeft, ConstrainedRight, ConstrainedTop, ConstrainedBottom bool
 }
 
+type Tile struct {
+    LocX, LocY int
+}
+
 type Board struct {
     /* Unique game level number (i.e. floor number) */
     Level, Width, Height int
     /* List of rooms */
     RoomList map[int]*Room
+    /* List of "doors" -- tiles that override walls */
+    DoorList map[int]*Tile
 }
 
 /* Creates a brand new board, for level -- 0, 1, 2, etc */
@@ -26,45 +30,26 @@ func New(level int) *Board {
     b.Width = interfaces.BOARD_WIDTH
     b.Height = interfaces.BOARD_HEIGHT
     b.RoomList = make(map[int]*Room)
-    NewGrowingGenerator(b).Apply()
+    b.DoorList = make(map[int]*Tile)
+    NewPiecesGenerator(b).Apply()
     DumpRooms(b)
-    rand.Seed(time.Now().Unix())
     return b
-}
-
-/* Picks a random spawn point. TODO: should be in Game so that things can't
- * spawn over entities */
-func (b *Board) GetRandomSpawnPoint() (int, int) {
-    maxAttempts := 1000
-
-    for x := 0; x < maxAttempts; x++ {
-        x := rand.Intn(interfaces.BOARD_WIDTH)
-        y := rand.Intn(interfaces.BOARD_HEIGHT)
-
-        // TODO Bad way to do this
-        if b.GetRender()[y][x] == '.' {
-            return x, y
-        }
-    }
-
-    /* TODO should never happen */
-    return 0, 0
 }
 
 func (b *Board) GetRender() []string {
     /* And finally, write the rooms to the board */
-    layer := []string {"L--------------L",
-                       "|..............|",
-                       "|..............|",
-                       "|..............|",
-                       "|..............|",
-                       "|..............|",
-                       "|..............|",
-                       "|..............|",
-                       "|..............|",
-                       "|..............|",
-                       "|..............|",
-                       "L--------------L"}
+    layer := []string {"################",
+                       "#..............#",
+                       "#..............#",
+                       "#..............#",
+                       "#..............#",
+                       "#..............#",
+                       "#..............#",
+                       "#..............#",
+                       "#..............#",
+                       "#..............#",
+                       "#..............#",
+                       "################"}
 
     for _, room := range b.RoomList {
         /* Draw the top wall */
@@ -74,7 +59,7 @@ func (b *Board) GetRender() []string {
         for x := spX - room.Left; x <= spX + room.Right; x++ {
             var e error
             // TODO magic character
-            if layer, e = setTile(layer, x, spY, "-"); e != nil {
+            if layer, e = setTile(layer, x, spY, "#"); e != nil {
                 log.Fatalf("%v", e)
             }
         }
@@ -86,7 +71,7 @@ func (b *Board) GetRender() []string {
         for x := spX - room.Left; x <= spX + room.Right; x++ {
             var e error
             // TODO magic character
-            if layer, e = setTile(layer, x, spY, "-"); e != nil {
+            if layer, e = setTile(layer, x, spY, "#"); e != nil {
                 log.Fatalf("%v", e)
             }
         }
@@ -98,7 +83,7 @@ func (b *Board) GetRender() []string {
         for y := spY - room.Top; y <= spY + room.Bottom; y++ {
             var e error
             // TODO magic character
-            if layer, e = setTile(layer, spX, y, "|"); e != nil {
+            if layer, e = setTile(layer, spX, y, "#"); e != nil {
                 log.Fatalf("%v", e)
             }
         }
@@ -110,20 +95,17 @@ func (b *Board) GetRender() []string {
         for y := spY - room.Top; y <= spY + room.Bottom; y++ {
             var e error
             // TODO magic character
-            if layer, e = setTile(layer, spX, y, "|"); e != nil {
+            if layer, e = setTile(layer, spX, y, "#"); e != nil {
                 log.Fatalf("%v", e)
             }
         }
+    }
 
-        /* Draw the L corners */
-        layer, _ = setTile(layer, room.StartingPointX - room.Left,
-            room.StartingPointY - room.Top, "L")
-        layer, _ = setTile(layer, room.StartingPointX + room.Right,
-            room.StartingPointY - room.Top, "L")
-        layer, _ = setTile(layer, room.StartingPointX - room.Left,
-            room.StartingPointY + room.Bottom, "L")
-        layer, _ = setTile(layer, room.StartingPointX + room.Right,
-            room.StartingPointY + room.Bottom, "L")
+    for _, door := range b.DoorList {
+        var e error
+        if layer, e = setTile(layer, door.LocX, door.LocY, "|"); e != nil {
+            log.Fatalln(e)
+        }
     }
 
     return layer

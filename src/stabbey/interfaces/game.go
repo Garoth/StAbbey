@@ -17,6 +17,9 @@ type Game interface {
     /* Monster manipulation */
     AddMonster(monster Monster)
     GetMonsterByEntityId(entid int) Monster
+    /* Utilities */
+    IsSpaceEmpty(x, y int) bool
+    GetRandomEmptySpace() (int, int)
     /* Tick manipulation */
     GetLastTick() int
     SetLastTick(tick int)
