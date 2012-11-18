@@ -1,6 +1,8 @@
 package interfaces
 
 type Action interface {
-    /* Get the action type, relates to some const defines */
-    ActionType() string
+    /* Get the action command string (ex. ml for move left) */
+    ActionString() string
+    /* Execute the action, whatever it is */
+    Act(e Entity, g Game)
 }

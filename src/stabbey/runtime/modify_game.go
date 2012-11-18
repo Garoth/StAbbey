@@ -1,7 +1,6 @@
 package runtime
 
 import (
-    "log"
     "time"
 
     "stabbey/interfaces"
@@ -50,20 +49,7 @@ func broadcastGamestate() {
 
 /* Generic action handler for any entity */
 func act(entity interfaces.Entity, action interfaces.Action) {
-    command := action.ActionType()
-
-    boardId, x, y := entity.GetPosition()
-    if command == "mr" && GAME.IsSpaceEmpty(x + 1, y) {
-        entity.SetPosition(boardId, x + 1, y)
-    } else if command == "ml" && GAME.IsSpaceEmpty(x - 1, y) {
-        entity.SetPosition(boardId, x - 1, y)
-    } else if command == "mu" && GAME.IsSpaceEmpty(x, y - 1) {
-        entity.SetPosition(boardId, x, y - 1)
-    } else if command == "md" && GAME.IsSpaceEmpty(x, y + 1) {
-        entity.SetPosition(boardId, x, y + 1)
-    } else {
-        log.Printf("Order %v did nothing.", command)
-    }
+    action.Act(entity, GAME)
 }
 
 /* Updates players' ticks and send out gamestate when everyone's ready */

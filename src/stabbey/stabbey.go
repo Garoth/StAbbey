@@ -142,7 +142,7 @@ func KeepReading(p interfaces.Player, ws *websocket.Conn) {
             }
 
             o := order.NewOrder(playerOrder.CommandCode, playerOrder.TickNum,
-                playerOrder.Queue, p)
+                playerOrder.Queue, p, GAME)
             RUNTIME.AddOrder(o)
         }
     }

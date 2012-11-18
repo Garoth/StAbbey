@@ -12,7 +12,7 @@ type order struct {
 }
 
 func NewOrder(commandcode, ticknum int, actions []string,
-        player interfaces.Player) *order {
+        player interfaces.Player, game interfaces.Game) *order {
 
     order := &order{commandcode, ticknum,
         make([]interfaces.Action, len(actions)), player}

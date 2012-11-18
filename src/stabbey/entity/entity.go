@@ -62,7 +62,7 @@ func (e *Entity) GetStringActionQueue() []string {
     q := make([]string, len(e.GetActionQueue()))
 
     for i := 0; i < len(e.GetActionQueue()); i++ {
-        q[i] = e.GetActionQueue()[i].ActionType()
+        q[i] = e.GetActionQueue()[i].ActionString()
     }
 
     return q
