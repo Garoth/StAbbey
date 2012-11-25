@@ -19,10 +19,17 @@ socketErrored = function(e) {
     console.log(e);
 }
 
+firstMessage = true;
 socketMessaged = function(e) {
     jsObj = $.parseJSON(e.data);
     console.log("socket message:");
     console.log(jsObj);
+
+    if (firstMessage === true) {
+        firstMessage = false;
+        return;
+    }
+
     RESPONSE_TICK_NUM = jsObj.LastTick;
 
     entLayer = jsObj.Boards[0].Layers[0];

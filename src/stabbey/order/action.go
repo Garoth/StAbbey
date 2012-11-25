@@ -16,8 +16,15 @@ var ACTIONS = map[byte] func(partialAction *Action) {
 }
 
 type Action struct {
+    /* Short encodded string representing the action */
     actionString string
+    /* Descriptions, for UI */
+    shortDesc, longDesc string
+    /* Which direction(s) this action is usable - left, right, up, down, self */
+    availableDirections [5]bool
+    /* How many times the action is to be repeated */
     count int
+    /* Function that'll perform the action on the world state */
     act func(e interfaces.Entity, g interfaces.Game)
 }
 
@@ -26,6 +33,9 @@ func NewAction(at string) interfaces.Action {
 
     me := &Action{}
     me.actionString = at
+    me.shortDesc = "MISSING SHORT DESC"
+    me.longDesc = "MISSING LONG DESC"
+    me.availableDirections = [5]bool{true, true, true, true, false}
     me.count = 0
     me.act = func(e interfaces.Entity, g interfaces.Game) { }
     ACTIONS[at[0]](me)
@@ -37,6 +47,18 @@ func (a *Action) ActionString() string {
     return a.actionString
 }
 
+func (a *Action) ShortDescription() string {
+    return a.shortDesc
+}
+
+func (a *Action) LongDescription() string {
+    return a.longDesc
+}
+
+func (a *Action) AvailableDirections() [5]bool {
+    return a.availableDirections
+}
+
 /* Wrapper around the act member to work with interfaces */
 func (a *Action) Act(e interfaces.Entity, g interfaces.Game) {
     a.act(e, g)
@@ -44,11 +66,16 @@ func (a *Action) Act(e interfaces.Entity, g interfaces.Game) {
 
 /* Makes you do nothing for one turn */
 func IdleAction(me *Action) {
-    /* Yep. */
+    me.shortDesc = "Do Nothing"
+    me.longDesc = "You stand still and contemplate reality."
+    me.availableDirections = [5]bool{false, false, false, false, false}
 }
 
 /* Moves your entity over one */
 func MoveAction(me *Action) {
+    me.shortDesc = "Move"
+    me.longDesc = "You bravely advance."
+
     me.act = func(e interfaces.Entity, g interfaces.Game) {
         boardId, x, y := e.GetPosition()
 
@@ -63,6 +90,9 @@ func MoveAction(me *Action) {
 
 /* Pushes a neigbouring entity over one */
 func PushAction(me *Action) {
+    me.shortDesc = "Push"
+    me.longDesc = "You put your weight into a mighty shove."
+
     me.act = func(e interfaces.Entity, g interfaces.Game) {
         boardId, x, y := e.GetPosition()
         x2, y2 := getDirectionCoords(me.actionString[1], x, y)

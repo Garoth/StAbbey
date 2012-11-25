@@ -17,6 +17,7 @@ import (
     "stabbey/player"
     "stabbey/signalhandlers"
     "stabbey/runtime"
+    "stabbey/serializable"
 )
 
 const FILE_SETUP_HTML string = "resources/html/setup.html"
@@ -117,6 +118,7 @@ func WebSocketConnect(ws *websocket.Conn) {
             playerId, _ := strconv.Atoi(websocketConnection.Player)
             p := GAME.GetPlayer(playerId)
             p.SetWebSocketConnection(ws)
+            p.SendMessage(serializable.NewGameInfo().Json())
             KeepReading(p, ws)
         }
     }

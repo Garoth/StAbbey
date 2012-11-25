@@ -5,4 +5,8 @@ type Action interface {
     ActionString() string
     /* Execute the action, whatever it is */
     Act(e Entity, g Game)
+    /* Gets the descriptions that may be used for the UI */
+    LongDescription() string
+    ShortDescription() string
+    AvailableDirections() [5]bool
 }
