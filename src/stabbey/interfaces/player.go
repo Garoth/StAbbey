@@ -11,6 +11,8 @@ type Player interface {
     GetPlayerId() int
     SetPlayerId(id int)
     GetEntityId() int
+    /* Available actions getters / setters */
+    GetAvailableActions() []Action
     /* Last Sent Tick Getters / Setters */
     GetLastTick() int
     SetLastTick(tickNum int)

@@ -8,8 +8,9 @@ import (
     "code.google.com/p/go.net/websocket"
 
     "stabbey/entity"
-    "stabbey/uidgenerator"
     "stabbey/interfaces"
+    "stabbey/order"
+    "stabbey/uidgenerator"
 )
 
 var uidg = uidgenerator.New()
@@ -17,6 +18,7 @@ var uidg = uidgenerator.New()
 type Player struct {
     entity.Entity
     PlayerId int
+    AvailableActions []interfaces.Action
     PlayerLastTick int
     PlayerLastTickTime time.Time
     WebSocketConnection *websocket.Conn
@@ -29,6 +31,8 @@ func New() *Player {
     p.SetPlayerId(uidg.NextUid())
     p.SetLastTickTime(time.Now())
     p.SetWebSocketConnection(nil)
+    p.AvailableActions = append(p.AvailableActions, order.NewAction("."))
+    p.AvailableActions = append(p.AvailableActions, order.NewAction("mu"))
 
     /* Entity stuff */
     p.SetPosition(0, 8, 6)
@@ -49,6 +53,10 @@ func (p *Player) SetPlayerId(id int) {
 
 func (p *Player) GetEntityId() int {
     return p.Entity.GetEntityId()
+}
+
+func (p *Player) GetAvailableActions() []interfaces.Action {
+    return p.AvailableActions
 }
 
 func (p *Player) GetLastTick() int {

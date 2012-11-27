@@ -28,15 +28,20 @@ socketMessaged = function(e) {
     /* This is a message that describes start state */
     if (firstMessage === true) {
         firstMessage = false;
-
-        $.each(jsObj.StartingActions, function(index, action) {
-            addAction(action);
-        });
-
+        console.log("Version is " + jsObj.Version);
         return;
     }
 
     RESPONSE_TICK_NUM = jsObj.LastTick;
+
+    console.log("me is", parseInt(me));
+    var myPlayer = jsObj.Players[parseInt(me)]
+    var myEntityId = myPlayer.EntityId;
+
+    $("#dynamic-controls").html("");
+    $.each(myPlayer.AvailableActions, function(index, action) {
+        addAction(action);
+    });
 
     entLayer = jsObj.Boards[0].Layers[0];
     $.each(jsObj.Entities, function(index, player) {
@@ -46,8 +51,6 @@ socketMessaged = function(e) {
     $("#board").html(entLayer.join("<br/>"));
     drawBoard(jsObj);
 
-    console.log("me is", parseInt(me));
-    var myEntityId = jsObj.Players[parseInt(me)].EntityId;
     if (jsObj.Entities[myEntityId].ActionQueue.length > 0) {
         increaseTick();
         tick(true);
