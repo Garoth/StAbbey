@@ -25,8 +25,14 @@ socketMessaged = function(e) {
     console.log("socket message:");
     console.log(jsObj);
 
+    /* This is a message that describes start state */
     if (firstMessage === true) {
         firstMessage = false;
+
+        $.each(jsObj.StartingActions, function(index, action) {
+            addAction(action);
+        });
+
         return;
     }
 
@@ -40,9 +46,6 @@ socketMessaged = function(e) {
     $("#board").html(entLayer.join("<br/>"));
     drawBoard(jsObj);
 
-    /* Probably could clobber what the player is trying to do. Beta-code */
-    /* TODO EntityId might not be PlayerId sometime. Player should prob.
-     *      report its EntityId as well as its Id */
     console.log("me is", parseInt(me));
     var myEntityId = jsObj.Players[parseInt(me)].EntityId;
     if (jsObj.Entities[myEntityId].ActionQueue.length > 0) {
@@ -52,6 +55,72 @@ socketMessaged = function(e) {
     setQueue(jsObj.Entities[myEntityId].ActionQueue)
 }
 /**** End WebSocket Hooks ****/
+
+/* Adds a new ability to the client */
+addAction = function(action) {
+    var cont = $("#dynamic-controls");
+
+    if (action.AvailableDirections[0]) {
+        var t = $("<div>" + action.ShortDescription +
+            " Left</div>").appendTo(cont);
+        t.click(function() {
+            console.log("Queued left order: " + action.LongDescription);
+            addToQueue(action.ActionString + "l");
+        });
+    }
+
+    if (action.AvailableDirections[1]) {
+        var t = $("<div>" + action.ShortDescription +
+            " Right</div>").appendTo(cont);
+        t.click(function() {
+            console.log("Queued right order: " + action.LongDescription);
+            addToQueue(action.ActionString + "r");
+        });
+    }
+
+    if (action.AvailableDirections[2]) {
+        var t = $("<div>" + action.ShortDescription +
+            " Up</div>").appendTo(cont);
+        t.click(function() {
+            console.log("Queued up order: " + action.LongDescription);
+            addToQueue(action.ActionString + "u");
+        });
+    }
+
+    if (action.AvailableDirections[3]) {
+        var t = $("<div>" + action.ShortDescription +
+                " Down</div>").appendTo(cont);
+        t.click(function() {
+            console.log("Queued down order: " + action.LongDescription);
+            addToQueue(action.ActionString + "d");
+        });
+    }
+
+    if (action.AvailableDirections[4]) {
+        var t = $("<div>" + action.ShortDescription +
+                " Self</div>").appendTo(cont);
+        t.click(function() {
+            console.log("Queued self order: " + action.LongDescription);
+            addToQueue(action.ActionString + "s");
+        });
+    }
+
+    if (action.AvailableDirections[0] == false &&
+        action.AvailableDirections[1] == false &&
+        action.AvailableDirections[2] == false &&
+        action.AvailableDirections[3] == false &&
+        action.AvailableDirections[4] == false) {
+
+        var t = $("<div>" + action.ShortDescription +
+                "</div>").appendTo(cont);
+        t.click(function() {
+            console.log("Queued order: " + action.LongDescription);
+            addToQueue(action.ActionString);
+        });
+    }
+
+    $("<br />").appendTo(cont);
+};
 
 tileImages = {}
 IMAGES_LOADED = false;
@@ -172,44 +241,6 @@ sendMessage = function(vars) {
     conn.send(msg);
 };
 
-/* Various actions that could be sent to the server */
-ACTIONS = function() {
-    var me = {}
-
-    /* List of commands the server understands. These will be validated by the
-     * server to ensure that the client is actually able to do what they're
-     * asking to do.
-     *
-     * The base codes below are used to create full codes.
-     */
-    var base_code_verbs = {
-        idle: ".",
-        move: "m",
-        push: "p"
-    }
-
-    me.DIRECTIONS = {
-        LEFT  : "l",
-        RIGHT : "r",
-        UP    : "u",
-        DOWN  : "d"
-    }
-
-    me.idle = function() {
-        return base_code_verbs.idle
-    }
-
-    me.move = function(direction) {
-        return base_code_verbs.move + direction
-    }
-
-    me.push = function(direction) {
-        return base_code_verbs.push + direction
-    }
-
-    return me;
-}();
-
 /* Various command that can be sent to the server with sendMessage */
 COMMANDS = function() {
     me = {};
@@ -282,51 +313,6 @@ $(function() {
         $("#start").toggleClass("disabled").off()
     });
 
-    $("#idle").click(function() {
-        console.log("Queued order to do nothing");
-        addToQueue(ACTIONS.idle())
-    });
-
-    $("#move-right").click(function() {
-        console.log("Queued order to move right");
-        addToQueue(ACTIONS.move(ACTIONS.DIRECTIONS.RIGHT))
-    });
-
-    $("#move-left").click(function() {
-        console.log("Queued order to move left");
-        addToQueue(ACTIONS.move(ACTIONS.DIRECTIONS.LEFT))
-    });
-
-    $("#move-up").click(function() {
-        console.log("Queued order to move up");
-        addToQueue(ACTIONS.move(ACTIONS.DIRECTIONS.UP))
-    });
-
-    $("#move-down").click(function() {
-        console.log("Queued order to move down");
-        addToQueue(ACTIONS.move(ACTIONS.DIRECTIONS.DOWN))
-    });
-
-    $("#push-right").click(function() {
-        console.log("Queued order to push right");
-        addToQueue(ACTIONS.push(ACTIONS.DIRECTIONS.RIGHT))
-    });
-
-    $("#push-left").click(function() {
-        console.log("Queued order to push left");
-        addToQueue(ACTIONS.push(ACTIONS.DIRECTIONS.LEFT))
-    });
-
-    $("#push-up").click(function() {
-        console.log("Queued order to push up");
-        addToQueue(ACTIONS.push(ACTIONS.DIRECTIONS.UP))
-    });
-
-    $("#push-down").click(function() {
-        console.log("Queued order to push down");
-        addToQueue(ACTIONS.push(ACTIONS.DIRECTIONS.DOWN))
-    });
-
     $("#ready").click(function() {
         console.log("Queue ready!");
         sendMessage(COMMANDS.queueActions(QUEUE, TICK_NUM));
@@ -336,19 +322,19 @@ $(function() {
 
     $(document).keydown(function(e){
         if (e.keyCode == 37) {
-            $("#move-left").click();
+            $("div:contains('Move Left')").click();
             return false;
         }
         if (e.keyCode == 38) {
-            $("#move-up").click();
+            $("div:contains('Move Up')").click();
             return false;
         }
         if (e.keyCode == 39) {
-            $("#move-right").click();
+            $("div:contains('Move Right')").click();
             return false;
         }
         if (e.keyCode == 40) {
-            $("#move-down").click();
+            $("div:contains('Move Down')").click();
             return false;
         }
         if (e.keyCode == 13) {
