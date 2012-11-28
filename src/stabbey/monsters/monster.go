@@ -19,6 +19,8 @@ type Monster struct {
 /* Generates a particular type of monster using a monster builder */
 func New(monsterBuilder func(*Monster)) *Monster {
     monster := newGeneric()
+    monster.SetMaxArdour(50)
+    monster.SetArdour(50)
     monsterBuilder(monster)
     return monster
 }

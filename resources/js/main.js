@@ -229,8 +229,22 @@ drawBoard = function(serverState) {
             }
         }
 
+        /* Entity icon */
         ctx.drawImage(entityImg, entity.X * tileSize,
             entity.Y * tileSize, tileSize - 2, tileSize - 2);
+
+        /* Health Bar */
+        ctx.fillStyle = "rgb(200,0,0)";
+        ctx.fillRect(entity.X * tileSize,
+                (entity.Y + 1) * tileSize - 5,
+                tileSize - 1,
+                4);
+        var ardourPercent = entity.Ardour / entity.MaxArdour
+        ctx.fillStyle = "rgb(0,200,0)";
+        ctx.fillRect(entity.X * tileSize,
+                (entity.Y + 1) * tileSize - 5,
+                (tileSize - 1) * ardourPercent,
+                4);
     });
 
 };

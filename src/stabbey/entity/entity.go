@@ -1,6 +1,8 @@
 package entity
 
 import (
+    "log"
+
     "stabbey/interfaces"
     "stabbey/uidgenerator"
 )
@@ -8,7 +10,7 @@ import (
 var UIDG = uidgenerator.New()
 
 type Entity struct {
-    EntityId, BoardId, X, Y int
+    EntityId, BoardId, X, Y, Ardour, MaxArdour int
     Name, Type string
     ActionQueue []interfaces.Action
 }
@@ -16,6 +18,8 @@ type Entity struct {
 func New(entid int) *Entity {
     e := &Entity{}
     e.SetEntityId(entid)
+    e.MaxArdour = 50
+    e.Ardour = 50
     e.ActionQueue = make([]interfaces.Action, 0, 10)
     return e
 }
@@ -52,6 +56,46 @@ func (e *Entity) SetType(t string) {
 
 func (e *Entity) GetType() string {
     return e.Type
+}
+
+func (e *Entity) SetMaxArdour(ardour int) {
+    e.MaxArdour = ardour
+    if e.MaxArdour < 0 {
+        log.Println("Warning: attempt to set max ardour to below 0")
+        e.MaxArdour = 0
+    }
+}
+
+func (e *Entity) GetMaxArdour() int {
+    return e.MaxArdour
+}
+
+func (e *Entity) ChangeArdour(difference int) int {
+    e.Ardour += difference
+    if e.Ardour > e.MaxArdour {
+        e.Ardour = e.MaxArdour
+    }
+    if e.Ardour < 0 {
+        e.Ardour = 0
+    }
+    log.Println("Entity", e.Name, "changed ardour to", e.Ardour)
+    return e.Ardour
+}
+
+func (e *Entity) SetArdour(ardour int) {
+    e.Ardour = ardour
+    if e.Ardour > e.MaxArdour {
+        log.Println("Warning: attempt to set ardour to above max")
+        e.Ardour = e.MaxArdour
+    }
+    if e.Ardour < 0 {
+        log.Println("Warning: attempt to set ardour to below 0")
+        e.Ardour = 0
+    }
+}
+
+func (e *Entity) GetArdour() int {
+    return e.Ardour
 }
 
 func (e *Entity) GetActionQueue() []interfaces.Action {

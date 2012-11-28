@@ -17,6 +17,11 @@ type Entity interface {
     GetName() string
     SetType(t string)
     GetType() string
+    SetMaxArdour(ardour int)
+    GetMaxArdour() int
+    ChangeArdour(difference int) int
+    SetArdour(ardour int)
+    GetArdour() int
     /* Queue Manipulation Getters / Setters */
     GetActionQueue() []Action
     GetStringActionQueue() []string

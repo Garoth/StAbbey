@@ -33,12 +33,15 @@ func New() *Player {
     p.SetWebSocketConnection(nil)
     p.AvailableActions = append(p.AvailableActions, order.NewAction("."))
     p.AvailableActions = append(p.AvailableActions, order.NewAction("mu"))
+    p.AvailableActions = append(p.AvailableActions, order.NewAction("*u"))
 
     /* Entity stuff */
     p.SetPosition(0, 8, 6)
     p.SetEntityId(entity.UIDG.NextUid())
     p.SetType(interfaces.ENTITY_TYPE_PLAYER)
     p.SetName("Player " + strconv.Itoa(p.GetPlayerId()))
+    p.SetMaxArdour(100)
+    p.SetArdour(100)
 
     return p
 }

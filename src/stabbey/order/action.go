@@ -13,6 +13,7 @@ var ACTIONS = map[byte] func(partialAction *Action) {
     '.' : IdleAction,
     'm' : MoveAction,
     'p' : PushAction,
+    '*' : PunchAction,
 }
 
 type Action struct {
@@ -88,7 +89,7 @@ func MoveAction(me *Action) {
     }
 }
 
-/* Pushes a neigbouring entity over one */
+/* Pushes a neighbouring entity over one */
 func PushAction(me *Action) {
     me.shortDesc = "Push"
     me.longDesc = "You put your weight into a mighty shove."
@@ -106,7 +107,24 @@ func PushAction(me *Action) {
                     me.actionString)
             }
         } else {
-            log.Printf("Nothing to push at %v", me.actionString)
+            log.Printf("Nothing to push with %v", me.actionString)
+        }
+    }
+}
+
+/* Punches a neighbouring entity */
+func PunchAction(me *Action) {
+    me.shortDesc = "Punch"
+    me.longDesc = "You punch wildly."
+
+    me.act = func(e interfaces.Entity, g interfaces.Game) {
+        boardId, x, y := e.GetPosition()
+        x2, y2 := getDirectionCoords(me.actionString[1], x, y)
+
+        if entity := g.GetEntityByLocation(boardId, x2, y2); entity != nil {
+            entity.ChangeArdour(-10)
+        } else {
+            log.Printf("Nothing to punch with %v", me.actionString)
         }
     }
 }
