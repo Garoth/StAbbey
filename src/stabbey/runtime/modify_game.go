@@ -17,10 +17,10 @@ func initLevel(levelId int) {
         GAME.AddMonster(m)
     }
 
-    /* Spawn a chest with a skill in */
+    /* TODO Spawn a chest with a skill in */
 }
 
-/* Starting point for every tick of the world */
+/* Ticks when the players are done their round and other stuff can change */
 func worldTick() {
     /* Inform non-player entities */
     for _, ent := range GAME.GetEntities() {
@@ -39,6 +39,7 @@ func allPlayersReady() bool {
             return false
         }
     }
+
     return true
 }
 

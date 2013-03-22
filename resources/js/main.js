@@ -52,9 +52,13 @@ socketMessaged = function(e) {
     drawBoard(jsObj);
 
     if (jsObj.Entities[myEntityId].ActionQueue.length > 0) {
-        increaseTick();
+        setTick(RESPONSE_TICK_NUM + 1);
+        tick(true);
+    } else {
+        setTick(RESPONSE_TICK_NUM);
         tick(true);
     }
+
     setQueue(jsObj.Entities[myEntityId].ActionQueue)
 }
 /**** End WebSocket Hooks ****/
@@ -302,8 +306,12 @@ clearQueue = function() {
     $("#queue").text(QUEUE.join(", "));
 }
 
-increaseTick = function() {
-    TICK_NUM += 1;
+setTick = function(tickNum) {
+    if (tickNum == null) {
+        tickNum = TICK_NUM + 1;
+    }
+
+    TICK_NUM = tickNum;
     $("#tick").text("" + TICK_NUM);
 }
 
@@ -325,7 +333,7 @@ $(function() {
     $("#start").click(function() {
         console.log("Sent start game message");
         sendMessage(COMMANDS.startGame())
-        increaseTick();
+        setTick(RESPONSE_TICK_NUM + 1);
         tick();
         $("#start").toggleClass("disabled").off()
     });
@@ -333,7 +341,7 @@ $(function() {
     $("#ready").click(function() {
         console.log("Queue ready!");
         sendMessage(COMMANDS.queueActions(QUEUE, TICK_NUM));
-        increaseTick();
+        setTick(RESPONSE_TICK_NUM + 1);
         tick(true);
     })
 
