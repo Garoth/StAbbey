@@ -47,9 +47,9 @@ func main() {
     http.HandleFunc("/resources/js/",       JavascriptHandler)
     http.HandleFunc("/resources/css/",      CssHandler)
     http.HandleFunc("/resources/img/",      ImgHandler)
-    http.HandleFunc(HTTP_ROOT,    InitSetup)
-    http.HandleFunc(HTTP_CONNECT, ConnectSetup)
-    http.Handle(HTTP_WEBSOCKET,   websocket.Handler(WebSocketConnect))
+    http.HandleFunc(HTTP_ROOT,              InitSetup)
+    http.HandleFunc(HTTP_CONNECT,           ConnectSetup)
+    http.Handle(HTTP_WEBSOCKET,             websocket.Handler(WebSocketConnect))
 
     log.Println("Starting Server")
     if err := http.ListenAndServe(*ADDR, nil); err != nil {

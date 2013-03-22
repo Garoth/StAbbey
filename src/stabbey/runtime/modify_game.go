@@ -16,6 +16,8 @@ func initLevel(levelId int) {
         m.SetPosition(levelId, x, y)
         GAME.AddMonster(m)
     }
+
+    /* Spawn a chest with a skill in */
 }
 
 /* Starting point for every tick of the world */
