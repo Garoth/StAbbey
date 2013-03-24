@@ -2,3 +2,4 @@
 bin
 pkg
 *.css
+.DS_Store
