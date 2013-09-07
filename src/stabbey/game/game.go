@@ -66,7 +66,7 @@ func (g *Game) AddMonster(mon interfaces.Monster) {
 }
 
 /* Checks if an entity may be placed into a given tile on the current board */
-func (g *Game) IsSpaceEmpty(locX, locY int) bool {
+func (g *Game) CanMoveToSpace(locX, locY int) bool {
     /* Check if any entities are there */
     for _, e := range g.Entities {
         boardId, x, y := e.GetPosition()
@@ -92,7 +92,7 @@ func (g *Game) GetRandomEmptySpace() (int, int) {
         x := rand.Intn(interfaces.BOARD_WIDTH)
         y := rand.Intn(interfaces.BOARD_HEIGHT)
 
-        if g.IsSpaceEmpty(x, y) {
+        if g.CanMoveToSpace(x, y) {
             return x, y
         }
     }
@@ -151,6 +151,19 @@ func (g *Game) GetMonsterByEntityId(entid int) interfaces.Monster {
 
 func (g *Game) GetEntities() map[int] interfaces.Entity {
     return g.Entities
+}
+
+func (g *Game) GetEntitiesAtSpace(boardId, x, y int) []interfaces.Entity {
+    ret := []interfaces.Entity{}
+
+    for _, entity := range g.Entities {
+        boardId2, x2, y2 := entity.GetPosition()
+        if boardId2 == boardId && x == x2 && y == y2 {
+            ret = append(ret, entity)
+        }
+    }
+
+    return ret
 }
 
 func (g *Game) GetLastTick() int {

@@ -5,6 +5,7 @@ import (
 
 const ENTITY_TYPE_PLAYER     = "player"
 const ENTITY_TYPE_MONSTER    = "monster"
+const ENTITY_TYPE_LOOT       = "loot"
 
 /* A monster, player, or some special thing of that sort */
 type Entity interface {
@@ -23,6 +24,8 @@ type Entity interface {
     SetArdour(ardour int)
     GetArdour() int
     IsDead() bool
+    Die()
+    Trodden()
     /* Queue Manipulation Getters / Setters */
     GetActionQueue() []Action
     GetStringActionQueue() []string

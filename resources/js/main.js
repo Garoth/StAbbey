@@ -230,7 +230,7 @@ drawBoard = function(serverState) {
     }
 
     if (entity.Ardour === 0) {
-      ctx.globalAlpha = 0.2
+      return;
     }
 
     var entityImg = null;
@@ -265,8 +265,6 @@ drawBoard = function(serverState) {
         (entity.Y + 1) * tileSize - 5,
         (tileSize - 1) * ardourPercent,
         4);
-
-    ctx.globalAlpha = 1;
   });
 
 };

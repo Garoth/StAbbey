@@ -11,16 +11,20 @@ import (
 var uidg = uidgenerator.New()
 
 type Monster struct {
-    entity.Entity
+    *entity.Entity
     MonsterId int
     TickFunction func(int)
+    GameFunctions interfaces.MonsterModifyGame
 }
 
 /* Generates a particular type of monster using a monster builder */
-func New(monsterBuilder func(*Monster)) *Monster {
+func New(monsterBuilder func(*Monster),
+        gameFns interfaces.MonsterModifyGame) *Monster {
+
     monster := newGeneric()
     monster.SetMaxArdour(50)
     monster.SetArdour(50)
+    monster.GameFunctions = gameFns
     monsterBuilder(monster)
     return monster
 }
@@ -28,6 +32,7 @@ func New(monsterBuilder func(*Monster)) *Monster {
 /* Basic initiation of a monster class */
 func newGeneric() *Monster {
     me := &Monster{}
+    me.Entity = entity.New(entity.UIDG.NextUid())
 
     /* Monster stuff */
     me.MonsterId = uidg.NextUid()
@@ -36,7 +41,6 @@ func newGeneric() *Monster {
 
     /* Entity stuff */
     me.SetPosition(0, 8, 6)
-    me.SetEntityId(entity.UIDG.NextUid())
     me.SetType(interfaces.ENTITY_TYPE_MONSTER)
     me.SetName("Monster " + strconv.Itoa(me.MonsterId))
 

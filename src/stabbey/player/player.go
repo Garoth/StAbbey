@@ -36,8 +36,8 @@ func New() *Player {
     p.AvailableActions = append(p.AvailableActions, order.NewAction("*u"))
 
     /* Entity stuff */
+    p.Entity = entity.New(entity.UIDG.NextUid())
     p.SetPosition(0, 8, 6)
-    p.SetEntityId(entity.UIDG.NextUid())
     p.SetType(interfaces.ENTITY_TYPE_PLAYER)
     p.SetName("Player " + strconv.Itoa(p.GetPlayerId()))
     p.SetMaxArdour(100)

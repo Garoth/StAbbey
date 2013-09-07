@@ -1,6 +1,7 @@
 package monsters
 
 import (
+    "log"
     "strconv"
 )
 
@@ -10,5 +11,10 @@ func ChestBuilder(me *Monster) {
     me.SetArdour(10)
 
     me.TickFunction = func(tick int) {
+    }
+
+    me.DeathFunction = func() {
+        log.Println(me.GetName(), "drops loot")
+        me.GameFunctions.DropLoot(me.GetPosition())
     }
 }

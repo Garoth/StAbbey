@@ -1,24 +1,42 @@
 package runtime
 
 import (
+    "log"
     "time"
 
     "stabbey/interfaces"
     "stabbey/monsters"
 )
 
+
+/* Holder for functions that Monsters may to do modify the game */
+type MonsterModifyGame struct {
+}
+
+func NewMonsterModifyGame() *MonsterModifyGame {
+    me := &MonsterModifyGame{}
+    return me
+}
+
+/* Lets an entity drop loot */
+func (me *MonsterModifyGame) DropLoot(boardId, x, y int) {
+    log.Println("attempted to drop loot")
+}
+
 /* Initializes game-logic stuff for a particular game level */
 func initLevel(levelId int) {
+    monsterFunctions := NewMonsterModifyGame();
+
     /* Spawn some starting monsters */
     for i := 0; i < 3; i++ {
-        m := monsters.New(monsters.GargoyleBuilder)
+        m := monsters.New(monsters.GargoyleBuilder, monsterFunctions)
         x, y := GAME.GetRandomEmptySpace()
         m.SetPosition(levelId, x, y)
         GAME.AddMonster(m)
     }
 
     /* TODO Spawn a chest with a skill in */
-    c := monsters.New(monsters.ChestBuilder)
+    c := monsters.New(monsters.ChestBuilder, monsterFunctions)
     x, y := GAME.GetRandomEmptySpace()
     c.SetPosition(levelId, x, y)
     GAME.AddMonster(c)

@@ -15,11 +15,12 @@ type Game interface {
     GetEntityByPlayer(player Player) Entity
     GetEntityByLocation(boardId, x, y int) Entity
     GetEntities() map[int] Entity
+    GetEntitiesAtSpace(boardid, x, y int) []Entity
     /* Monster manipulation */
     AddMonster(monster Monster)
     GetMonsterByEntityId(entid int) Monster
     /* Utilities */
-    IsSpaceEmpty(x, y int) bool
+    CanMoveToSpace(x, y int) bool
     GetRandomEmptySpace() (int, int)
     /* Tick manipulation */
     GetLastTick() int

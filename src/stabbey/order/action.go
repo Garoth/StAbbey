@@ -81,7 +81,12 @@ func MoveAction(me *Action) {
         boardId, x, y := e.GetPosition()
 
         x2, y2 := getDirectionCoords(me.actionString[1], x, y)
-        if g.IsSpaceEmpty(x2, y2) {
+        if g.CanMoveToSpace(x2, y2) {
+            ents := g.GetEntitiesAtSpace(boardId, x2, y2)
+            for _, entity := range ents {
+                log.Println("about to step on", entity.GetName())
+                entity.Trodden();
+            }
             e.SetPosition(boardId, x2, y2)
         } else {
             log.Printf("Couldn't %v", me.actionString)
@@ -100,7 +105,7 @@ func PushAction(me *Action) {
 
         if entity := g.GetEntityByLocation(boardId, x2, y2); entity != nil {
             x3, y3 := getDirectionCoords(me.actionString[1], x2, y2)
-            if g.IsSpaceEmpty(x3, y3) {
+            if g.CanMoveToSpace(x3, y3) {
                 entity.SetPosition(boardId, x3, y3)
             } else {
                 log.Printf("Couldn't push %v by %v", entity.GetName(),

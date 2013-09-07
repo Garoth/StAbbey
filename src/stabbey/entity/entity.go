@@ -13,6 +13,8 @@ type Entity struct {
     EntityId, BoardId, X, Y, Ardour, MaxArdour int
     Name, Type string
     Dead bool
+    DeathFunction func()
+    TroddenFunction func()
     ActionQueue []interfaces.Action
 }
 
@@ -22,6 +24,12 @@ func New(entid int) *Entity {
     e.MaxArdour = 50
     e.Ardour = 50
     e.Dead = false
+    e.DeathFunction = func() {
+        log.Println(e.Name, "has died")
+    }
+    e.TroddenFunction = func() {
+        log.Println(e.Name, "was stepped on")
+    }
     e.ActionQueue = make([]interfaces.Action, 0, 10)
     return e
 }
@@ -82,8 +90,7 @@ func (e *Entity) ChangeArdour(difference int) int {
         log.Println(e.Name, "has died!")
         e.Ardour = 0
         e.Dead = true;
-    } else {
-        e.Dead = false;
+        e.Die()
     }
 
     log.Println("Entity", e.Name, "changed ardour to", e.Ardour)
@@ -108,6 +115,14 @@ func (e *Entity) GetArdour() int {
 
 func (e *Entity) IsDead() bool {
     return e.Dead
+}
+
+func (e *Entity) Die() {
+    e.DeathFunction()
+}
+
+func (e *Entity) Trodden() {
+    e.TroddenFunction()
 }
 
 func (e *Entity) GetActionQueue() []interfaces.Action {
