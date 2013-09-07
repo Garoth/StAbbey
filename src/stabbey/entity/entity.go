@@ -12,6 +12,7 @@ var UIDG = uidgenerator.New()
 type Entity struct {
     EntityId, BoardId, X, Y, Ardour, MaxArdour int
     Name, Type string
+    Dead bool
     ActionQueue []interfaces.Action
 }
 
@@ -20,6 +21,7 @@ func New(entid int) *Entity {
     e.SetEntityId(entid)
     e.MaxArdour = 50
     e.Ardour = 50
+    e.Dead = false
     e.ActionQueue = make([]interfaces.Action, 0, 10)
     return e
 }
@@ -62,7 +64,7 @@ func (e *Entity) SetMaxArdour(ardour int) {
     e.MaxArdour = ardour
     if e.MaxArdour < 0 {
         log.Println("Warning: attempt to set max ardour to below 0")
-        e.MaxArdour = 0
+        e.MaxArdour = 1
     }
 }
 
@@ -75,9 +77,15 @@ func (e *Entity) ChangeArdour(difference int) int {
     if e.Ardour > e.MaxArdour {
         e.Ardour = e.MaxArdour
     }
-    if e.Ardour < 0 {
+
+    if e.Ardour <= 0 {
+        log.Println(e.Name, "has died!")
         e.Ardour = 0
+        e.Dead = true;
+    } else {
+        e.Dead = false;
     }
+
     log.Println("Entity", e.Name, "changed ardour to", e.Ardour)
     return e.Ardour
 }
@@ -96,6 +104,10 @@ func (e *Entity) SetArdour(ardour int) {
 
 func (e *Entity) GetArdour() int {
     return e.Ardour
+}
+
+func (e *Entity) IsDead() bool {
+    return e.Dead
 }
 
 func (e *Entity) GetActionQueue() []interfaces.Action {

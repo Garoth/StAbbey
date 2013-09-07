@@ -18,6 +18,10 @@ func initLevel(levelId int) {
     }
 
     /* TODO Spawn a chest with a skill in */
+    c := monsters.New(monsters.ChestBuilder)
+    x, y := GAME.GetRandomEmptySpace()
+    c.SetPosition(levelId, x, y)
+    GAME.AddMonster(c)
 }
 
 /* Ticks when the players are done their round and other stuff can change */

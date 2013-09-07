@@ -68,9 +68,9 @@ func (g *Game) AddMonster(mon interfaces.Monster) {
 /* Checks if an entity may be placed into a given tile on the current board */
 func (g *Game) IsSpaceEmpty(locX, locY int) bool {
     /* Check if any entities are there */
-    for _, entity := range g.Entities {
-        boardId, x, y := entity.GetPosition()
-        if boardId == g.CurrentBoard && x == locX && y == locY {
+    for _, e := range g.Entities {
+        boardId, x, y := e.GetPosition()
+        if boardId == g.CurrentBoard && x == locX && y == locY && !e.IsDead() {
             return false
         }
     }
