@@ -242,6 +242,7 @@ drawBoard = function(serverState) {
     }
 
     var entityImg = null;
+    var drawHealth = true
 
     if (entity.Type === "monster") {
       if (entity.Name.indexOf("Gargoyle") !== -1) {
@@ -257,24 +258,27 @@ drawBoard = function(serverState) {
       }
     } else if (entity.Type === "loot") {
       entityImg = tileImages.loot;
+      drawHealth = false;
     }
 
     /* Entity icon */
     ctx.drawImage(entityImg, entity.X * tileSize,
-      entity.Y * tileSize, tileSize - 2, tileSize - 2);
+      entity.Y * tileSize, tileSize - 1, tileSize - 1);
 
     /* Health Bar */
-    ctx.fillStyle = "rgb(200,0,0)";
-    ctx.fillRect(entity.X * tileSize,
-        (entity.Y + 1) * tileSize - 5,
-        tileSize - 1,
-        4);
-    var ardourPercent = entity.Ardour / entity.MaxArdour
-    ctx.fillStyle = "rgb(0,200,0)";
-    ctx.fillRect(entity.X * tileSize,
-        (entity.Y + 1) * tileSize - 5,
-        (tileSize - 1) * ardourPercent,
-        4);
+    if (drawHealth === true) {
+      ctx.fillStyle = "rgb(200,0,0)";
+      ctx.fillRect(entity.X * tileSize,
+          (entity.Y + 1) * tileSize - 5,
+          tileSize - 1,
+          4);
+      var ardourPercent = entity.Ardour / entity.MaxArdour
+      ctx.fillStyle = "rgb(0,200,0)";
+      ctx.fillRect(entity.X * tileSize,
+          (entity.Y + 1) * tileSize - 5,
+          (tileSize - 1) * ardourPercent,
+          4);
+    }
   });
 
 };
