@@ -72,19 +72,32 @@ func (g *Game) CanMoveToSpace(locX, locY int) bool {
         boardId, x, y := e.GetPosition()
         if boardId == g.CurrentBoard && x == locX && y == locY &&
                 e.IsTangible() {
-            log.Println("Space", locX, locY, "is occupied by", e.GetName());
             return false
         }
     }
 
     /* Check if there are walls there */
-    /* TODO this is both inefficient and fragile */
-    if (g.Boards[g.CurrentBoard].GetRender()[locY][locX] == '#') {
-        log.Println("Space", locX, locY, "is occupied by a wall");
+    if g.IsWall(locX, locY) {
         return false
     }
 
     return true
+}
+
+/* Checks if there's a wall at a given tile */
+func (g *Game) IsWall(x, y int) bool {
+    if x > interfaces.BOARD_WIDTH - 1|| y > interfaces.BOARD_HEIGHT - 1 ||
+            x < 0 || y < 0 {
+        log.Println("Tried to check out wall out of bounds")
+        return true
+    } 
+
+    /* TODO this is both inefficient and fragile */
+    if (g.Boards[g.CurrentBoard].GetRender()[y][x] == '#') {
+        return true
+    }
+
+    return false
 }
 
 /* Picks a random empty space */
@@ -145,17 +158,6 @@ func (g *Game) GetEntity(entid int) interfaces.Entity {
 
 func (g *Game) GetEntityByPlayer(player interfaces.Player) interfaces.Entity {
     return g.PlayersToEntities[player]
-}
-
-func (g *Game) GetEntityByLocation(boardId, x, y int) interfaces.Entity {
-    for _, entity := range g.Entities {
-        boardId2, x2, y2 := entity.GetPosition()
-        if boardId2 == boardId && x == x2 && y == y2 {
-            return entity
-        }
-    }
-
-    return nil
 }
 
 func (g *Game) GetMonsterByEntityId(entid int) interfaces.Monster {

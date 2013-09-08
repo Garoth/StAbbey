@@ -34,6 +34,7 @@ func New() *Player {
     p.AvailableActions = append(p.AvailableActions, order.NewAction("."))
     p.AvailableActions = append(p.AvailableActions, order.NewAction("mu"))
     p.AvailableActions = append(p.AvailableActions, order.NewAction("*u"))
+    p.AvailableActions = append(p.AvailableActions, order.NewAction("lu"))
 
     /* Entity stuff */
     p.Entity = entity.New(entity.UIDG.NextUid())

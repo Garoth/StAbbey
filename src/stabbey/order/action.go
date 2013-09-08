@@ -14,6 +14,7 @@ var ACTIONS = map[byte] func(partialAction *Action) {
     'm' : MoveAction,
     'p' : PushAction,
     '*' : PunchAction,
+    'l' : LeapAction,
 }
 
 type Action struct {
@@ -79,11 +80,10 @@ func MoveAction(me *Action) {
 
     me.act = func(e interfaces.Entity, g interfaces.Game) {
         boardId, x, y := e.GetPosition()
+        x2, y2 := getDirectionCoords(me.actionString[1], x, y, 1)
 
-        x2, y2 := getDirectionCoords(me.actionString[1], x, y)
         if g.CanMoveToSpace(x2, y2) {
-            ents := g.GetEntitiesAtSpace(boardId, x2, y2)
-            for _, entity := range ents {
+            for _, entity := range g.GetEntitiesAtSpace(boardId, x2, y2) {
                 entity.Trodden(e);
             }
             e.SetPosition(boardId, x2, y2)
@@ -100,10 +100,10 @@ func PushAction(me *Action) {
 
     me.act = func(e interfaces.Entity, g interfaces.Game) {
         boardId, x, y := e.GetPosition()
-        x2, y2 := getDirectionCoords(me.actionString[1], x, y)
+        x2, y2 := getDirectionCoords(me.actionString[1], x, y, 1)
 
-        if entity := g.GetEntityByLocation(boardId, x2, y2); entity != nil {
-            x3, y3 := getDirectionCoords(me.actionString[1], x2, y2)
+        if entity := getAliveTangibleEntity(boardId, x2, y2, g); entity != nil {
+            x3, y3 := getDirectionCoords(me.actionString[1], x2, y2, 1)
             if g.CanMoveToSpace(x3, y3) {
                 entity.SetPosition(boardId, x3, y3)
             } else {
@@ -123,9 +123,9 @@ func PunchAction(me *Action) {
 
     me.act = func(e interfaces.Entity, g interfaces.Game) {
         boardId, x, y := e.GetPosition()
-        x2, y2 := getDirectionCoords(me.actionString[1], x, y)
+        x2, y2 := getDirectionCoords(me.actionString[1], x, y, 1)
 
-        if entity := g.GetEntityByLocation(boardId, x2, y2); entity != nil {
+        if entity := getAliveTangibleEntity(boardId, x2, y2, g); entity != nil {
             entity.ChangeArdour(-10)
         } else {
             log.Printf("Nothing to punch with %v", me.actionString)
@@ -133,20 +133,90 @@ func PunchAction(me *Action) {
     }
 }
 
+/* Leaps in a direction, over other entities */
+func LeapAction(me *Action) {
+    me.shortDesc = "Leap"
+    me.longDesc = "You fall, but miss the ground for a while."
+
+    me.act = func(e interfaces.Entity, g interfaces.Game) {
+        leapLength := 3
+
+        boardId, xOrig, yOrig := e.GetPosition()
+        x, y := xOrig, yOrig
+        xDest, yDest := -1, -1
+        iLeft := leapLength
+
+        /* Find landing spot */
+        for i := 1; i <= leapLength; i++ {
+            x, y = getDirectionCoords(me.actionString[1], xOrig, yOrig, i)
+
+            if g.IsWall(x, y) {
+                iLeft = i - 1
+                break
+            }
+        }
+
+        for i := iLeft; i >= 0; i-- {
+            x, y = getDirectionCoords(me.actionString[1], xOrig, yOrig, i)
+
+            if g.CanMoveToSpace(x, y) {
+                xDest, yDest = x, y
+                iLeft = i
+                break
+            }
+        }
+
+        /* Land there if possible, trigger trodden */
+        if xDest == -1 && yDest == -1 {
+            log.Println("Leap by", e.GetName(), "failed -- no available space")
+            return
+        } else {
+            for _, entity := range g.GetEntitiesAtSpace(boardId, xDest, yDest) {
+                entity.Trodden(e);
+            }
+            log.Println(e.GetName(), "lept to", xDest, yDest)
+            e.SetPosition(boardId, xDest, yDest)
+        }
+
+        /* Trigger trodden on all entities along the way */
+        for iLeft = iLeft - 1; iLeft > 0; iLeft-- {
+            x, y := getDirectionCoords(me.actionString[1], xOrig, yOrig, iLeft)
+
+            for _, entity := range g.GetEntitiesAtSpace(boardId, x, y) {
+                entity.Trodden(e);
+            }
+        }
+    }
+}
+
 /* Reads a character like 'r' and changes the given x/y to the adjacent
- * tile based on the direction given. i.e. 'r' would add 1 to x */
-func getDirectionCoords(direction byte, x, y int) (int, int) {
+ * tile based on the direction given. i.e. 'r' would add 1 to x.
+ * The repeat setting how many tiles in that direction to go */
+func getDirectionCoords(direction byte, x, y, repeat int) (int, int) {
     if direction == 'r' {
-        return x + 1, y
+        return x + repeat, y
     } else if direction == 'l' {
-        return x - 1, y
+        return x - repeat, y
     } else if direction == 'u' {
-        return x, y - 1
+        return x, y - repeat
     } else if direction == 'd' {
-        return x, y + 1
+        return x, y + repeat
     } else {
         log.Fatalln("Invalid direction given", direction)
     }
 
     return x, y
+}
+
+/* Checks entities on a space and returns the first non-dead, tangible one */
+func getAliveTangibleEntity(boardId, x, y int,
+        g interfaces.Game) interfaces.Entity {
+
+    for _, entity := range g.GetEntitiesAtSpace(boardId, x, y) {
+        if !entity.IsDead() && entity.IsTangible() {
+            return entity
+        }
+    }
+
+    return nil
 }

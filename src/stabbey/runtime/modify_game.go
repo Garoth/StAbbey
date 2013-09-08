@@ -1,7 +1,6 @@
 package runtime
 
 import (
-    "log"
     "time"
 
     "stabbey/interfaces"
@@ -40,7 +39,6 @@ func (me *MonsterModifyGame) DropLoot(boardId, x, y int,
     loot.SetGameFunctions(NewLootModifyGame())
     loot.SetPosition(boardId, x, y)
     GAME.AddEntity(loot)
-    log.Println("loot dropped")
 }
 
 /* Initializes game-logic stuff for a particular game level */
