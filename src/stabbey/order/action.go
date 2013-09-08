@@ -84,8 +84,7 @@ func MoveAction(me *Action) {
         if g.CanMoveToSpace(x2, y2) {
             ents := g.GetEntitiesAtSpace(boardId, x2, y2)
             for _, entity := range ents {
-                log.Println("about to step on", entity.GetName())
-                entity.Trodden();
+                entity.Trodden(e);
             }
             e.SetPosition(boardId, x2, y2)
         } else {

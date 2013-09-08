@@ -3,6 +3,7 @@ package monsters
 import (
     "log"
     "strconv"
+    "stabbey/loot"
 )
 
 func ChestBuilder(me *Monster) {
@@ -15,6 +16,8 @@ func ChestBuilder(me *Monster) {
 
     me.DeathFunction = func() {
         log.Println(me.GetName(), "drops loot")
-        me.GameFunctions.DropLoot(me.GetPosition())
+        loot := loot.New()
+        boardId, x, y := me.GetPosition()
+        me.GameFunctions.DropLoot(boardId, x, y, loot)
     }
 }

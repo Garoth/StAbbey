@@ -70,7 +70,9 @@ func (g *Game) CanMoveToSpace(locX, locY int) bool {
     /* Check if any entities are there */
     for _, e := range g.Entities {
         boardId, x, y := e.GetPosition()
-        if boardId == g.CurrentBoard && x == locX && y == locY && !e.IsDead() {
+        if boardId == g.CurrentBoard && x == locX && y == locY &&
+                e.IsTangible() {
+            log.Println("Space", locX, locY, "is occupied by", e.GetName());
             return false
         }
     }
@@ -78,6 +80,7 @@ func (g *Game) CanMoveToSpace(locX, locY int) bool {
     /* Check if there are walls there */
     /* TODO this is both inefficient and fragile */
     if (g.Boards[g.CurrentBoard].GetRender()[locY][locX] == '#') {
+        log.Println("Space", locX, locY, "is occupied by a wall");
         return false
     }
 
@@ -104,6 +107,16 @@ func (g *Game) GetRandomEmptySpace() (int, int) {
 
 func (g *Game) GetPlayer(id int) interfaces.Player {
     return g.Players[id]
+}
+
+func (g *Game) GetPlayerByEntity(entity interfaces.Entity) interfaces.Player {
+    for player, ent := range g.PlayersToEntities {
+        if ent.GetEntityId() == entity.GetEntityId() {
+            return player
+        }
+    }
+
+    return nil
 }
 
 func (g *Game) GetPlayers() map[int] interfaces.Player {

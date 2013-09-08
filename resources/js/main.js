@@ -183,7 +183,15 @@ loadTiles = function() {
   };
   tileImages.chest.src = imgPath + "Chest.png";
 
-  $.when(floorDef, columnDef, bluePlayerDef,
+  tileImages.loot = new Image();
+  var lootDef = $.Deferred();
+  tileImages.loot.onload = function() {
+    console.log("Loot image loaded");
+    lootDef.resolve();
+  };
+  tileImages.loot.src = imgPath + "red-carpet-floor.png";
+
+  $.when(floorDef, chestDef, columnDef, bluePlayerDef, lootDef,
       greenPlayerDef, genericMonsterDef).then(function() {
     IMAGES_LOADED = true;
     console.log("ALL IMAGES LOADED!");
@@ -247,6 +255,8 @@ drawBoard = function(serverState) {
       } else if (entity.Name === "Player 1") {
         entityImg = tileImages.greenPlayer;
       }
+    } else if (entity.Type === "loot") {
+      entityImg = tileImages.loot;
     }
 
     /* Entity icon */

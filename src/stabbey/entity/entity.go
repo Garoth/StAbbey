@@ -12,9 +12,9 @@ var UIDG = uidgenerator.New()
 type Entity struct {
     EntityId, BoardId, X, Y, Ardour, MaxArdour int
     Name, Type string
-    Dead bool
+    Tangible, Dead bool
     DeathFunction func()
-    TroddenFunction func()
+    TroddenFunction func(interfaces.Entity)
     ActionQueue []interfaces.Action
 }
 
@@ -24,11 +24,13 @@ func New(entid int) *Entity {
     e.MaxArdour = 50
     e.Ardour = 50
     e.Dead = false
+    e.Tangible = true
+    e.Name = "Some unspecified entity"
     e.DeathFunction = func() {
-        log.Println(e.Name, "has died")
+        log.Println(e.GetName(), "has died")
     }
-    e.TroddenFunction = func() {
-        log.Println(e.Name, "was stepped on")
+    e.TroddenFunction = func(by interfaces.Entity) {
+        log.Println(e.GetName(), "was stepped on")
     }
     e.ActionQueue = make([]interfaces.Action, 0, 10)
     return e
@@ -87,7 +89,6 @@ func (e *Entity) ChangeArdour(difference int) int {
     }
 
     if e.Ardour <= 0 {
-        log.Println(e.Name, "has died!")
         e.Ardour = 0
         e.Dead = true;
         e.Die()
@@ -107,10 +108,21 @@ func (e *Entity) SetArdour(ardour int) {
         log.Println("Warning: attempt to set ardour to below 0")
         e.Ardour = 0
     }
+    if e.Ardour == 0 {
+        e.Die()
+    }
 }
 
 func (e *Entity) GetArdour() int {
     return e.Ardour
+}
+
+func (e *Entity) IsTangible() bool {
+    return e.Tangible
+}
+
+func (e *Entity) SetTangible(tangible bool) {
+    e.Tangible = tangible
 }
 
 func (e *Entity) IsDead() bool {
@@ -118,11 +130,12 @@ func (e *Entity) IsDead() bool {
 }
 
 func (e *Entity) Die() {
+    e.SetTangible(false)
     e.DeathFunction()
 }
 
-func (e *Entity) Trodden() {
-    e.TroddenFunction()
+func (e *Entity) Trodden(by interfaces.Entity) {
+    e.TroddenFunction(by)
 }
 
 func (e *Entity) GetActionQueue() []interfaces.Action {

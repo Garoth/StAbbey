@@ -7,12 +7,13 @@ import (
 )
 
 type Player interface {
+    Entity
     /* Unique Game ID Getters / Setters */
     GetPlayerId() int
     SetPlayerId(id int)
-    GetEntityId() int
     /* Available actions getters / setters */
     GetAvailableActions() []Action
+    AddAvailableAction(Action)
     /* Last Sent Tick Getters / Setters */
     GetLastTick() int
     SetLastTick(tickNum int)

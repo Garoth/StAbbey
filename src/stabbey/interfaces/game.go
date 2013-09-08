@@ -4,6 +4,7 @@ type Game interface {
     /* Player Manipulation */
     AddPlayer(player Player, entity Entity)
     GetPlayer(id int) Player
+    GetPlayerByEntity(entity Entity) Player
     GetPlayers() map[int] Player
     /* Board manipulation */
     AddBoard(board Board)

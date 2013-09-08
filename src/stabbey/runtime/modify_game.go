@@ -8,8 +8,23 @@ import (
     "stabbey/monsters"
 )
 
+/* TODO move *ModifyGame to different files */
 
-/* Holder for functions that Monsters may to do modify the game */
+/* Holder for functions that Loot may use to modify the game */
+type LootModifyGame struct {
+}
+
+func NewLootModifyGame() *LootModifyGame {
+    me := &LootModifyGame{}
+    return me
+}
+
+func (me *LootModifyGame) GetPlayerByEntity(
+        entity interfaces.Entity) interfaces.Player {
+    return GAME.GetPlayerByEntity(entity)
+}
+
+/* Holder for functions that Monsters may use to modify the game */
 type MonsterModifyGame struct {
 }
 
@@ -19,8 +34,13 @@ func NewMonsterModifyGame() *MonsterModifyGame {
 }
 
 /* Lets an entity drop loot */
-func (me *MonsterModifyGame) DropLoot(boardId, x, y int) {
-    log.Println("attempted to drop loot")
+func (me *MonsterModifyGame) DropLoot(boardId, x, y int,
+        loot interfaces.Loot) {
+
+    loot.SetGameFunctions(NewLootModifyGame())
+    loot.SetPosition(boardId, x, y)
+    GAME.AddEntity(loot)
+    log.Println("loot dropped")
 }
 
 /* Initializes game-logic stuff for a particular game level */

@@ -23,9 +23,11 @@ type Entity interface {
     ChangeArdour(difference int) int
     SetArdour(ardour int)
     GetArdour() int
+    IsTangible() bool
+    SetTangible(tangible bool)
     IsDead() bool
     Die()
-    Trodden()
+    Trodden(by Entity)
     /* Queue Manipulation Getters / Setters */
     GetActionQueue() []Action
     GetStringActionQueue() []string

@@ -16,7 +16,7 @@ import (
 var uidg = uidgenerator.New()
 
 type Player struct {
-    entity.Entity
+    *entity.Entity
     PlayerId int
     AvailableActions []interfaces.Action
     PlayerLastTick int
@@ -54,12 +54,12 @@ func (p *Player) SetPlayerId(id int) {
     p.PlayerId = id
 }
 
-func (p *Player) GetEntityId() int {
-    return p.Entity.GetEntityId()
-}
-
 func (p *Player) GetAvailableActions() []interfaces.Action {
     return p.AvailableActions
+}
+
+func (p *Player) AddAvailableAction(action interfaces.Action) {
+    p.AvailableActions = append(p.AvailableActions, action)
 }
 
 func (p *Player) GetLastTick() int {
