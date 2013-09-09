@@ -137,6 +137,22 @@ loadTiles = function() {
   };
   tileImages.floor.src = imgPath + "Floor.png";
 
+  tileImages.grass = new Image();
+  var grassDef = $.Deferred();
+  tileImages.grass.onload = function() {
+    console.log("Grass image loaded");
+    grassDef.resolve();
+  };
+  tileImages.grass.src = imgPath + "Grass.png";
+
+  tileImages.flowers = new Image();
+  var flowersDef = $.Deferred();
+  tileImages.flowers.onload = function() {
+    console.log("Flowers image loaded");
+    flowersDef.resolve();
+  };
+  tileImages.flowers.src = imgPath + "Flowers.png";
+
   tileImages.water = new Image();
   var waterDef = $.Deferred();
   tileImages.water.onload = function() {
@@ -202,7 +218,8 @@ loadTiles = function() {
   tileImages.carpet.src = imgPath + "RedCarpet.png";
 
   $.when(floorDef, chestDef, wallDef, bluePlayerDef, lootDef, waterDef,
-      carpetDef, greenPlayerDef, genericMonsterDef).then(function() {
+      carpetDef, greenPlayerDef, genericMonsterDef, grassDef,
+      flowersDef).then(function() {
     IMAGES_LOADED = true;
     console.log("ALL IMAGES LOADED!");
   });
@@ -255,10 +272,26 @@ drawBoard = function(serverState) {
         }
       }
 
-      /* Draw water tiles */
+      /* Draw carpet tiles */
       if (layer[i] === "c") {
         if (IMAGES_LOADED) {
           ctx.drawImage(tileImages.carpet, i * tileSize + borderX,
+              x * tileSize + borderY, tileSize, tileSize);
+        }
+      }
+
+      /* Draw grass tiles */
+      if (layer[i] === "g" || layer[i] === "f") {
+        if (IMAGES_LOADED) {
+          ctx.drawImage(tileImages.grass, i * tileSize + borderX,
+              x * tileSize + borderY, tileSize, tileSize);
+        }
+      }
+
+      /* Draw flower overlays */
+      if (layer[i] === "f") {
+        if (IMAGES_LOADED) {
+          ctx.drawImage(tileImages.flowers, i * tileSize + borderX,
               x * tileSize + borderY, tileSize, tileSize);
         }
       }
