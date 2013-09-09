@@ -3,7 +3,6 @@ package board
 import (
     "log"
     "stabbey/interfaces"
-    "stabbey/util"
 )
 
 func setTile(layer []string, posX, posY int, char string) ([]string, error) {
@@ -11,8 +10,7 @@ func setTile(layer []string, posX, posY int, char string) ([]string, error) {
     if posX < 0 || posX > interfaces.BOARD_WIDTH - 1 ||
             posY < 0 || posY > interfaces.BOARD_HEIGHT - 1 {
 
-        message := "Board Generator: Can't set character out of bounds"
-        return layer, util.NewError(message)
+        return layer, nil
     }
 
     row := layer[posY]

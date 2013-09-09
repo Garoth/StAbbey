@@ -143,13 +143,13 @@ loadTiles = function() {
   };
   tileImages.floor.src = imgPath + "Floor.png";
 
-  tileImages.column = new Image();
-  var columnDef = $.Deferred();
-  tileImages.column.onload = function() {
-    console.log("Column image loaded");
-    columnDef.resolve();
+  tileImages.wall = new Image();
+  var wallDef = $.Deferred();
+  tileImages.wall.onload = function() {
+    console.log("Wall image loaded");
+    wallDef.resolve();
   };
-  tileImages.column.src = imgPath + "Column.png";
+  tileImages.wall.src = imgPath + "Wall.png";
 
   tileImages.bluePlayer = new Image();
   var bluePlayerDef = $.Deferred();
@@ -191,7 +191,7 @@ loadTiles = function() {
   };
   tileImages.loot.src = imgPath + "red-carpet-floor.png";
 
-  $.when(floorDef, chestDef, columnDef, bluePlayerDef, lootDef,
+  $.when(floorDef, chestDef, wallDef, bluePlayerDef, lootDef,
       greenPlayerDef, genericMonsterDef).then(function() {
     IMAGES_LOADED = true;
     console.log("ALL IMAGES LOADED!");
@@ -205,30 +205,49 @@ drawBoard = function(serverState) {
   var canvas = document.getElementById("canvas-board");
   var canvasWidth = $("#canvas-board").width();
   var canvasHeight = $("#canvas-board").height();
-  var tileSize = Math.round(canvasHeight / layers.length);
+  var tileSize = Math.round(canvasHeight / (layers.length + 0.5));
+  var borderX = tileSize * 0.32;
+  var borderY = tileSize * 0.25
   var ctx = canvas.getContext("2d");
 
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
+  /* Draw outer border of walls */
+  for (var i = 0; i < layers[0].length + 2; i++) {
+    ctx.drawImage(tileImages.wall, i * tileSize - (tileSize - borderX),
+        - (tileSize - borderY), tileSize, tileSize);
+    ctx.drawImage(tileImages.wall, i * tileSize - (tileSize - borderX),
+        borderY + layers.length * tileSize, tileSize, tileSize);
+  }
+
+  for (var i = 0; i < layers.length; i++) {
+    ctx.drawImage(tileImages.wall, - (tileSize - borderX),
+        i * tileSize + borderY, tileSize, tileSize);
+    ctx.drawImage(tileImages.wall, borderX + layers[0].length * tileSize,
+        i * tileSize + borderY, tileSize, tileSize);
+  }
+
+  /* Draws main board under everything */
   for (var x = 0; x < layers.length; x++) {
     var layer = layers[x];
     for (var i = 0; i < layer.length; i++) {
-      /* Draw tile outlines */
-      ctx.strokeRect(i * tileSize, x * tileSize, tileSize, tileSize);
-
       /* Draw floor everywhere */
       if (IMAGES_LOADED) {
-        ctx.drawImage(tileImages.floor, i * tileSize, x * tileSize,
-            tileSize, tileSize);
+        ctx.drawImage(tileImages.floor, i * tileSize + borderX,
+            x * tileSize + borderY, tileSize, tileSize);
       }
 
       /* Draw walls */
       if (layer[i] === "#") {
         if (IMAGES_LOADED) {
-          ctx.drawImage(tileImages.column, i * tileSize,
-              x * tileSize, tileSize, tileSize);
+          ctx.drawImage(tileImages.wall, i * tileSize + borderX,
+              x * tileSize + borderY, tileSize, tileSize);
         }
       }
+
+      /* Draw tile outlines */
+      ctx.strokeRect(i * tileSize + borderX, x * tileSize + borderY,
+          tileSize, tileSize);
     }
   }
 
@@ -262,20 +281,20 @@ drawBoard = function(serverState) {
     }
 
     /* Entity icon */
-    ctx.drawImage(entityImg, entity.X * tileSize,
-      entity.Y * tileSize, tileSize - 1, tileSize - 1);
+    ctx.drawImage(entityImg, entity.X * tileSize + borderX,
+      entity.Y * tileSize + borderY, tileSize - 1, tileSize - 1);
 
     /* Health Bar */
     if (drawHealth === true) {
       ctx.fillStyle = "rgb(200,0,0)";
-      ctx.fillRect(entity.X * tileSize,
-          (entity.Y + 1) * tileSize - 5,
+      ctx.fillRect(entity.X * tileSize + borderX,
+          (entity.Y + 1) * tileSize - 5 + borderY,
           tileSize - 1,
           4);
       var ardourPercent = entity.Ardour / entity.MaxArdour
       ctx.fillStyle = "rgb(0,200,0)";
-      ctx.fillRect(entity.X * tileSize,
-          (entity.Y + 1) * tileSize - 5,
+      ctx.fillRect(entity.X * tileSize + borderX,
+          (entity.Y + 1) * tileSize - 5 + borderY,
           (tileSize - 1) * ardourPercent,
           4);
     }
