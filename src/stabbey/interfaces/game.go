@@ -17,6 +17,7 @@ type Game interface {
     GetEntities() map[int] Entity
     GetEntitiesAtSpace(boardid, x, y int) []Entity
     IsWall(x, y int) bool
+    IsWater(x, y int) bool
     /* Monster manipulation */
     AddMonster(monster Monster)
     GetMonsterByEntityId(entid int) Monster

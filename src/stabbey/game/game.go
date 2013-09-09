@@ -90,10 +90,26 @@ func (g *Game) IsWall(x, y int) bool {
             x < 0 || y < 0 {
         log.Println("Tried to check out wall out of bounds")
         return true
-    } 
+    }
 
     /* TODO this is both inefficient and fragile */
     if (g.Boards[g.CurrentBoard].GetRender()[y][x] == '#') {
+        return true
+    }
+
+    return false
+}
+
+/* Checks if there's water at a given tile */
+func (g *Game) IsWater(x, y int) bool {
+    if x > interfaces.BOARD_WIDTH - 1|| y > interfaces.BOARD_HEIGHT - 1 ||
+            x < 0 || y < 0 {
+        log.Println("Tried to check for water out of bounds")
+        return false
+    }
+
+    /* TODO this is both inefficient and fragile */
+    if (g.Boards[g.CurrentBoard].GetRender()[y][x] == '~') {
         return true
     }
 
@@ -108,7 +124,8 @@ func (g *Game) GetRandomEmptySpace() (int, int) {
         x := rand.Intn(interfaces.BOARD_WIDTH)
         y := rand.Intn(interfaces.BOARD_HEIGHT)
 
-        if g.CanMoveToSpace(x, y) {
+        /* Has to be somewhere an entity can stand, and not in water */
+        if g.CanMoveToSpace(x, y) && !g.IsWater(x, y) {
             return x, y
         }
     }
