@@ -27,8 +27,8 @@ func (me *piecesGen) Apply() {
 
     me.RoomList[9] = &Room{9, 6, 0, 0, 0, 0, false, false, false, false}
     me.RoomList[10] = &Room{13, 6, 0, 0, 0, 0, false, false, false, false}
-    me.RoomList[11] = &Room{9, 9, 0, 0, 0, 0, false, false, false, false}
-    me.RoomList[12] = &Room{13, 9, 0, 0, 0, 0, false, false, false, false}
+    me.RoomList[11] = &Room{9, 10, 0, 0, 0, 0, false, false, false, false}
+    me.RoomList[12] = &Room{13, 10, 0, 0, 0, 0, false, false, false, false}
 
     /* LocX, LocY */
     me.DoorList[0] = &Tile{2, 4}
@@ -39,4 +39,103 @@ func (me *piecesGen) Apply() {
     me.DoorList[5] = &Tile{10, 4}
     me.DoorList[6] = &Tile{11, 4}
     me.DoorList[7] = &Tile{12, 4}
+
+    /* LocX, LocY */
+    me.WaterList[0] = &Tile{0, 7}
+    me.WaterList[1] = &Tile{1, 7}
+    me.WaterList[2] = &Tile{1, 8}
+    me.WaterList[3] = &Tile{1, 9}
+    me.WaterList[4] = &Tile{1, 10}
+    me.WaterList[5] = &Tile{1, 11}
+
+    me.WaterList[6] = &Tile{5, 7}
+    me.WaterList[7] = &Tile{4, 7}
+    me.WaterList[8] = &Tile{4, 8}
+    me.WaterList[9] = &Tile{4, 9}
+    me.WaterList[10] = &Tile{4, 10}
+    me.WaterList[11] = &Tile{4, 11}
+
+    me.WaterList[12] = &Tile{11, 3}
+    me.WaterList[13] = &Tile{11, 4}
+    me.WaterList[14] = &Tile{11, 5}
+    me.WaterList[15] = &Tile{11, 6}
+    me.WaterList[16] = &Tile{11, 7}
+    me.WaterList[17] = &Tile{9, 8}
+    me.WaterList[18] = &Tile{10, 8}
+    me.WaterList[19] = &Tile{11, 8}
+    me.WaterList[20] = &Tile{12, 8}
+    me.WaterList[21] = &Tile{13, 8}
+    me.WaterList[22] = &Tile{11, 9}
+    me.WaterList[23] = &Tile{11, 10}
+
+    /* LocX, LocY, Type, Map Char */
+    me.GroundDecorList[0]   =   &GroundDecor{2,    1,   "carpet",   "c"}
+    me.GroundDecorList[1]   =   &GroundDecor{3,    1,   "carpet",   "c"}
+    me.GroundDecorList[2]   =   &GroundDecor{4,    1,   "carpet",   "c"}
+    me.GroundDecorList[3]   =   &GroundDecor{5,    1,   "carpet",   "c"}
+    me.GroundDecorList[4]   =   &GroundDecor{6,    1,   "carpet",   "c"}
+    me.GroundDecorList[5]   =   &GroundDecor{7,    1,   "carpet",   "c"}
+    me.GroundDecorList[6]   =   &GroundDecor{8,    1,   "carpet",   "c"}
+    me.GroundDecorList[7]   =   &GroundDecor{9,    1,   "carpet",   "c"}
+    me.GroundDecorList[8]   =   &GroundDecor{10,   1,   "carpet",   "c"}
+    me.GroundDecorList[9]   =   &GroundDecor{11,   1,   "carpet",   "c"}
+    me.GroundDecorList[10]   =   &GroundDecor{12,   1,   "carpet",   "c"}
+
+    me.GroundDecorList[11]   =   &GroundDecor{2,    2,   "carpet",   "c"}
+    me.GroundDecorList[12]   =   &GroundDecor{3,    2,   "carpet",   "c"}
+    me.GroundDecorList[13]   =   &GroundDecor{4,    2,   "carpet",   "c"}
+    me.GroundDecorList[14]   =   &GroundDecor{5,    2,   "carpet",   "c"}
+    me.GroundDecorList[15]   =   &GroundDecor{6,    2,   "carpet",   "c"}
+    me.GroundDecorList[16]   =   &GroundDecor{7,    2,   "carpet",   "c"}
+    me.GroundDecorList[17]   =   &GroundDecor{8,    2,   "carpet",   "c"}
+    me.GroundDecorList[18]   =   &GroundDecor{9,    2,   "carpet",   "c"}
+    me.GroundDecorList[19]   =   &GroundDecor{10,   2,   "carpet",   "c"}
+    me.GroundDecorList[20]   =   &GroundDecor{11,   2,   "carpet",   "c"}
+    me.GroundDecorList[21]   =   &GroundDecor{12,   2,   "carpet",   "c"}
+
+    me.GroundDecorList[22]   =   &GroundDecor{2,    3,   "carpet",   "c"}
+    me.GroundDecorList[23]   =   &GroundDecor{3,    3,   "carpet",   "c"}
+    me.GroundDecorList[24]   =   &GroundDecor{10,   3,   "carpet",   "c"}
+    me.GroundDecorList[25]   =   &GroundDecor{12,   3,   "carpet",   "c"}
+
+    me.GroundDecorList[26]   =   &GroundDecor{2,    4,   "carpet",   "c"}
+    me.GroundDecorList[27]   =   &GroundDecor{3,    4,   "carpet",   "c"}
+    me.GroundDecorList[28]   =   &GroundDecor{10,   4,   "carpet",   "c"}
+    me.GroundDecorList[29]   =   &GroundDecor{12,   4,   "carpet",   "c"}
+
+    me.GroundDecorList[30]   =   &GroundDecor{10,   5,   "carpet",   "c"}
+    me.GroundDecorList[31]   =   &GroundDecor{12,   5,   "carpet",   "c"}
+
+    me.GroundDecorList[32]   =   &GroundDecor{10,   5,   "carpet",   "c"}
+    me.GroundDecorList[33]   =   &GroundDecor{12,   5,   "carpet",   "c"}
+
+    me.GroundDecorList[34]   =   &GroundDecor{10,   6,   "carpet",   "c"}
+    me.GroundDecorList[35]   =   &GroundDecor{12,   6,   "carpet",   "c"}
+
+    me.GroundDecorList[36]   =   &GroundDecor{8,    7,   "carpet",   "c"}
+    me.GroundDecorList[37]   =   &GroundDecor{9,    7,   "carpet",   "c"}
+    me.GroundDecorList[38]   =   &GroundDecor{10,   7,   "carpet",   "c"}
+    me.GroundDecorList[39]   =   &GroundDecor{12,   7,   "carpet",   "c"}
+    me.GroundDecorList[40]   =   &GroundDecor{13,   7,   "carpet",   "c"}
+    me.GroundDecorList[41]   =   &GroundDecor{14,   7,   "carpet",   "c"}
+    me.GroundDecorList[42]   =   &GroundDecor{15,   7,   "carpet",   "c"}
+
+    me.GroundDecorList[43]   =   &GroundDecor{8,    8,  "carpet",   "c"}
+    me.GroundDecorList[44]   =   &GroundDecor{14,   8,  "carpet",   "c"}
+    me.GroundDecorList[45]   =   &GroundDecor{15,   8,  "carpet",   "c"}
+
+    me.GroundDecorList[46]   =   &GroundDecor{8,    9,  "carpet",   "c"}
+    me.GroundDecorList[47]   =   &GroundDecor{9,    9,  "carpet",   "c"}
+    me.GroundDecorList[48]   =   &GroundDecor{10,   9,  "carpet",   "c"}
+    me.GroundDecorList[49]   =   &GroundDecor{12,   9,  "carpet",   "c"}
+    me.GroundDecorList[50]   =   &GroundDecor{13,   9,  "carpet",   "c"}
+    me.GroundDecorList[51]   =   &GroundDecor{14,   9,  "carpet",   "c"}
+    me.GroundDecorList[52]   =   &GroundDecor{15,   9,  "carpet",   "c"}
+
+    me.GroundDecorList[53]   =   &GroundDecor{10,   10,   "carpet",   "c"}
+    me.GroundDecorList[54]   =   &GroundDecor{12,   10,   "carpet",   "c"}
+
+    me.GroundDecorList[55]   =   &GroundDecor{10,   11,   "carpet",   "c"}
+    me.GroundDecorList[56]   =   &GroundDecor{11,   11,   "carpet",   "c"}
+    me.GroundDecorList[57]   =   &GroundDecor{12,   11,   "carpet",   "c"}
 }

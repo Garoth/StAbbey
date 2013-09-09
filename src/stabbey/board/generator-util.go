@@ -20,12 +20,24 @@ func setTile(layer []string, posX, posY int, char string) ([]string, error) {
     return layer, nil
 }
 
-func DumpRooms(b *Board) {
-    log.Printf("--- List of Rooms ---")
+func PrintBoardInfo(b *Board) {
+    log.Printf("--- Board Rooms ---")
     for k, room := range b.RoomList {
         log.Printf("Room %v: at (%v, %v) with size (%v, %v, %v, %v)", k,
             room.StartingPointX, room.StartingPointY, room.Top, room.Right,
             room.Bottom, room.Left)
     }
-    log.Printf("--- End List of Rooms ---")
+
+    decorline := ""
+    for i := 0; i < interfaces.BOARD_WIDTH + 4; i++ {
+        decorline = decorline + "-"
+    }
+
+    log.Println(decorline)
+    for _, row := range b.GetRender() {
+        log.Println("|", row, "|")
+    }
+    log.Println(decorline)
+
+    log.Printf("--- End Board Info ---")
 }

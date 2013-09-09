@@ -43,12 +43,6 @@ socketMessaged = function(e) {
     addAction(action);
   });
 
-  entLayer = jsObj.Boards[0].Layers[0];
-  $.each(jsObj.Entities, function(index, player) {
-    entLayer[player.Y] = entLayer[player.Y].substr(0, player.X) +
-      'X' + entLayer[player.Y].substr(player.X + 1);
-  });
-  $("#board").html(entLayer.join("<br/>"));
   drawBoard(jsObj);
 
   if (jsObj.Entities[myEntityId].ActionQueue.length > 0) {
@@ -143,6 +137,14 @@ loadTiles = function() {
   };
   tileImages.floor.src = imgPath + "Floor.png";
 
+  tileImages.water = new Image();
+  var waterDef = $.Deferred();
+  tileImages.water.onload = function() {
+    console.log("Water image loaded");
+    waterDef.resolve();
+  };
+  tileImages.water.src = imgPath + "Water.png";
+
   tileImages.wall = new Image();
   var wallDef = $.Deferred();
   tileImages.wall.onload = function() {
@@ -189,10 +191,18 @@ loadTiles = function() {
     console.log("Loot image loaded");
     lootDef.resolve();
   };
-  tileImages.loot.src = imgPath + "red-carpet-floor.png";
+  tileImages.loot.src = imgPath + "Tree.png";
 
-  $.when(floorDef, chestDef, wallDef, bluePlayerDef, lootDef,
-      greenPlayerDef, genericMonsterDef).then(function() {
+  tileImages.carpet = new Image();
+  var carpetDef = $.Deferred();
+  tileImages.carpet.onload = function() {
+    console.log("Carpet image loaded");
+    carpetDef.resolve();
+  };
+  tileImages.carpet.src = imgPath + "RedCarpet.png";
+
+  $.when(floorDef, chestDef, wallDef, bluePlayerDef, lootDef, waterDef,
+      carpetDef, greenPlayerDef, genericMonsterDef).then(function() {
     IMAGES_LOADED = true;
     console.log("ALL IMAGES LOADED!");
   });
@@ -235,6 +245,22 @@ drawBoard = function(serverState) {
       if (IMAGES_LOADED) {
         ctx.drawImage(tileImages.floor, i * tileSize + borderX,
             x * tileSize + borderY, tileSize, tileSize);
+      }
+
+      /* Draw water tiles */
+      if (layer[i] === "~") {
+        if (IMAGES_LOADED) {
+          ctx.drawImage(tileImages.water, i * tileSize + borderX,
+              x * tileSize + borderY, tileSize, tileSize);
+        }
+      }
+
+      /* Draw water tiles */
+      if (layer[i] === "c") {
+        if (IMAGES_LOADED) {
+          ctx.drawImage(tileImages.carpet, i * tileSize + borderX,
+              x * tileSize + borderY, tileSize, tileSize);
+        }
       }
 
       /* Draw walls */

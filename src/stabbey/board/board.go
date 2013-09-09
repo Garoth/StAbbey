@@ -14,6 +14,11 @@ type Tile struct {
     LocX, LocY int
 }
 
+type GroundDecor struct {
+    LocX, LocY int
+    DecorType, TextMapChar string
+}
+
 type Board struct {
     /* Unique game level number (i.e. floor number) */
     Level, Width, Height int
@@ -21,6 +26,10 @@ type Board struct {
     RoomList map[int]*Room
     /* List of "doors" -- tiles that override walls */
     DoorList map[int]*Tile
+    /* List of water tiles */
+    WaterList map[int]*Tile
+    /* List of ground decoration tiles */
+    GroundDecorList map[int]*GroundDecor
 }
 
 /* Creates a brand new board, for level -- 0, 1, 2, etc */
@@ -31,8 +40,10 @@ func New(level int) *Board {
     b.Height = interfaces.BOARD_HEIGHT
     b.RoomList = make(map[int]*Room)
     b.DoorList = make(map[int]*Tile)
+    b.WaterList = make(map[int]*Tile)
+    b.GroundDecorList = make(map[int]*GroundDecor)
     NewPiecesGenerator(b).Apply()
-    DumpRooms(b)
+    PrintBoardInfo(b)
     return b
 }
 
@@ -104,6 +115,22 @@ func (b *Board) GetRender() []string {
     for _, door := range b.DoorList {
         var e error
         if layer, e = setTile(layer, door.LocX, door.LocY, "|"); e != nil {
+            log.Fatalln(e)
+        }
+    }
+
+    for _, water := range b.WaterList {
+        var e error
+        if layer, e = setTile(layer, water.LocX, water.LocY, "~"); e != nil {
+            log.Fatalln(e)
+        }
+    }
+
+    for _, decor := range b.GroundDecorList {
+        var e error
+        if layer, e = setTile(layer, decor.LocX, decor.LocY,
+                decor.TextMapChar); e != nil {
+
             log.Fatalln(e)
         }
     }
