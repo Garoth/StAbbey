@@ -24,7 +24,7 @@ type Player struct {
     WebSocketConnection *websocket.Conn
 }
 
-func New() *Player {
+func New(g interfaces.Game) *Player {
     p := &Player{}
 
     /* Player stuff */
@@ -37,7 +37,7 @@ func New() *Player {
     p.AvailableActions = append(p.AvailableActions, order.NewAction("lu"))
 
     /* Entity stuff */
-    p.Entity = entity.New(entity.UIDG.NextUid())
+    p.Entity = entity.New(entity.UIDG.NextUid(), g)
     p.SetPosition(0, 8, 6)
     p.SetType(interfaces.ENTITY_TYPE_PLAYER)
     p.SetName("Player " + strconv.Itoa(p.GetPlayerId()))

@@ -4,70 +4,30 @@ import (
     "time"
 
     "stabbey/interfaces"
-    "stabbey/monsters"
+    "stabbey/entity"
 )
-
-/* TODO move *ModifyGame to different files */
-
-/* Holder for functions that Loot may use to modify the game */
-type LootModifyGame struct {
-}
-
-func NewLootModifyGame() *LootModifyGame {
-    me := &LootModifyGame{}
-    return me
-}
-
-func (me *LootModifyGame) GetPlayerByEntity(
-        entity interfaces.Entity) interfaces.Player {
-    return GAME.GetPlayerByEntity(entity)
-}
-
-/* Holder for functions that Monsters may use to modify the game */
-type MonsterModifyGame struct {
-}
-
-func NewMonsterModifyGame() *MonsterModifyGame {
-    me := &MonsterModifyGame{}
-    return me
-}
-
-/* Lets an entity drop loot */
-func (me *MonsterModifyGame) DropLoot(boardId, x, y int,
-        loot interfaces.Loot) {
-
-    loot.SetGameFunctions(NewLootModifyGame())
-    loot.SetPosition(boardId, x, y)
-    GAME.AddEntity(loot)
-}
 
 /* Initializes game-logic stuff for a particular game level */
 func initLevel(levelId int) {
-    monsterFunctions := NewMonsterModifyGame();
-
     /* Spawn some starting monsters */
     for i := 0; i < 3; i++ {
-        m := monsters.New(monsters.GargoyleBuilder, monsterFunctions)
+        m := entity.NewGargoyle(GAME)
         x, y := GAME.GetRandomEmptySpace()
         m.SetPosition(levelId, x, y)
-        GAME.AddMonster(m)
+        GAME.AddEntity(m)
     }
 
-    /* TODO Spawn a chest with a skill in */
-    c := monsters.New(monsters.ChestBuilder, monsterFunctions)
+    c := entity.NewChest(GAME)
     x, y := GAME.GetRandomEmptySpace()
     c.SetPosition(levelId, x, y)
-    GAME.AddMonster(c)
+    GAME.AddEntity(c)
 }
 
 /* Ticks when the players are done their round and other stuff can change */
 func worldTick() {
     /* Inform non-player entities */
     for _, ent := range GAME.GetEntities() {
-        if (ent.GetType() == interfaces.ENTITY_TYPE_MONSTER) {
-            monster := GAME.GetMonsterByEntityId(ent.GetEntityId())
-            monster.WorldTick(GAME.GetLastTick())
-        }
+        ent.WorldTick(GAME.GetLastTick())
     }
 }
 

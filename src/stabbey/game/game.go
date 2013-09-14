@@ -32,7 +32,6 @@ type Game struct {
     Boards map[int] interfaces.Board
     Entities map[int] interfaces.Entity
     PlayersToEntities map[interfaces.Player] interfaces.Entity
-    EntityIdToMonster map[int] interfaces.Monster
     LastTick int
     CurrentBoard int
     GameRunning bool
@@ -50,7 +49,6 @@ func NewGame(gamekey string) *Game {
     g.CurrentBoard = 0
     g.Entities = make(map[int] interfaces.Entity, 100)
     g.PlayersToEntities = make(map[interfaces.Player] interfaces.Entity, 10)
-    g.EntityIdToMonster = make(map[int] interfaces.Monster, 10)
     return g
 }
 
@@ -58,11 +56,6 @@ func (g *Game) AddPlayer(player interfaces.Player, entity interfaces.Entity) {
     g.Players[player.GetPlayerId()] = player
     g.AddEntity(entity)
     g.PlayersToEntities[player] = entity
-}
-
-func (g *Game) AddMonster(mon interfaces.Monster) {
-    g.EntityIdToMonster[mon.GetEntityId()] = mon
-    g.AddEntity(mon)
 }
 
 /* Checks if an entity may be placed into a given tile on the current board */
@@ -175,10 +168,6 @@ func (g *Game) GetEntity(entid int) interfaces.Entity {
 
 func (g *Game) GetEntityByPlayer(player interfaces.Player) interfaces.Entity {
     return g.PlayersToEntities[player]
-}
-
-func (g *Game) GetMonsterByEntityId(entid int) interfaces.Monster {
-    return g.EntityIdToMonster[entid]
 }
 
 func (g *Game) GetEntities() map[int] interfaces.Entity {

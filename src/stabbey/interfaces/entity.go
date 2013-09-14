@@ -3,13 +3,16 @@ package interfaces
 import (
 )
 
-const ENTITY_TYPE_PLAYER     = "player"
-const ENTITY_TYPE_MONSTER    = "monster"
-const ENTITY_TYPE_LOOT       = "loot"
+const (
+    ENTITY_TYPE_PLAYER            = "player"
+    ENTITY_TYPE_MONSTER           = "monster"
+    ENTITY_TYPE_TRIGGER           = "loot"
+
+    TRIGGER_TYPE_ABILITY_PUSH     = "pu"
+)
 
 /* A monster, player, or some special thing of that sort */
 type Entity interface {
-    /* Entity Ids must be unique */
     SetEntityId(id int)
     GetEntityId() int
     SetPosition(boardid, x, y int)
@@ -28,9 +31,9 @@ type Entity interface {
     IsDead() bool
     Die()
     Trodden(by Entity)
-    /* Queue Manipulation Getters / Setters */
     GetActionQueue() []Action
     GetStringActionQueue() []string
     SetActionQueue([]Action)
     PopAction() Action
+    WorldTick(tick int)
 }

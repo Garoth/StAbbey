@@ -79,7 +79,7 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
         GAME.Run()
     }
 
-    curPlayer = player.New()
+    curPlayer = player.New(GAME)
     pX, pY := GAME.GetRandomEmptySpace()
     curPlayer.SetPosition(0, pX, pY)
     GAME.AddPlayer(curPlayer, curPlayer)

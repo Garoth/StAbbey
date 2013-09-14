@@ -11,16 +11,22 @@ var UIDG = uidgenerator.New()
 
 type Entity struct {
     EntityId, BoardId, X, Y, Ardour, MaxArdour int
+    Game interfaces.Game
     Name, Type string
     Tangible, Dead bool
     DeathFunction func()
     TroddenFunction func(interfaces.Entity)
+    TickFunction func(int)
     ActionQueue []interfaces.Action
 }
 
-func New(entid int) *Entity {
+func New(entid int, g interfaces.Game) *Entity {
     e := &Entity{}
     e.SetEntityId(entid)
+    e.BoardId = 0
+    e.X = 0
+    e.Y = 0
+    e.Game = g
     e.MaxArdour = 50
     e.Ardour = 50
     e.Dead = false
@@ -32,10 +38,13 @@ func New(entid int) *Entity {
     e.TroddenFunction = func(by interfaces.Entity) {
         log.Println(e.GetName(), "was stepped on")
     }
+    e.TickFunction = func(tick int) {
+    }
     e.ActionQueue = make([]interfaces.Action, 0, 10)
     return e
 }
 
+/* TODO should force entity to be unique */
 func (e *Entity) SetEntityId(id int) {
     e.EntityId = id
 }
@@ -165,3 +174,6 @@ func (e *Entity) PopAction() interfaces.Action {
     return nil
 }
 
+func (me *Entity) WorldTick(tick int) {
+    me.TickFunction(tick)
+}
