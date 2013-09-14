@@ -7,20 +7,27 @@ import (
     "stabbey/entity"
 )
 
+func placeEntityRandomly(entity interfaces.Entity, boardId int) {
+    x, y := GAME.GetRandomEmptySpace()
+    entity.SetPosition(boardId, x, y)
+    GAME.AddEntity(entity)
+}
+
 /* Initializes game-logic stuff for a particular game level */
-func initLevel(levelId int) {
+func initLevel(boardId int) {
     /* Spawn some starting monsters */
     for i := 0; i < 3; i++ {
-        m := entity.NewGargoyle(GAME)
-        x, y := GAME.GetRandomEmptySpace()
-        m.SetPosition(levelId, x, y)
-        GAME.AddEntity(m)
+        placeEntityRandomly(entity.NewGargoyle(GAME), boardId)
     }
 
-    c := entity.NewChest(GAME)
-    x, y := GAME.GetRandomEmptySpace()
-    c.SetPosition(levelId, x, y)
-    GAME.AddEntity(c)
+    /* Place a chest */
+    placeEntityRandomly(entity.NewChest(GAME), boardId)
+
+    /* Place some traps */
+    for i := 0; i < 5; i++ {
+        x, y := GAME.GetRandomEmptySpace()
+        placeEntityRandomly(entity.NewTeleportTrap(GAME, x, y), boardId)
+    }
 }
 
 /* Ticks when the players are done their round and other stuff can change */

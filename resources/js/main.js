@@ -320,28 +320,53 @@ drawBoard = function(serverState) {
     }
 
     var entityImg = null;
+    var entityPlaceholderText = "";
     var drawHealth = true
 
     if (entity.Type === "monster") {
-      if (entity.Name.indexOf("Gargoyle") !== -1) {
+      if (entity.Subtype === "gargoyle") {
         entityImg = tileImages.genericMonster;
-      } else if (entity.Name.indexOf("Chest") !== -1) {
+      } else if (entity.Subtype === "chest") {
         entityImg = tileImages.chest;
       }
+
     } else if (entity.Type === "player") {
       if (entity.Name === "Player 0") {
         entityImg = tileImages.bluePlayer;
       } else if (entity.Name === "Player 1") {
         entityImg = tileImages.greenPlayer;
       }
-    } else if (entity.Type === "loot") {
-      entityImg = tileImages.loot;
-      drawHealth = false;
+
+    } else if (entity.Type === "trigger") {
+      if (entity.Subtype === "ability loot") {
+        entityImg = null;
+        entityPlaceholderText = "Loot";
+        drawHealth = false;
+      } else if (entity.Subtype === "teleport trap") {
+        entityImg = null;
+        entityPlaceholderText = "T. Trap";
+        drawHealth = false;
+      }
+
+    } else if (entity.Type === "inert") {
+      if (entity.Subtype === "sprung trap") {
+        entityImg = null;
+        entityPlaceholderText = "S. Trap";
+        drawHealth = false;
+      }
     }
 
     /* Entity icon */
-    ctx.drawImage(entityImg, entity.X * tileSize + borderX,
-      entity.Y * tileSize + borderY, tileSize - 1, tileSize - 1);
+    if (entityImg != null) {
+      ctx.drawImage(entityImg, entity.X * tileSize + borderX,
+        entity.Y * tileSize + borderY, tileSize - 1, tileSize - 1);
+    } else {
+      ctx.fillStyle="#FFFFFF";
+      ctx.font="10px Arial";
+      ctx.fillText(entityPlaceholderText,
+          entity.X * tileSize + borderX + 4,
+          (entity.Y + 1) * tileSize + borderY - 4);
+    }
 
     /* Health Bar */
     if (drawHealth === true) {

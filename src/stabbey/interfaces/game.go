@@ -10,6 +10,7 @@ type Game interface {
     AddBoard(board Board)
     GetBoard(level int) Board
     GetBoards() map[int] Board
+    GetCurrentBoard() int
     /* Entity manipulation */
     AddEntity(entity Entity)
     GetEntity(entid int) Entity

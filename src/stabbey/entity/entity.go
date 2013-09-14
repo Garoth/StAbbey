@@ -12,7 +12,7 @@ var UIDG = uidgenerator.New()
 type Entity struct {
     EntityId, BoardId, X, Y, Ardour, MaxArdour int
     Game interfaces.Game
-    Name, Type string
+    Name, Type, Subtype string
     Tangible, Dead bool
     DeathFunction func()
     TroddenFunction func(interfaces.Entity)
@@ -32,6 +32,8 @@ func New(entid int, g interfaces.Game) *Entity {
     e.Dead = false
     e.Tangible = true
     e.Name = "Some unspecified entity"
+    e.Type = interfaces.ENTITY_TYPE_UNKNOWN
+    e.Subtype = interfaces.ENTITY_SUBTYPE_UNKNOWN
     e.DeathFunction = func() {
         log.Println(e.GetName(), "has died")
     }
@@ -57,10 +59,28 @@ func (e *Entity) GetPosition() (boardid, x, y int) {
     return e.BoardId, e.X, e.Y
 }
 
-func (e *Entity) SetPosition(boardid, x, y int) {
-    e.BoardId = boardid
+func (e *Entity) SetPosition(boardId, x, y int) {
+    /* TODO doesn't consider boardId */
+    if e.IsTangible() && !e.Game.CanMoveToSpace(x, y) {
+        log.Fatalln("Attempted to move entity to impossible place", x, y)
+    }
+
+    /* Ordering of operations matters here, since we want to see what
+     * entities are on the target tile before we're on that tile
+     * (to exclude ourselves). Also, we can't trigger the trodden
+     * on those entities we're landing on before moving, since
+     * it could be that landing on one repositions us right away */
+    entitiesAtTarget := e.Game.GetEntitiesAtSpace(boardId, x, y)
+
+    e.BoardId = boardId
     e.X = x
     e.Y = y
+
+    if e.IsTangible() {
+        for _, entity := range entitiesAtTarget {
+            entity.Trodden(e);
+        }
+    }
 }
 
 func (e *Entity) SetName(name string) {
@@ -79,8 +99,21 @@ func (e *Entity) GetType() string {
     return e.Type
 }
 
+func (e *Entity) SetSubtype(t string) {
+    e.Subtype = t
+}
+
+func (e *Entity) GetSubtype() string {
+    return e.Subtype
+}
+
 func (e *Entity) SetMaxArdour(ardour int) {
     e.MaxArdour = ardour
+
+    if e.Ardour > e.MaxArdour {
+        e.Ardour = e.MaxArdour
+    }
+
     if e.MaxArdour < 0 {
         log.Println("Warning: attempt to set max ardour to below 0")
         e.MaxArdour = 1
@@ -99,7 +132,6 @@ func (e *Entity) ChangeArdour(difference int) int {
 
     if e.Ardour <= 0 {
         e.Ardour = 0
-        e.Dead = true;
         e.Die()
     }
 
@@ -139,6 +171,8 @@ func (e *Entity) IsDead() bool {
 }
 
 func (e *Entity) Die() {
+    e.Ardour = 0
+    e.Dead = true;
     e.SetTangible(false)
     e.DeathFunction()
 }

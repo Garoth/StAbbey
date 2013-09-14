@@ -158,6 +158,10 @@ func (g *Game) GetBoards() map[int] interfaces.Board {
     return g.Boards
 }
 
+func (g *Game) GetCurrentBoard() int {
+    return g.CurrentBoard
+}
+
 func (g *Game) AddEntity(entity interfaces.Entity) {
     g.Entities[entity.GetEntityId()] = entity
 }

@@ -8,7 +8,8 @@ import (
 
 func NewAbilityTrigger(g interfaces.Game, abilityCode string) *Entity {
     me := newBasicTrigger(g)
-    me.SetName("(Trigger) Loot for ability " + abilityCode)
+    me.SetSubtype(interfaces.ENTITY_TRIGGER_SUBTYPE_ABILITY_LOOT)
+    me.SetName("Loot for ability " + abilityCode)
 
     me.TroddenFunction = func(by interfaces.Entity) {
         log.Println(me.GetName() + " trodden on by", by.GetName())

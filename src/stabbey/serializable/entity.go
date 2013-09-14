@@ -6,7 +6,7 @@ import (
 
 type Entity struct {
     EntityId, BoardId, X, Y, MaxArdour, Ardour int
-    Name, Type string
+    Name, Type, Subtype string
     ActionQueue []string
 }
 
@@ -15,6 +15,7 @@ func NewEntity(e interfaces.Entity) *Entity {
     se.EntityId = e.GetEntityId()
     se.Name = e.GetName()
     se.Type = e.GetType()
+    se.Subtype = e.GetSubtype()
     se.MaxArdour = e.GetMaxArdour()
     se.Ardour = e.GetArdour()
     se.BoardId, se.X, se.Y = e.GetPosition()

@@ -83,9 +83,6 @@ func MoveAction(me *Action) {
         x2, y2 := getDirectionCoords(me.actionString[1], x, y, 1)
 
         if g.CanMoveToSpace(x2, y2) {
-            for _, entity := range g.GetEntitiesAtSpace(boardId, x2, y2) {
-                entity.Trodden(e);
-            }
             e.SetPosition(boardId, x2, y2)
         } else {
             log.Printf("Couldn't %v", me.actionString)
@@ -166,19 +163,16 @@ func LeapAction(me *Action) {
             }
         }
 
-        /* Land there if possible, trigger trodden */
+        /* Land there if possible */
         if xDest == -1 && yDest == -1 {
             log.Println("Leap by", e.GetName(), "failed -- no available space")
             return
         } else {
-            for _, entity := range g.GetEntitiesAtSpace(boardId, xDest, yDest) {
-                entity.Trodden(e);
-            }
             log.Println(e.GetName(), "lept to", xDest, yDest)
             e.SetPosition(boardId, xDest, yDest)
         }
 
-        /* Trigger trodden on all entities along the way */
+        /* Trigger trodden on all entities along the way manually */
         for iLeft = iLeft - 1; iLeft > 0; iLeft-- {
             x, y := getDirectionCoords(me.actionString[1], xOrig, yOrig, iLeft)
 

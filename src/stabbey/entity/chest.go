@@ -8,6 +8,7 @@ import (
 
 func NewChest(g interfaces.Game) interfaces.Entity {
     me := newBasicMonster(g)
+    me.SetSubtype(interfaces.ENTITY_MONSTER_SUBTYPE_CHEST)
     me.SetName("Chest " + strconv.Itoa(me.GetEntityId()))
     me.SetMaxArdour(10)
     me.SetArdour(10)

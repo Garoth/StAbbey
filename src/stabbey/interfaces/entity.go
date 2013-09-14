@@ -4,11 +4,20 @@ import (
 )
 
 const (
-    ENTITY_TYPE_PLAYER            = "player"
-    ENTITY_TYPE_MONSTER           = "monster"
-    ENTITY_TYPE_TRIGGER           = "loot"
+    ENTITY_TYPE_UNKNOWN                  = "unknown type"
+    ENTITY_TYPE_PLAYER                   = "player"
+    ENTITY_TYPE_MONSTER                  = "monster"
+    ENTITY_TYPE_TRIGGER                  = "trigger"
+    ENTITY_TYPE_INERT                    = "inert"
 
-    TRIGGER_TYPE_ABILITY_PUSH     = "pu"
+    ENTITY_SUBTYPE_UNKNOWN               = "unknown subtype"
+    ENTITY_MONSTER_SUBTYPE_GARGOYLE      = "gargoyle"
+    ENTITY_MONSTER_SUBTYPE_CHEST         = "chest"
+    ENTITY_TRIGGER_SUBTYPE_ABILITY_LOOT  = "ability loot"
+    ENTITY_TRIGGER_SUBTYPE_TELEPORT_TRAP = "teleport trap"
+    ENTITY_INERT_SUBTYPE_TRAP            = "sprung trap"
+
+    TRIGGER_TYPE_ABILITY_PUSH            = "pu"
 )
 
 /* A monster, player, or some special thing of that sort */
@@ -21,6 +30,8 @@ type Entity interface {
     GetName() string
     SetType(t string)
     GetType() string
+    SetSubtype(t string)
+    GetSubtype() string
     SetMaxArdour(ardour int)
     GetMaxArdour() int
     ChangeArdour(difference int) int
