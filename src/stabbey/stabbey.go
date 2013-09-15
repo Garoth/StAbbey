@@ -10,7 +10,6 @@ import (
 
     "code.google.com/p/go.net/websocket"
 
-    "stabbey/board"
     "stabbey/game"
     "stabbey/interfaces"
     "stabbey/order"
@@ -75,7 +74,6 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
     if gamekey == "" && GAME == nil {
         gamekey = "0"
         GAME = game.NewGame(gamekey)
-        GAME.AddBoard(board.New(0))
         GAME.Run()
     }
 

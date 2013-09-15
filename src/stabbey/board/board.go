@@ -22,6 +22,10 @@ type GroundDecor struct {
 type Board struct {
     /* Unique game level number (i.e. floor number) */
     Level, Width, Height int
+    /* Game object (for adding entities) */
+    Game interfaces.Game
+    /* Board generator */
+    Generator interfaces.BoardGenerator
     /* List of rooms */
     RoomList map[int]*Room
     /* List of "doors" -- tiles that override walls */
@@ -33,8 +37,9 @@ type Board struct {
 }
 
 /* Creates a brand new board, for level -- 0, 1, 2, etc */
-func New(level int) *Board {
+func New(level int, game interfaces.Game) *Board {
     b := &Board{}
+    b.Game = game
     b.Level = level
     b.Width = interfaces.BOARD_WIDTH
     b.Height = interfaces.BOARD_HEIGHT
@@ -42,9 +47,14 @@ func New(level int) *Board {
     b.DoorList = make(map[int]*Tile)
     b.WaterList = make(map[int]*Tile)
     b.GroundDecorList = make(map[int]*GroundDecor)
-    NewPiecesGenerator(b).Apply()
+    b.Generator = NewPiecesGenerator(b)
+    b.Generator.Apply()
     PrintBoardInfo(b)
     return b
+}
+
+func (b *Board) LoadStartingEntities() {
+    b.Generator.LoadEntities(b.Game)
 }
 
 func (b *Board) GetRender() []string {

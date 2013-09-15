@@ -24,8 +24,8 @@ func New(entid int, g interfaces.Game) *Entity {
     e := &Entity{}
     e.SetEntityId(entid)
     e.BoardId = 0
-    e.X = 0
-    e.Y = 0
+    e.X = -1
+    e.Y = -1
     e.Game = g
     e.MaxArdour = 50
     e.Ardour = 50
@@ -135,7 +135,7 @@ func (e *Entity) ChangeArdour(difference int) int {
         e.Die()
     }
 
-    log.Println("Entity", e.Name, "changed ardour to", e.Ardour)
+    log.Println(e.Name, "changed ardour to", e.Ardour)
     return e.Ardour
 }
 

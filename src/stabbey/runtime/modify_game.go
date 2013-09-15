@@ -16,15 +16,10 @@ func placeEntityRandomly(entity interfaces.Entity, boardId int) {
 /* Initializes game-logic stuff for a particular game level */
 func initLevel(boardId int) {
     /* Spawn some starting monsters */
-    for i := 0; i < 3; i++ {
-        placeEntityRandomly(entity.NewGargoyle(GAME), boardId)
-    }
-
-    /* Place a chest */
-    placeEntityRandomly(entity.NewChest(GAME), boardId)
+    placeEntityRandomly(entity.NewGargoyle(GAME), boardId)
 
     /* Place some traps */
-    for i := 0; i < 5; i++ {
+    for i := 0; i < 3; i++ {
         x, y := GAME.GetRandomEmptySpace()
         placeEntityRandomly(entity.NewTeleportTrap(GAME, x, y), boardId)
     }

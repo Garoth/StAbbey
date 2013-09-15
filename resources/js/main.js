@@ -132,7 +132,6 @@ loadTiles = function() {
   tileImages.floor = new Image();
   var floorDef = $.Deferred();
   tileImages.floor.onload = function() {
-    console.log("Floor image loaded");
     floorDef.resolve();
   };
   tileImages.floor.src = imgPath + "Floor.png";
@@ -140,7 +139,6 @@ loadTiles = function() {
   tileImages.grass = new Image();
   var grassDef = $.Deferred();
   tileImages.grass.onload = function() {
-    console.log("Grass image loaded");
     grassDef.resolve();
   };
   tileImages.grass.src = imgPath + "Grass.png";
@@ -148,7 +146,6 @@ loadTiles = function() {
   tileImages.flowers = new Image();
   var flowersDef = $.Deferred();
   tileImages.flowers.onload = function() {
-    console.log("Flowers image loaded");
     flowersDef.resolve();
   };
   tileImages.flowers.src = imgPath + "Flowers.png";
@@ -156,7 +153,6 @@ loadTiles = function() {
   tileImages.water = new Image();
   var waterDef = $.Deferred();
   tileImages.water.onload = function() {
-    console.log("Water image loaded");
     waterDef.resolve();
   };
   tileImages.water.src = imgPath + "Water.png";
@@ -164,7 +160,6 @@ loadTiles = function() {
   tileImages.wall = new Image();
   var wallDef = $.Deferred();
   tileImages.wall.onload = function() {
-    console.log("Wall image loaded");
     wallDef.resolve();
   };
   tileImages.wall.src = imgPath + "Wall.png";
@@ -172,7 +167,6 @@ loadTiles = function() {
   tileImages.bluePlayer = new Image();
   var bluePlayerDef = $.Deferred();
   tileImages.bluePlayer.onload = function() {
-    console.log("Blue Player image loaded");
     bluePlayerDef.resolve();
   };
   tileImages.bluePlayer.src = imgPath + "Player-blue.png";
@@ -180,7 +174,6 @@ loadTiles = function() {
   tileImages.greenPlayer = new Image();
   var greenPlayerDef = $.Deferred();
   tileImages.greenPlayer.onload = function() {
-    console.log("Green Player image loaded");
     greenPlayerDef.resolve();
   };
   tileImages.greenPlayer.src = imgPath + "Player-green.png";
@@ -188,7 +181,6 @@ loadTiles = function() {
   tileImages.genericMonster = new Image();
   var genericMonsterDef = $.Deferred();
   tileImages.genericMonster.onload = function() {
-    console.log("Generic Monster image loaded");
     genericMonsterDef.resolve();
   };
   tileImages.genericMonster.src = imgPath + "Generic-Monster.png";
@@ -196,30 +188,34 @@ loadTiles = function() {
   tileImages.chest = new Image();
   var chestDef = $.Deferred();
   tileImages.chest.onload = function() {
-    console.log("Chest image loaded");
     chestDef.resolve();
   };
   tileImages.chest.src = imgPath + "Chest.png";
 
-  tileImages.loot = new Image();
-  var lootDef = $.Deferred();
-  tileImages.loot.onload = function() {
-    console.log("Loot image loaded");
-    lootDef.resolve();
+  tileImages.tree = new Image();
+  var treeDef = $.Deferred();
+  tileImages.tree.onload = function() {
+    treeDef.resolve();
   };
-  tileImages.loot.src = imgPath + "Tree.png";
+  tileImages.tree.src = imgPath + "Tree.png";
 
   tileImages.carpet = new Image();
   var carpetDef = $.Deferred();
   tileImages.carpet.onload = function() {
-    console.log("Carpet image loaded");
     carpetDef.resolve();
   };
   tileImages.carpet.src = imgPath + "RedCarpet.png";
 
-  $.when(floorDef, chestDef, wallDef, bluePlayerDef, lootDef, waterDef,
+  tileImages.statue = new Image();
+  var statueDef = $.Deferred();
+  tileImages.statue.onload = function() {
+    statueDef.resolve();
+  };
+  tileImages.statue.src = imgPath + "Statue.png";
+
+  $.when(floorDef, chestDef, wallDef, bluePlayerDef, treeDef, waterDef,
       carpetDef, greenPlayerDef, genericMonsterDef, grassDef,
-      flowersDef).then(function() {
+      statueDef, flowersDef).then(function() {
     IMAGES_LOADED = true;
     console.log("ALL IMAGES LOADED!");
   });
@@ -353,6 +349,10 @@ drawBoard = function(serverState) {
       if (entity.Subtype === "sprung trap") {
         entityPlaceholderText = "No Trap";
         drawHealth = false;
+      } else if (entity.Subtype === "tree") {
+        entityImg = tileImages.tree;
+      } else if (entity.Subtype === "inert statue") {
+        entityImg = tileImages.statue;
       }
     }
 
@@ -369,7 +369,7 @@ drawBoard = function(serverState) {
     }
 
     /* Health Bar */
-    if (drawHealth === true) {
+    if (drawHealth === true && entity.Ardour !== entity.MaxArdour) {
       ctx.fillStyle = "rgb(200,0,0)";
       ctx.fillRect(entity.X * tileSize + borderX,
           (entity.Y + 1) * tileSize - 5 + borderY,

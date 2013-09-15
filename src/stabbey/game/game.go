@@ -24,6 +24,7 @@ import (
     "time"
 
     "stabbey/interfaces"
+    "stabbey/board"
     "stabbey/serializable"
 )
 
@@ -45,10 +46,13 @@ func NewGame(gamekey string) *Game {
     g.GameRunning = false
     g.Gamekey = gamekey
     g.Players = make(map[int] interfaces.Player, 10)
-    g.Boards = make(map[int] interfaces.Board, 10)
-    g.CurrentBoard = 0
     g.Entities = make(map[int] interfaces.Entity, 100)
     g.PlayersToEntities = make(map[interfaces.Player] interfaces.Entity, 10)
+    g.Boards = make(map[int] interfaces.Board, 10)
+    g.CurrentBoard = 0
+    /* Do at the end, to ensure game object is ready for modification */
+    g.AddBoard(board.New(0, g))
+    g.GetBoards()[0].LoadStartingEntities()
     return g
 }
 

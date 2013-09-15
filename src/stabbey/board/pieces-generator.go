@@ -2,6 +2,7 @@ package board
 
 import (
     "stabbey/interfaces"
+    "stabbey/entity"
 )
 
 type piecesGen struct { *Board }
@@ -10,6 +11,11 @@ type piecesGen struct { *Board }
  * in a functional but random way. */
 func NewPiecesGenerator(b *Board) interfaces.BoardGenerator {
     return &piecesGen{b}
+}
+
+func setEntity(game interfaces.Game, entity interfaces.Entity, x, y int) {
+    entity.SetPosition(game.GetCurrentBoard(), x, y)
+    game.AddEntity(entity)
 }
 
 func (me *piecesGen) Apply() {
@@ -169,4 +175,24 @@ func (me *piecesGen) Apply() {
     me.GroundDecorList[85] = &GroundDecor{2,  11,  "flower", "f"}
     me.GroundDecorList[86] = &GroundDecor{3,  11,  "grass",  "g"}
     me.GroundDecorList[87] = &GroundDecor{5,  11,  "grass",  "g"}
+}
+
+func (me *piecesGen) LoadEntities(game interfaces.Game) {
+    setEntity(game, entity.NewInertStatue(game), 1, 5)
+    setEntity(game, entity.NewInertStatue(game), 4, 5)
+    setEntity(game, entity.NewInertStatue(game), 8, 5)
+    setEntity(game, entity.NewInertStatue(game), 14, 5)
+    setEntity(game, entity.NewInertStatue(game), 9, 11)
+    setEntity(game, entity.NewInertStatue(game), 13, 11)
+
+    setEntity(game, entity.NewChest(game), 15, 3)
+
+    setEntity(game, entity.NewTree(game), 0, 5)
+    setEntity(game, entity.NewTree(game), 5, 5)
+    setEntity(game, entity.NewTree(game), 0, 7)
+    setEntity(game, entity.NewTree(game), 5, 7)
+    setEntity(game, entity.NewTree(game), 0, 9)
+    setEntity(game, entity.NewTree(game), 5, 9)
+    setEntity(game, entity.NewTree(game), 0, 11)
+    setEntity(game, entity.NewTree(game), 5, 11)
 }

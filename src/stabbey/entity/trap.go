@@ -26,8 +26,8 @@ func NewTeleportTrap(g interfaces.Game, x, y int) *Entity {
         }
         me.Die()
 
-        _, myX, myY := me.GetPosition()
-        sprungTrap := NewSprungTrap(g, myX, myY)
+        sprungTrap := NewSprungTrap(g)
+        sprungTrap.SetPosition(me.GetPosition())
         me.Game.AddEntity(sprungTrap)
     }
 
@@ -50,11 +50,10 @@ func NewCaltropTrap(g interfaces.Game) *Entity {
     return me
 }
 
-func NewSprungTrap(g interfaces.Game, x, y int) *Entity {
+func NewSprungTrap(g interfaces.Game) *Entity {
     me := newBasicInert(g)
     me.SetSubtype(interfaces.ENTITY_INERT_SUBTYPE_TRAP)
     me.SetTangible(false)
-    me.SetPosition(me.Game.GetCurrentBoard(), x, y)
-    me.SetName("Sprung trap at " + strconv.Itoa(x) + ", " + strconv.Itoa(y))
+    me.SetName("Sprung trap")
     return me
 }

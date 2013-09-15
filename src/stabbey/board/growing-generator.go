@@ -21,6 +21,9 @@ func NewGrowingGenerator(b *Board) interfaces.BoardGenerator {
     return &growingGen{b}
 }
 
+func (me *growingGen) LoadEntities(game interfaces.Game) {
+}
+
 func (me *growingGen) Apply() {
     rand.Seed(time.Now().Unix())
     totalRooms := 0

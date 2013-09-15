@@ -7,6 +7,7 @@ const BOARD_WIDTH int = 16
 const BOARD_HEIGHT int = 12
 
 type Board interface {
+    LoadStartingEntities()
     GetLevel() int
     SetLevel(int)
     GetWidth() int
@@ -18,4 +19,5 @@ type Board interface {
 
 type BoardGenerator interface {
     Apply()
+    LoadEntities(Game)
 }
