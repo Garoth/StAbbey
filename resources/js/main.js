@@ -339,19 +339,19 @@ drawBoard = function(serverState) {
 
     } else if (entity.Type === "trigger") {
       if (entity.Subtype === "ability loot") {
-        entityImg = null;
         entityPlaceholderText = "Loot";
         drawHealth = false;
       } else if (entity.Subtype === "teleport trap") {
-        entityImg = null;
         entityPlaceholderText = "T. Trap";
+        drawHealth = false;
+      } else if (entity.Subtype === "caltrop trap") {
+        entityPlaceholderText = "C. Trap";
         drawHealth = false;
       }
 
     } else if (entity.Type === "inert") {
       if (entity.Subtype === "sprung trap") {
-        entityImg = null;
-        entityPlaceholderText = "S. Trap";
+        entityPlaceholderText = "No Trap";
         drawHealth = false;
       }
     }

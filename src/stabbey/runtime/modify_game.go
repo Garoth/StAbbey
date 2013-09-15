@@ -28,6 +28,10 @@ func initLevel(boardId int) {
         x, y := GAME.GetRandomEmptySpace()
         placeEntityRandomly(entity.NewTeleportTrap(GAME, x, y), boardId)
     }
+
+    for i := 0; i < 3; i++ {
+        placeEntityRandomly(entity.NewCaltropTrap(GAME), boardId)
+    }
 }
 
 /* Ticks when the players are done their round and other stuff can change */

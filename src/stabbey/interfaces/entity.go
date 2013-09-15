@@ -15,6 +15,7 @@ const (
     ENTITY_MONSTER_SUBTYPE_CHEST         = "chest"
     ENTITY_TRIGGER_SUBTYPE_ABILITY_LOOT  = "ability loot"
     ENTITY_TRIGGER_SUBTYPE_TELEPORT_TRAP = "teleport trap"
+    ENTITY_TRIGGER_SUBTYPE_CALTROP_TRAP  = "caltrop trap"
     ENTITY_INERT_SUBTYPE_TRAP            = "sprung trap"
 
     TRIGGER_TYPE_ABILITY_PUSH            = "pu"

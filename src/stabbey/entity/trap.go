@@ -9,11 +9,10 @@ import (
 func NewTeleportTrap(g interfaces.Game, x, y int) *Entity {
     me := newBasicTrigger(g)
     me.SetSubtype(interfaces.ENTITY_TRIGGER_SUBTYPE_TELEPORT_TRAP)
-    me.SetName("Teleport trap to " + strconv.Itoa(x) + ", " + strconv.Itoa(y))
+    me.SetName("Teleport trap " + strconv.Itoa(me.GetEntityId()) +  " to " +
+        strconv.Itoa(x) + ", " + strconv.Itoa(y))
 
     me.TroddenFunction = func(by interfaces.Entity) {
-        log.Println(me.GetName() + " trodden on by", by.GetName())
-
         /* I've already triggered */
         if me.IsDead() {
             return
@@ -30,6 +29,22 @@ func NewTeleportTrap(g interfaces.Game, x, y int) *Entity {
         _, myX, myY := me.GetPosition()
         sprungTrap := NewSprungTrap(g, myX, myY)
         me.Game.AddEntity(sprungTrap)
+    }
+
+    return me
+}
+
+func NewCaltropTrap(g interfaces.Game) *Entity {
+    damage := 20
+    me := newBasicTrigger(g)
+    me.SetSubtype(interfaces.ENTITY_TRIGGER_SUBTYPE_CALTROP_TRAP)
+    me.SetName("Caltrop trap " + strconv.Itoa(me.GetEntityId()))
+
+    me.TroddenFunction = func(by interfaces.Entity) {
+        if by.IsTangible() {
+            log.Println(me.GetName())
+            by.ChangeArdour(-damage)
+        }
     }
 
     return me
