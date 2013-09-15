@@ -69,6 +69,7 @@ func (r *Runtime) scheduleActions() {
     for {
         if allPlayersReady() {
             log.Println("Players ready; sent initial game state")
+            GAME.Run()
             GAME.SetLastTick(GAME.GetLastTick() + 1)
             broadcastGamestate()
             break

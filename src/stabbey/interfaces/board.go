@@ -8,6 +8,7 @@ const BOARD_HEIGHT int = 12
 
 type Board interface {
     LoadStartingEntities()
+    WarpPlayersToStart()
     GetLevel() int
     SetLevel(int)
     GetWidth() int

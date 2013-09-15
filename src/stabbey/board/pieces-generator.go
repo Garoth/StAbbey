@@ -19,6 +19,10 @@ func setEntity(game interfaces.Game, entity interfaces.Entity, x, y int) {
 }
 
 func (me *piecesGen) Apply() {
+    /* Player stating location */
+    me.PlayerStartX = 2
+    me.PlayerStartY = 11
+
     /* StartX, StartY, Left, Right, Top, Bottom, ... constraints */
     me.RoomList[0] = &Room{0, 0, 1, 6, 1, 4, false, false, false, false}
     me.RoomList[1] = &Room{7, 0, 1, 6, 1, 4, false, false, false, false}

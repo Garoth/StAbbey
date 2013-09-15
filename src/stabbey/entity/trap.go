@@ -18,7 +18,7 @@ func NewTeleportTrap(g interfaces.Game, x, y int) *Entity {
             return
         }
 
-        if me.Game.CanMoveToSpace(x, y) {
+        if me.Game.CanMoveToSpace(g.GetCurrentBoard(), x, y) {
             log.Println("Teleporting", by.GetName(), "to", x, y)
             by.SetPosition(me.Game.GetCurrentBoard(), x, y)
         } else {

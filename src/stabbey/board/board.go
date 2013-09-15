@@ -21,7 +21,7 @@ type GroundDecor struct {
 
 type Board struct {
     /* Unique game level number (i.e. floor number) */
-    Level, Width, Height int
+    PlayerStartX, PlayerStartY, Level, Width, Height int
     /* Game object (for adding entities) */
     Game interfaces.Game
     /* Board generator */
@@ -55,6 +55,13 @@ func New(level int, game interfaces.Game) *Board {
 
 func (b *Board) LoadStartingEntities() {
     b.Generator.LoadEntities(b.Game)
+}
+
+func (b *Board) WarpPlayersToStart() {
+    for _, player := range b.Game.GetPlayers() {
+        b.Game.PlaceAtNearestTile(player, b.Level,
+            b.PlayerStartX, b.PlayerStartY)
+    }
 }
 
 func (b *Board) GetRender() []string {

@@ -63,18 +63,25 @@ func (g *Game) AddPlayer(player interfaces.Player, entity interfaces.Entity) {
 }
 
 /* Checks if an entity may be placed into a given tile on the current board */
-func (g *Game) CanMoveToSpace(locX, locY int) bool {
+func (g *Game) CanMoveToSpace(targetBoardId, locX, locY int) bool {
+    /* Check if in bounds */
+    if targetBoardId >= len(g.Boards) ||
+            locX < 0 || locX >= interfaces.BOARD_WIDTH ||
+            locY < 0 || locY >= interfaces.BOARD_HEIGHT {
+        return false
+    }
+
     /* Check if any entities are there */
     for _, e := range g.Entities {
         boardId, x, y := e.GetPosition()
-        if boardId == g.CurrentBoard && x == locX && y == locY &&
+        if boardId == targetBoardId && x == locX && y == locY &&
                 e.IsTangible() {
             return false
         }
     }
 
     /* Check if there are walls there */
-    if g.IsWall(locX, locY) {
+    if g.IsWall(targetBoardId, locX, locY) {
         return false
     }
 
@@ -82,7 +89,7 @@ func (g *Game) CanMoveToSpace(locX, locY int) bool {
 }
 
 /* Checks if there's a wall at a given tile */
-func (g *Game) IsWall(x, y int) bool {
+func (g *Game) IsWall(boardId, x, y int) bool {
     if x > interfaces.BOARD_WIDTH - 1|| y > interfaces.BOARD_HEIGHT - 1 ||
             x < 0 || y < 0 {
         log.Println("Tried to check out wall out of bounds")
@@ -90,7 +97,7 @@ func (g *Game) IsWall(x, y int) bool {
     }
 
     /* TODO this is both inefficient and fragile */
-    if (g.Boards[g.CurrentBoard].GetRender()[y][x] == '#') {
+    if (g.Boards[boardId].GetRender()[y][x] == '#') {
         return true
     }
 
@@ -98,7 +105,7 @@ func (g *Game) IsWall(x, y int) bool {
 }
 
 /* Checks if there's water at a given tile */
-func (g *Game) IsWater(x, y int) bool {
+func (g *Game) IsWater(boardId, x, y int) bool {
     if x > interfaces.BOARD_WIDTH - 1|| y > interfaces.BOARD_HEIGHT - 1 ||
             x < 0 || y < 0 {
         log.Println("Tried to check for water out of bounds")
@@ -106,7 +113,7 @@ func (g *Game) IsWater(x, y int) bool {
     }
 
     /* TODO this is both inefficient and fragile */
-    if (g.Boards[g.CurrentBoard].GetRender()[y][x] == '~') {
+    if (g.Boards[boardId].GetRender()[y][x] == '~') {
         return true
     }
 
@@ -122,7 +129,8 @@ func (g *Game) GetRandomEmptySpace() (int, int) {
         y := rand.Intn(interfaces.BOARD_HEIGHT)
 
         /* Has to be somewhere an entity can stand, and not in water */
-        if g.CanMoveToSpace(x, y) && !g.IsWater(x, y) {
+        if g.CanMoveToSpace(g.GetCurrentBoard(), x, y) &&
+                !g.IsWater(g.GetCurrentBoard(), x, y) {
             return x, y
         }
     }
@@ -131,6 +139,73 @@ func (g *Game) GetRandomEmptySpace() (int, int) {
     return 0, 0
 }
 
+func (g *Game) PlaceAtNearestTile(ent interfaces.Entity, boardId, x, y int) {
+    tryX, tryY := -1, -1
+
+    /* assuming BOARD_WIDTH is the higher of the two */
+    for radius := 0; radius < interfaces.BOARD_WIDTH + 5; radius++ {
+
+        /* Testing horizontally an vertically closest tiles */
+        /* Right */
+        tryX, tryY = x + radius, y
+        if (g.CanMoveToSpace(boardId, tryX, tryY)) {
+            ent.SetPosition(boardId, tryX, tryY)
+            return
+        }
+
+        /* Bottom */
+        tryX, tryY = x, y + radius
+        if (g.CanMoveToSpace(boardId, tryX, tryY)) {
+            ent.SetPosition(boardId, tryX, tryY)
+            return
+        }
+
+        /* Left */
+        tryX, tryY = x - radius, y
+        if (g.CanMoveToSpace(boardId, tryX, tryY)) {
+            ent.SetPosition(boardId, tryX, tryY)
+            return
+        }
+
+        /* Top */
+        tryX, tryY = x, y - radius
+        if (g.CanMoveToSpace(boardId, tryX, tryY)) {
+            ent.SetPosition(boardId, tryX, tryY)
+            return
+        }
+
+        /* Testing all tiles at increasing distances away */
+        for wallLen := 0; wallLen < (radius * 2) + 1; wallLen++ {
+            /* Testing top wall of new circle */
+            tryX, tryY = x - radius + wallLen, y - radius
+            if (g.CanMoveToSpace(boardId, tryX, tryY)) {
+                ent.SetPosition(boardId, tryX, tryY)
+                return
+            }
+
+            /* Testing right wall of new circle */
+            tryX, tryY = x + radius, y - radius + wallLen
+            if (g.CanMoveToSpace(boardId, tryX, tryY)) {
+                ent.SetPosition(boardId, tryX, tryY)
+                return
+            }
+
+            /* Testing left wall of new circle */
+            tryX, tryY = x - radius, y - radius + wallLen
+            if (g.CanMoveToSpace(boardId, tryX, tryY)) {
+                ent.SetPosition(boardId, tryX, tryY)
+                return
+            }
+
+            /* Testing bottom wall of new circle */
+            tryX, tryY = x - radius + wallLen, y + radius
+            if (g.CanMoveToSpace(boardId, tryX, tryY)) {
+                ent.SetPosition(boardId, tryX, tryY)
+                return
+            }
+        }
+    }
+}
 
 func (g *Game) GetPlayer(id int) interfaces.Player {
     return g.Players[id]
@@ -213,5 +288,6 @@ func (g *Game) Json(player interfaces.Player) string {
 }
 
 func (g *Game) Run() {
+    g.Boards[g.CurrentBoard].WarpPlayersToStart()
     log.Printf("Game %v running", g.Gamekey)
 }

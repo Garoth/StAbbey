@@ -82,7 +82,7 @@ func MoveAction(me *Action) {
         boardId, x, y := e.GetPosition()
         x2, y2 := getDirectionCoords(me.actionString[1], x, y, 1)
 
-        if g.CanMoveToSpace(x2, y2) {
+        if g.CanMoveToSpace(boardId, x2, y2) {
             e.SetPosition(boardId, x2, y2)
         } else {
             log.Printf("Couldn't %v", me.actionString)
@@ -101,7 +101,7 @@ func PushAction(me *Action) {
 
         if entity := getAliveTangibleEntity(boardId, x2, y2, g); entity != nil {
             x3, y3 := getDirectionCoords(me.actionString[1], x2, y2, 1)
-            if g.CanMoveToSpace(x3, y3) {
+            if g.CanMoveToSpace(boardId, x3, y3) {
                 entity.SetPosition(boardId, x3, y3)
             } else {
                 log.Printf("Couldn't push %v by %v", entity.GetName(),
@@ -147,7 +147,7 @@ func LeapAction(me *Action) {
         for i := 1; i <= leapLength; i++ {
             x, y = getDirectionCoords(me.actionString[1], xOrig, yOrig, i)
 
-            if g.IsWall(x, y) {
+            if g.IsWall(boardId, x, y) {
                 iLeft = i - 1
                 break
             }
@@ -156,7 +156,7 @@ func LeapAction(me *Action) {
         for i := iLeft; i >= 0; i-- {
             x, y = getDirectionCoords(me.actionString[1], xOrig, yOrig, i)
 
-            if g.CanMoveToSpace(x, y) {
+            if g.CanMoveToSpace(boardId, x, y) {
                 xDest, yDest = x, y
                 iLeft = i
                 break

@@ -17,11 +17,12 @@ type Game interface {
     GetEntityByPlayer(player Player) Entity
     GetEntities() map[int] Entity
     GetEntitiesAtSpace(boardid, x, y int) []Entity
-    IsWall(x, y int) bool
-    IsWater(x, y int) bool
+    IsWall(boardId, x, y int) bool
+    IsWater(boardId, x, y int) bool
     /* Utilities */
-    CanMoveToSpace(x, y int) bool
+    CanMoveToSpace(boardId, x, y int) bool
     GetRandomEmptySpace() (int, int)
+    PlaceAtNearestTile(e Entity, boardId, x, y int)
     /* Tick manipulation */
     GetLastTick() int
     SetLastTick(tick int)

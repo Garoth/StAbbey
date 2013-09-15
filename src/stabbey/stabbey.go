@@ -74,7 +74,6 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
     if gamekey == "" && GAME == nil {
         gamekey = "0"
         GAME = game.NewGame(gamekey)
-        GAME.Run()
     }
 
     curPlayer = player.New(GAME)
