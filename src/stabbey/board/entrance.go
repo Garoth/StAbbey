@@ -1,3 +1,4 @@
+/* Static entrance level generator */
 package board
 
 import (
@@ -5,20 +6,20 @@ import (
     "stabbey/entity"
 )
 
-type piecesGen struct { *Board }
+type entranceGen struct { *Board }
 
-/* Idea of this board generator is to use pre-made pieces and combine them
- * in a functional but random way. */
-func NewPiecesGenerator(b *Board) interfaces.BoardGenerator {
-    return &piecesGen{b}
+func NewEntranceGenerator(b *Board) interfaces.BoardGenerator {
+    return &entranceGen{b}
 }
 
-func setEntity(game interfaces.Game, entity interfaces.Entity, x, y int) {
-    entity.SetPosition(game.GetCurrentBoard(), x, y)
+func (me *entranceGen) setEntity(game interfaces.Game,
+        entity interfaces.Entity, x, y int) {
+
+    entity.SetPosition(me.GetId(), x, y)
     game.AddEntity(entity)
 }
 
-func (me *piecesGen) Apply() {
+func (me *entranceGen) Apply() {
     /* Player stating location */
     me.PlayerStartX = 2
     me.PlayerStartY = 11
@@ -181,22 +182,26 @@ func (me *piecesGen) Apply() {
     me.GroundDecorList[89] = &GroundDecor{5,  11,  "grass",  "g"}
 }
 
-func (me *piecesGen) LoadEntities(game interfaces.Game) {
-    setEntity(game, entity.NewInertStatue(game), 1, 5)
-    setEntity(game, entity.NewInertStatue(game), 4, 5)
-    setEntity(game, entity.NewInertStatue(game), 8, 5)
-    setEntity(game, entity.NewInertStatue(game), 14, 5)
-    setEntity(game, entity.NewInertStatue(game), 9, 11)
-    setEntity(game, entity.NewInertStatue(game), 13, 11)
+func (me *entranceGen) LoadEntities(game interfaces.Game) {
+    me.setEntity(game, entity.NewInertStatue(game), 1, 5)
+    me.setEntity(game, entity.NewInertStatue(game), 4, 5)
+    me.setEntity(game, entity.NewInertStatue(game), 8, 5)
+    me.setEntity(game, entity.NewInertStatue(game), 14, 5)
+    me.setEntity(game, entity.NewInertStatue(game), 9, 11)
+    me.setEntity(game, entity.NewInertStatue(game), 13, 11)
 
-    setEntity(game, entity.NewChest(game), 15, 3)
+    me.setEntity(game, entity.NewChest(game), 15, 3)
 
-    setEntity(game, entity.NewTree(game), 0, 5)
-    setEntity(game, entity.NewTree(game), 5, 5)
-    setEntity(game, entity.NewTree(game), 0, 7)
-    setEntity(game, entity.NewTree(game), 5, 7)
-    setEntity(game, entity.NewTree(game), 0, 9)
-    setEntity(game, entity.NewTree(game), 5, 9)
-    setEntity(game, entity.NewTree(game), 0, 11)
-    setEntity(game, entity.NewTree(game), 5, 11)
+    me.setEntity(game, entity.NewTree(game), 0, 5)
+    me.setEntity(game, entity.NewTree(game), 5, 5)
+    me.setEntity(game, entity.NewTree(game), 0, 7)
+    me.setEntity(game, entity.NewTree(game), 5, 7)
+    me.setEntity(game, entity.NewTree(game), 0, 9)
+    me.setEntity(game, entity.NewTree(game), 5, 9)
+    me.setEntity(game, entity.NewTree(game), 0, 11)
+    me.setEntity(game, entity.NewTree(game), 5, 11)
+
+    if (me.Id != game.GetNumBoards() - 1) {
+        me.setEntity(game, entity.NewStairsUp(game), 15, 8)
+    }
 }

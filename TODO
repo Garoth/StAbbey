@@ -1,1 +1,4 @@
 * teleport traps under water are invisible
+* intangible things shouldn't spawn on each other (ex. multiple traps, traps on
+  the exit stairs, etc)
+* handle a player gaining the same ability multiple times

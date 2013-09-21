@@ -26,6 +26,7 @@ import (
     "stabbey/interfaces"
     "stabbey/board"
     "stabbey/serializable"
+    "stabbey/entity"
 )
 
 type Game struct {
@@ -33,8 +34,7 @@ type Game struct {
     Boards map[int] interfaces.Board
     Entities map[int] interfaces.Entity
     PlayersToEntities map[interfaces.Player] interfaces.Entity
-    LastTick int
-    CurrentBoard int
+    LastTick, CurrentBoard, NumBoards int
     GameRunning bool
     Gamekey string
 }
@@ -49,10 +49,14 @@ func NewGame(gamekey string) *Game {
     g.Entities = make(map[int] interfaces.Entity, 100)
     g.PlayersToEntities = make(map[interfaces.Player] interfaces.Entity, 10)
     g.Boards = make(map[int] interfaces.Board, 10)
-    g.CurrentBoard = 0
+    g.CurrentBoard = -1
+    g.NumBoards = 3
     /* Do at the end, to ensure game object is ready for modification */
-    g.AddBoard(board.New(0, g))
-    g.GetBoards()[0].LoadStartingEntities()
+    for i := 0; i < g.NumBoards; i++ {
+        g.AddBoard(board.New(i, g))
+        g.GetBoards()[i].LoadStartingEntities()
+    }
+    g.NextBoard()
     return g
 }
 
@@ -64,9 +68,13 @@ func (g *Game) AddPlayer(player interfaces.Player, entity interfaces.Entity) {
 
 /* Checks if an entity may be placed into a given tile on the current board */
 func (g *Game) CanMoveToSpace(targetBoardId, locX, locY int) bool {
-    /* Check if in bounds */
-    if targetBoardId >= len(g.Boards) ||
-            locX < 0 || locX >= interfaces.BOARD_WIDTH ||
+
+    /* Check possible board */
+    if targetBoardId >= len(g.Boards) {
+        return false
+    }
+
+    if locX < 0 || locX >= interfaces.BOARD_WIDTH ||
             locY < 0 || locY >= interfaces.BOARD_HEIGHT {
         return false
     }
@@ -226,11 +234,11 @@ func (g *Game) GetPlayers() map[int] interfaces.Player {
 }
 
 func (g *Game) AddBoard(board interfaces.Board) {
-    g.Boards[board.GetLevel()] = board
+    g.Boards[board.GetId()] = board
 }
 
-func (g *Game) GetBoard(level int) interfaces.Board {
-    return g.Boards[level]
+func (g *Game) GetBoard(boardId int) interfaces.Board {
+    return g.Boards[boardId]
 }
 
 func (g *Game) GetBoards() map[int] interfaces.Board {
@@ -239,6 +247,38 @@ func (g *Game) GetBoards() map[int] interfaces.Board {
 
 func (g *Game) GetCurrentBoard() int {
     return g.CurrentBoard
+}
+
+func (g *Game) GetNumBoards() int {
+    return g.NumBoards
+}
+
+func (g *Game) placeEntityRandomly(entity interfaces.Entity, boardId int) {
+    x, y := g.GetRandomEmptySpace()
+    entity.SetPosition(boardId, x, y)
+    g.AddEntity(entity)
+}
+
+func (g *Game) NextBoard() {
+    if (g.CurrentBoard + 1 >= g.NumBoards) {
+        log.Fatalf("Call to move to next board despite being at last one")
+    }
+
+    g.CurrentBoard++
+    g.Boards[g.CurrentBoard].WarpPlayersToStart()
+
+    /* Spawn some starting monsters */
+    g.placeEntityRandomly(entity.NewGargoyle(g), g.CurrentBoard)
+
+    /* Place some traps */
+    for i := 0; i < 3; i++ {
+        x, y := g.GetRandomEmptySpace()
+        g.placeEntityRandomly(entity.NewTeleportTrap(g, x, y), g.CurrentBoard)
+    }
+
+    for i := 0; i < 3; i++ {
+        g.placeEntityRandomly(entity.NewCaltropTrap(g), g.CurrentBoard)
+    }
 }
 
 func (g *Game) AddEntity(entity interfaces.Entity) {

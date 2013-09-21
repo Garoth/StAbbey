@@ -169,14 +169,14 @@ loadTiles = function() {
   tileImages.bluePlayer.onload = function() {
     bluePlayerDef.resolve();
   };
-  tileImages.bluePlayer.src = imgPath + "Player-blue.png";
+  tileImages.bluePlayer.src = imgPath + "Player-Blue.png";
 
   tileImages.greenPlayer = new Image();
   var greenPlayerDef = $.Deferred();
   tileImages.greenPlayer.onload = function() {
     greenPlayerDef.resolve();
   };
-  tileImages.greenPlayer.src = imgPath + "Player-green.png";
+  tileImages.greenPlayer.src = imgPath + "Player-Green.png";
 
   tileImages.genericMonster = new Image();
   var genericMonsterDef = $.Deferred();
@@ -213,9 +213,23 @@ loadTiles = function() {
   };
   tileImages.statue.src = imgPath + "Statue.png";
 
+  tileImages.stairsup = new Image();
+  var stairsupDef = $.Deferred();
+  tileImages.stairsup.onload = function() {
+    stairsupDef.resolve();
+  };
+  tileImages.stairsup.src = imgPath + "Stairs-Up.png";
+
+  tileImages.stairsdown = new Image();
+  var stairsdownDef = $.Deferred();
+  tileImages.stairsdown.onload = function() {
+    stairsdownDef.resolve();
+  };
+  tileImages.stairsdown.src = imgPath + "Stairs-Down.png";
+
   $.when(floorDef, chestDef, wallDef, bluePlayerDef, treeDef, waterDef,
       carpetDef, greenPlayerDef, genericMonsterDef, grassDef,
-      statueDef, flowersDef).then(function() {
+      statueDef, flowersDef, stairsupDef, stairsdownDef).then(function() {
     IMAGES_LOADED = true;
     console.log("ALL IMAGES LOADED!");
   });
@@ -224,7 +238,7 @@ loadTiles();
 
 /* Draws the Canvas based map */
 drawBoard = function(serverState) {
-  var layers = serverState.Boards[0].Layers[0];
+  var layers = serverState.Boards[serverState.CurrentBoard].Layers[0];
   var canvas = document.getElementById("canvas-board");
   var canvasWidth = $("#canvas-board").width();
   var canvasHeight = $("#canvas-board").height();
@@ -307,11 +321,9 @@ drawBoard = function(serverState) {
   }
 
   $.each(serverState.Entities, function(index, entity) {
-    if (IMAGES_LOADED === false) {
-      return;
-    }
-
-    if (entity.Ardour === 0) {
+    if (IMAGES_LOADED === false ||
+        entity.Ardour === 0 ||
+        entity.BoardId !== serverState.CurrentBoard) {
       return;
     }
 
@@ -343,6 +355,8 @@ drawBoard = function(serverState) {
       } else if (entity.Subtype === "caltrop trap") {
         entityPlaceholderText = "C. Trap";
         drawHealth = false;
+      } else if (entity.Subtype === "stairs up") {
+        entityImg = tileImages.stairsup;
       }
 
     } else if (entity.Type === "inert") {

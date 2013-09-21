@@ -60,9 +60,8 @@ func (e *Entity) GetPosition() (boardid, x, y int) {
 }
 
 func (e *Entity) SetPosition(boardId, x, y int) {
-    /* TODO doesn't consider boardId */
     if e.IsTangible() && !e.Game.CanMoveToSpace(boardId, x, y) {
-        log.Fatalln("Attempted to move entity to impossible place", x, y)
+        log.Fatalln("Can't move", e.GetName(), "to impossible place", x, y)
     }
 
     /* Ordering of operations matters here, since we want to see what

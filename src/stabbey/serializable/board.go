@@ -14,7 +14,7 @@ type Board struct {
 func NewBoard(b interfaces.Board) *Board {
     sb := &Board{}
 
-    sb.Level = b.GetLevel()
+    sb.Level = b.GetId()
     sb.Layers = make([][]string, 1)
     sb.Layers[0] = b.GetRender()
 

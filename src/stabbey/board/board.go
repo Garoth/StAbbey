@@ -20,8 +20,7 @@ type GroundDecor struct {
 }
 
 type Board struct {
-    /* Unique game level number (i.e. floor number) */
-    PlayerStartX, PlayerStartY, Level, Width, Height int
+    PlayerStartX, PlayerStartY, Id, Width, Height int
     /* Game object (for adding entities) */
     Game interfaces.Game
     /* Board generator */
@@ -36,21 +35,25 @@ type Board struct {
     GroundDecorList map[int]*GroundDecor
 }
 
-/* Creates a brand new board, for level -- 0, 1, 2, etc */
-func New(level int, game interfaces.Game) *Board {
+/* Creates a brand new board, for id -- 0, 1, 2, etc */
+func New(id int, game interfaces.Game) *Board {
     b := &Board{}
     b.Game = game
-    b.Level = level
+    b.Id = id
     b.Width = interfaces.BOARD_WIDTH
     b.Height = interfaces.BOARD_HEIGHT
     b.RoomList = make(map[int]*Room)
     b.DoorList = make(map[int]*Tile)
     b.WaterList = make(map[int]*Tile)
     b.GroundDecorList = make(map[int]*GroundDecor)
-    b.Generator = NewPiecesGenerator(b)
+    b.pickGenerator()
+    return b
+}
+
+func (b *Board) pickGenerator() {
+    b.Generator = NewEntranceGenerator(b)
     b.Generator.Apply()
     PrintBoardInfo(b)
-    return b
 }
 
 func (b *Board) LoadStartingEntities() {
@@ -59,7 +62,7 @@ func (b *Board) LoadStartingEntities() {
 
 func (b *Board) WarpPlayersToStart() {
     for _, player := range b.Game.GetPlayers() {
-        b.Game.PlaceAtNearestTile(player, b.Level,
+        b.Game.PlaceAtNearestTile(player, b.Id,
             b.PlayerStartX, b.PlayerStartY)
     }
 }
@@ -155,12 +158,12 @@ func (b *Board) GetRender() []string {
     return layer
 }
 
-func (b *Board) GetLevel() int {
-    return b.Level
+func (b *Board) GetId() int {
+    return b.Id
 }
 
-func (b *Board) SetLevel(level int) {
-    b.Level = level
+func (b *Board) SetId(id int) {
+    b.Id = id
 }
 
 func (b *Board) GetWidth() int {

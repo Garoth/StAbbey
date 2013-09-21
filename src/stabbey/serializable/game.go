@@ -9,7 +9,7 @@ type Game struct {
     Players []*Player
     Boards []*Board
     Entities []*Entity
-    LastTick int
+    LastTick, CurrentBoard int
 }
 
 func NewGame(game interfaces.Game) *Game {
@@ -26,6 +26,7 @@ func NewGame(game interfaces.Game) *Game {
     }
 
     g.LastTick = game.GetLastTick()
+    g.CurrentBoard = game.GetCurrentBoard()
 
     return g
 }
