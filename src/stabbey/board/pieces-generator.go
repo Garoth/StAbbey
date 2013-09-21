@@ -51,19 +51,17 @@ func (me *piecesGen) Apply() {
     me.DoorList[7] = &Tile{12, 4}
 
     /* LocX, LocY */
-    me.WaterList[0] = &Tile{0, 7}
-    me.WaterList[1] = &Tile{1, 7}
-    me.WaterList[2] = &Tile{1, 8}
-    me.WaterList[3] = &Tile{1, 9}
-    me.WaterList[4] = &Tile{1, 10}
-    me.WaterList[5] = &Tile{1, 11}
+    me.WaterList[0] = &Tile{0, 8}
+    me.WaterList[1] = &Tile{1, 8}
+    me.WaterList[2] = &Tile{1, 9}
+    me.WaterList[3] = &Tile{1, 10}
+    me.WaterList[4] = &Tile{1, 11}
 
-    me.WaterList[6] = &Tile{5, 7}
-    me.WaterList[7] = &Tile{4, 7}
-    me.WaterList[8] = &Tile{4, 8}
-    me.WaterList[9] = &Tile{4, 9}
-    me.WaterList[10] = &Tile{4, 10}
-    me.WaterList[11] = &Tile{4, 11}
+    me.WaterList[5] = &Tile{5, 8}
+    me.WaterList[6] = &Tile{4, 8}
+    me.WaterList[7] = &Tile{4, 9}
+    me.WaterList[8] = &Tile{4, 10}
+    me.WaterList[9] = &Tile{4, 11}
 
     me.WaterList[12] = &Tile{11, 3}
     me.WaterList[13] = &Tile{11, 4}
@@ -161,24 +159,26 @@ func (me *piecesGen) Apply() {
     me.GroundDecorList[67] = &GroundDecor{3,  6,   "grass",  "g"}
     me.GroundDecorList[68] = &GroundDecor{4,  6,   "grass",  "g"}
     me.GroundDecorList[69] = &GroundDecor{5,  6,   "grass",  "g"}
-    me.GroundDecorList[70] = &GroundDecor{2,  7,   "flower", "f"}
-    me.GroundDecorList[71] = &GroundDecor{3,  7,   "grass",  "g"}
-    me.GroundDecorList[72] = &GroundDecor{0,  8,   "grass",  "g"}
-    me.GroundDecorList[73] = &GroundDecor{2,  8,   "grass",  "g"}
-    me.GroundDecorList[74] = &GroundDecor{3,  8,   "flower", "f"}
-    me.GroundDecorList[75] = &GroundDecor{5,  8,   "grass",  "g"}
-    me.GroundDecorList[76] = &GroundDecor{0,  9,   "grass",  "g"}
-    me.GroundDecorList[77] = &GroundDecor{2,  9,   "grass",  "g"}
-    me.GroundDecorList[78] = &GroundDecor{3,  9,   "grass",  "g"}
-    me.GroundDecorList[79] = &GroundDecor{5,  9,   "grass",  "g"}
-    me.GroundDecorList[80] = &GroundDecor{0,  10,  "grass",  "g"}
-    me.GroundDecorList[81] = &GroundDecor{2,  10,  "grass",  "f"}
-    me.GroundDecorList[82] = &GroundDecor{3,  10,  "grass",  "g"}
-    me.GroundDecorList[83] = &GroundDecor{5,  10,  "grass",  "g"}
-    me.GroundDecorList[84] = &GroundDecor{0,  11,  "grass",  "g"}
-    me.GroundDecorList[85] = &GroundDecor{2,  11,  "flower", "f"}
-    me.GroundDecorList[86] = &GroundDecor{3,  11,  "grass",  "g"}
-    me.GroundDecorList[87] = &GroundDecor{5,  11,  "grass",  "g"}
+    me.GroundDecorList[70] = &GroundDecor{0,  7,   "grass",  "g"}
+    me.GroundDecorList[71] = &GroundDecor{1,  7,   "grass",  "g"}
+    me.GroundDecorList[72] = &GroundDecor{2,  7,   "flower", "f"}
+    me.GroundDecorList[73] = &GroundDecor{3,  7,   "grass",  "g"}
+    me.GroundDecorList[74] = &GroundDecor{4,  7,   "grass",  "g"}
+    me.GroundDecorList[75] = &GroundDecor{5,  7,   "grass",  "g"}
+    me.GroundDecorList[76] = &GroundDecor{2,  8,   "grass",  "g"}
+    me.GroundDecorList[77] = &GroundDecor{3,  8,   "flower", "f"}
+    me.GroundDecorList[78] = &GroundDecor{0,  9,   "grass",  "g"}
+    me.GroundDecorList[79] = &GroundDecor{2,  9,   "grass",  "g"}
+    me.GroundDecorList[80] = &GroundDecor{3,  9,   "grass",  "g"}
+    me.GroundDecorList[81] = &GroundDecor{5,  9,   "grass",  "g"}
+    me.GroundDecorList[82] = &GroundDecor{0,  10,  "grass",  "g"}
+    me.GroundDecorList[83] = &GroundDecor{2,  10,  "grass",  "f"}
+    me.GroundDecorList[84] = &GroundDecor{3,  10,  "grass",  "g"}
+    me.GroundDecorList[85] = &GroundDecor{5,  10,  "grass",  "g"}
+    me.GroundDecorList[86] = &GroundDecor{0,  11,  "grass",  "g"}
+    me.GroundDecorList[87] = &GroundDecor{2,  11,  "flower", "f"}
+    me.GroundDecorList[88] = &GroundDecor{3,  11,  "grass",  "g"}
+    me.GroundDecorList[89] = &GroundDecor{5,  11,  "grass",  "g"}
 }
 
 func (me *piecesGen) LoadEntities(game interfaces.Game) {

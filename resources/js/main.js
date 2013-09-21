@@ -472,10 +472,14 @@ $(function() {
   });
 
   $("#ready").click(function() {
-    console.log("Queue ready!");
-    sendMessage(COMMANDS.queueActions(QUEUE, TICK_NUM));
-    setTick(RESPONSE_TICK_NUM + 1);
-    tick(true);
+    if (QUEUE.length > 0) {
+      console.log("Queue ready!");
+      sendMessage(COMMANDS.queueActions(QUEUE, TICK_NUM));
+      setTick(RESPONSE_TICK_NUM + 1);
+      tick(true);
+    } else {
+      console.log("Ignoring ready click with no queue");
+    }
   })
 
   $(document).keydown(function(e){

@@ -43,6 +43,13 @@ func (r *Runtime) processOrders() {
             updateTick(order)
         } else if COMMAND_CODES[order.GetCommandCode()] == "set queue" {
             entity := GAME.GetEntityByPlayer(order.GetPlayer())
+
+            if (len(order.GetActions()) <= 0) {
+                log.Printf("Ignoring %v's set queue: no actions set",
+                    order.GetPlayer().GetName())
+                continue
+            }
+
             entity.SetActionQueue(order.GetActions())
             printOrder(order)
         }
@@ -91,7 +98,9 @@ func (r *Runtime) scheduleActions() {
             if action := entity.PopAction(); action != nil {
                 act(entity, action)
             } else {
-                log.Fatalf("Player %v didn't have move ready!", i)
+                log.Printf("Player %v didn't have move ready " +
+                    "(client set queue error)!" +
+                    " This'll count as 1 do nothing.", i)
             }
 
             GAME.SetLastTick(GAME.GetLastTick() + 1)
