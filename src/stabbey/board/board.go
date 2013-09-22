@@ -51,7 +51,14 @@ func New(id int, game interfaces.Game) *Board {
 }
 
 func (b *Board) pickGenerator() {
-    b.Generator = NewEntranceGenerator(b)
+    if b.Id == 0 {
+        b.Generator = NewCenterSprawlGenerator(b)
+    } else if b.Id == 1 {
+        b.Generator = NewEntranceGenerator(b)
+    } else {
+        b.Generator = NewGrowingGenerator(b)
+    }
+
     b.Generator.Apply()
     PrintBoardInfo(b)
 }

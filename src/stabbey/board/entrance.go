@@ -183,25 +183,25 @@ func (me *entranceGen) Apply() {
 }
 
 func (me *entranceGen) LoadEntities(game interfaces.Game) {
-    me.setEntity(game, entity.NewInertStatue(game), 1, 5)
-    me.setEntity(game, entity.NewInertStatue(game), 4, 5)
-    me.setEntity(game, entity.NewInertStatue(game), 8, 5)
-    me.setEntity(game, entity.NewInertStatue(game), 14, 5)
-    me.setEntity(game, entity.NewInertStatue(game), 9, 11)
-    me.setEntity(game, entity.NewInertStatue(game), 13, 11)
+    setEntity(game, entity.NewInertStatue(game), me.Id, 1, 5)
+    setEntity(game, entity.NewInertStatue(game), me.Id, 4, 5)
+    setEntity(game, entity.NewInertStatue(game), me.Id, 8, 5)
+    setEntity(game, entity.NewInertStatue(game), me.Id, 14, 5)
+    setEntity(game, entity.NewInertStatue(game), me.Id, 9, 11)
+    setEntity(game, entity.NewInertStatue(game), me.Id, 13, 11)
 
-    me.setEntity(game, entity.NewChest(game), 15, 3)
+    setEntity(game, entity.NewChest(game), me.Id, 15, 3)
 
-    me.setEntity(game, entity.NewTree(game), 0, 5)
-    me.setEntity(game, entity.NewTree(game), 5, 5)
-    me.setEntity(game, entity.NewTree(game), 0, 7)
-    me.setEntity(game, entity.NewTree(game), 5, 7)
-    me.setEntity(game, entity.NewTree(game), 0, 9)
-    me.setEntity(game, entity.NewTree(game), 5, 9)
-    me.setEntity(game, entity.NewTree(game), 0, 11)
-    me.setEntity(game, entity.NewTree(game), 5, 11)
+    setEntity(game, entity.NewTree(game), me.Id, 0, 5)
+    setEntity(game, entity.NewTree(game), me.Id, 5, 5)
+    setEntity(game, entity.NewTree(game), me.Id, 0, 7)
+    setEntity(game, entity.NewTree(game), me.Id, 5, 7)
+    setEntity(game, entity.NewTree(game), me.Id, 0, 9)
+    setEntity(game, entity.NewTree(game), me.Id, 5, 9)
+    setEntity(game, entity.NewTree(game), me.Id, 0, 11)
+    setEntity(game, entity.NewTree(game), me.Id, 5, 11)
 
     if (me.Id != game.GetNumBoards() - 1) {
-        me.setEntity(game, entity.NewStairsUp(game), 15, 8)
+        setEntity(game, entity.NewStairsUp(game), me.Id, 15, 8)
     }
 }

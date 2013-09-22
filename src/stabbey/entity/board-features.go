@@ -14,8 +14,10 @@ func NewStairsUp(g interfaces.Game) *Entity {
     me.SetSubtype(interfaces.ENTITY_TRIGGER_SUBTYPE_STAIRS_UP)
 
     me.TroddenFunction = func(by interfaces.Entity) {
-        log.Println(by.GetName(), "reached stairs. Loading next board.")
-        me.Game.NextBoard()
+        if by.GetType() == interfaces.ENTITY_TYPE_PLAYER {
+            log.Println(by.GetName(), "reached stairs. Loading next board.")
+            me.Game.NextBoard()
+        }
     }
 
     return me

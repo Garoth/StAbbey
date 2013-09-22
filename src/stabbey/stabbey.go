@@ -39,6 +39,7 @@ type MainPageTemplate struct {
 /* Start the server and connect url paths to functions */
 func main() {
     flag.Parse()
+    log.SetFlags(log.Lshortfile)
 
     go signalhandlers.Interrupt()
     go signalhandlers.Quit()

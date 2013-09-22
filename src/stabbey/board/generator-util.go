@@ -5,6 +5,13 @@ import (
     "stabbey/interfaces"
 )
 
+func setEntity(game interfaces.Game, entity interfaces.Entity,
+        boardId, x, y int) {
+    entity.SetPosition(boardId, x, y)
+    game.AddEntity(entity)
+}
+
+
 func setTile(layer []string, posX, posY int, char string) ([]string, error) {
 
     if posX < 0 || posX > interfaces.BOARD_WIDTH - 1 ||
@@ -21,12 +28,11 @@ func setTile(layer []string, posX, posY int, char string) ([]string, error) {
 }
 
 func PrintBoardInfo(b *Board) {
-    log.Printf("--- Board Rooms ---")
-    for k, room := range b.RoomList {
-        log.Printf("Room %v: at (%v, %v) with size (%v, %v, %v, %v)", k,
-            room.StartingPointX, room.StartingPointY, room.Top, room.Right,
-            room.Bottom, room.Left)
-    }
+    log.Printf("--- Board %v Info ---", b.Id)
+    log.Println("Number of rooms:", len(b.RoomList))
+    log.Println("Number of doors:", len(b.DoorList))
+    log.Println("Number of water tiles:", len(b.WaterList))
+    log.Println("Number of decoration tiles:", len(b.GroundDecorList))
 
     decorline := ""
     for i := 0; i < interfaces.BOARD_WIDTH + 4; i++ {
@@ -38,6 +44,4 @@ func PrintBoardInfo(b *Board) {
         log.Println("|", row, "|")
     }
     log.Println(decorline)
-
-    log.Printf("--- End Board Info ---")
 }
