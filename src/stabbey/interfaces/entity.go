@@ -11,12 +11,17 @@ const (
     ENTITY_TYPE_INERT                    = "inert"
 
     ENTITY_SUBTYPE_UNKNOWN               = "unknown subtype"
+
     ENTITY_MONSTER_SUBTYPE_GARGOYLE      = "gargoyle"
     ENTITY_MONSTER_SUBTYPE_CHEST         = "chest"
+    ENTITY_MONSTER_SUBTYPE_BOULDER       = "boulder"
+
+    ENTITY_TRIGGER_SUBTYPE_STAIRS_UP     = "stairs up"
     ENTITY_TRIGGER_SUBTYPE_ABILITY_LOOT  = "ability loot"
     ENTITY_TRIGGER_SUBTYPE_TELEPORT_TRAP = "teleport trap"
     ENTITY_TRIGGER_SUBTYPE_CALTROP_TRAP  = "caltrop trap"
-    ENTITY_TRIGGER_SUBTYPE_STAIRS_UP     = "stairs up"
+    ENTITY_TRIGGER_SUBTYPE_BOULDER_TRAP  = "boulder trap"
+
     ENTITY_INERT_SUBTYPE_TRAP            = "sprung trap"
     ENTITY_INERT_SUBTYPE_TREE            = "tree"
     ENTITY_INERT_SUBTYPE_STATUE          = "inert statue"
@@ -28,6 +33,7 @@ const (
 type Entity interface {
     SetEntityId(id int)
     GetEntityId() int
+    SwapPositionWith(entity Entity)
     SetPosition(boardid, x, y int)
     GetPosition() (boardid, x, y int)
     SetName(name string)

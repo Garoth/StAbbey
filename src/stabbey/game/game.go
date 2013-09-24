@@ -100,7 +100,6 @@ func (g *Game) CanMoveToSpace(targetBoardId, locX, locY int) bool {
 func (g *Game) IsWall(boardId, x, y int) bool {
     if x > interfaces.BOARD_WIDTH - 1|| y > interfaces.BOARD_HEIGHT - 1 ||
             x < 0 || y < 0 {
-        log.Println("Tried to check out wall out of bounds")
         return true
     }
 
@@ -308,6 +307,18 @@ func (g *Game) GetEntitiesAtSpace(boardId, x, y int) []interfaces.Entity {
     }
 
     return ret
+}
+
+func (g *Game) GetTangibleEntityAtSpace(bId, x, y int) interfaces.Entity {
+    /* A check to ensure that there is only one tangible entity would be
+     * useful, since that should *never* happen */
+    for _, entity := range g.GetEntitiesAtSpace(bId, x, y) {
+        if entity.IsTangible() {
+            return entity
+        }
+    }
+
+    return nil
 }
 
 func (g *Game) GetLastTick() int {

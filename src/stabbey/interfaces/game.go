@@ -23,6 +23,8 @@ type Game interface {
     GetEntityByPlayer(player Player) Entity
     GetEntities() map[int] Entity
     GetEntitiesAtSpace(boardid, x, y int) []Entity
+    // Returns first tangible entity at space (there should only ever be one)
+    GetTangibleEntityAtSpace(boardid, x, y int) Entity
     IsWall(boardId, x, y int) bool
     IsWater(boardId, x, y int) bool
 

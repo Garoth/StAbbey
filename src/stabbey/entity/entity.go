@@ -59,6 +59,25 @@ func (e *Entity) GetPosition() (boardid, x, y int) {
     return e.BoardId, e.X, e.Y
 }
 
+func (e *Entity) SwapPositionWith(other interfaces.Entity) {
+    if !e.IsTangible() || !other.IsTangible() {
+        log.Fatalf("Swap only makes sense for tangible entities. Got %v & %v",
+            e.GetName(), other.GetName())
+    }
+
+    /* It's crucial that two tagnible entities don't end up on same tile */
+    boardId, x, y := e.GetPosition()
+    boardId2, x2, y2 := other.GetPosition()
+    e.BoardId, e.X, e.Y = boardId2, x2, y2
+    /* Can work since both entities are technically in the same place */
+    other.SetPosition(boardId, x, y)
+
+    /* Manually trigger trodden functions since we didn't SetPosition */
+    for _, entity := range e.Game.GetEntitiesAtSpace(e.GetPosition()) {
+        entity.Trodden(e)
+    }
+}
+
 func (e *Entity) SetPosition(boardId, x, y int) {
     if e.IsTangible() && !e.Game.CanMoveToSpace(boardId, x, y) {
         log.Fatalln("Can't move", e.GetName(), "to impossible place", x, y)

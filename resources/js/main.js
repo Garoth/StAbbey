@@ -336,6 +336,8 @@ drawBoard = function(serverState) {
         entityImg = tileImages.genericMonster;
       } else if (entity.Subtype === "chest") {
         entityImg = tileImages.chest;
+      } else if (entity.Subtype === "boulder") {
+        entityPlaceholderText = "Boulder";
       }
 
     } else if (entity.Type === "player") {
@@ -348,15 +350,14 @@ drawBoard = function(serverState) {
     } else if (entity.Type === "trigger") {
       if (entity.Subtype === "ability loot") {
         entityPlaceholderText = "Loot";
-        drawHealth = false;
       } else if (entity.Subtype === "teleport trap") {
-        entityPlaceholderText = "T. Trap";
-        drawHealth = false;
+        entityPlaceholderText = "Teleport"
       } else if (entity.Subtype === "caltrop trap") {
-        entityPlaceholderText = "C. Trap";
-        drawHealth = false;
+        entityPlaceholderText = "Caltrop";
       } else if (entity.Subtype === "stairs up") {
         entityImg = tileImages.stairsup;
+      } else if (entity.Subtype === "boulder trap") {
+        entityPlaceholderText = "Bldr T.";
       }
 
     } else if (entity.Type === "inert") {
@@ -379,7 +380,7 @@ drawBoard = function(serverState) {
       ctx.font="10px Arial";
       ctx.fillText(entityPlaceholderText,
           entity.X * tileSize + borderX + 4,
-          (entity.Y + 1) * tileSize + borderY - 4);
+          (entity.Y + 1) * tileSize + borderY - 10);
     }
 
     /* Health Bar */
