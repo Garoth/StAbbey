@@ -50,7 +50,6 @@ func (r *Runtime) processOrders() {
             }
 
             entity.SetActionQueue(order.GetActions())
-            printOrder(order)
         }
     }
 }

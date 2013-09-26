@@ -76,6 +76,8 @@ func (me *centerSprawlGen) LoadEntities(game interfaces.Game) {
 
     setEntity(game, entity.NewBoulderTrap(game, 'N'), me.Id, 7, 3)
 
+    setEntity(game, entity.NewChest(game), me.Id, 9, 6)
+
     if (me.Id != game.GetNumBoards() - 1) {
         setEntity(game, entity.NewStairsUp(game), me.Id, 1, 7)
     }

@@ -16,6 +16,7 @@ type Entity struct {
     Tangible, Dead bool
     DeathFunction func()
     TroddenFunction func(interfaces.Entity)
+    RepositionFunction func(fromBId, fromX, fromY, toBId, toX, toY int)
     TickFunction func(int)
     ActionQueue []interfaces.Action
 }
@@ -42,6 +43,8 @@ func New(entid int, g interfaces.Game) *Entity {
     }
     e.TickFunction = func(tick int) {
     }
+    e.RepositionFunction = func(fromBId, fromX, fromY, toBId, toX, toY int) {
+    }
     e.ActionQueue = make([]interfaces.Action, 0, 10)
     return e
 }
@@ -53,10 +56,6 @@ func (e *Entity) SetEntityId(id int) {
 
 func (e *Entity) GetEntityId() int {
     return e.EntityId
-}
-
-func (e *Entity) GetPosition() (boardid, x, y int) {
-    return e.BoardId, e.X, e.Y
 }
 
 func (e *Entity) SwapPositionWith(other interfaces.Entity) {
@@ -76,6 +75,9 @@ func (e *Entity) SwapPositionWith(other interfaces.Entity) {
     for _, entity := range e.Game.GetEntitiesAtSpace(e.GetPosition()) {
         entity.Trodden(e)
     }
+
+    /* other's reposition function will be called by SetPosition */
+    e.RepositionFunction(boardId, x, y, boardId2, x2, y2)
 }
 
 func (e *Entity) SetPosition(boardId, x, y int) {
@@ -90,15 +92,20 @@ func (e *Entity) SetPosition(boardId, x, y int) {
      * it could be that landing on one repositions us right away */
     entitiesAtTarget := e.Game.GetEntitiesAtSpace(boardId, x, y)
 
-    e.BoardId = boardId
-    e.X = x
-    e.Y = y
+    oldBId, oldX, oldY := e.GetPosition()
+    e.BoardId, e.X, e.Y = boardId, x, y
 
     if e.IsTangible() {
         for _, entity := range entitiesAtTarget {
             entity.Trodden(e);
         }
     }
+
+    e.RepositionFunction(oldBId, oldX, oldY, boardId, x, y)
+}
+
+func (e *Entity) GetPosition() (boardid, x, y int) {
+    return e.BoardId, e.X, e.Y
 }
 
 func (e *Entity) SetName(name string) {

@@ -4,6 +4,7 @@ import (
     "log"
     "strconv"
     "stabbey/interfaces"
+    "stabbey/util"
 )
 
 func NewTeleportTrap(g interfaces.Game, x, y int) *Entity {
@@ -18,9 +19,10 @@ func NewTeleportTrap(g interfaces.Game, x, y int) *Entity {
             return
         }
 
-        if me.Game.CanMoveToSpace(g.GetCurrentBoard(), x, y) {
+        myBId, _, _ := me.GetPosition()
+        if me.Game.CanMoveToSpace(myBId, x, y) {
             log.Println("Teleporting", by.GetName(), "to", x, y)
-            by.SetPosition(me.Game.GetCurrentBoard(), x, y)
+            by.SetPosition(myBId, x, y)
         } else {
             log.Println(me.GetName() + " failed, since destination is blocked")
         }
@@ -111,6 +113,7 @@ func NewBoulder(g interfaces.Game, travelDir byte) *Entity {
     me := newBasicMonster(g)
     me.SetSubtype(interfaces.ENTITY_MONSTER_SUBTYPE_BOULDER)
     me.SetName("Boulder " + strconv.Itoa(me.GetEntityId()))
+    firstReposition := true
 
     me.TickFunction = func(tick int) {
         if me.IsDead() {
@@ -147,6 +150,20 @@ func NewBoulder(g interfaces.Game, travelDir byte) *Entity {
                 me.Die()
             }
         }
+    }
+
+    me.RepositionFunction = func(fromBId, fromX, fromY, toBId, toX, toY int) {
+        if fromBId != toBId || me.IsDead() {
+            return
+        }
+
+        /* Skip the first time we reposition, since that's us spawning */
+        if firstReposition {
+            firstReposition = false
+            return
+        }
+
+        travelDir = util.PrimaryDirection(fromX, fromY, toX, toY)
     }
 
     return me

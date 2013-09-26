@@ -227,9 +227,17 @@ loadTiles = function() {
   };
   tileImages.stairsdown.src = imgPath + "Stairs-Down.png";
 
+  tileImages.boulder = new Image();
+  var boulderDef = $.Deferred();
+  tileImages.boulder.onload = function() {
+    boulderDef.resolve();
+  };
+  tileImages.boulder.src = imgPath + "Boulder.png";
+
   $.when(floorDef, chestDef, wallDef, bluePlayerDef, treeDef, waterDef,
       carpetDef, greenPlayerDef, genericMonsterDef, grassDef,
-      statueDef, flowersDef, stairsupDef, stairsdownDef).then(function() {
+      statueDef, flowersDef, stairsupDef, stairsdownDef,
+      boulderDef).then(function() {
     IMAGES_LOADED = true;
     console.log("ALL IMAGES LOADED!");
   });
@@ -337,7 +345,7 @@ drawBoard = function(serverState) {
       } else if (entity.Subtype === "chest") {
         entityImg = tileImages.chest;
       } else if (entity.Subtype === "boulder") {
-        entityPlaceholderText = "Boulder";
+        entityImg = tileImages.boulder;
       }
 
     } else if (entity.Type === "player") {
