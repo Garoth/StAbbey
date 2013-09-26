@@ -53,36 +53,20 @@ func NewCaltropTrap(g interfaces.Game) *Entity {
 }
 
 /* Makes a boulder trap that throws a boulder from the nearest wall
- * in the giver startWallDir, which is either N, E, S, or W */
-func NewBoulderTrap(g interfaces.Game, startWallDir byte) *Entity {
+ * in the given direction */
+func NewBoulderTrap(g interfaces.Game, wallDir interfaces.Direction) *Entity {
     me := newBasicTrigger(g)
     me.SetSubtype(interfaces.ENTITY_TRIGGER_SUBTYPE_BOULDER_TRAP)
     me.SetName("Boulder trap " + strconv.Itoa(me.GetEntityId()) +
-        " from " + string(startWallDir) + " wall")
+        " from " + wallDir.Name() + " wall")
 
     me.TroddenFunction = func(by interfaces.Entity) {
         if by.IsTangible() == false || me.IsDead() {
             return
         }
 
-        /* TODO this is real trashy code */
-        var boulderDir byte
-        x, y := 0, 0
-        if startWallDir == 'N' {
-            y = -1
-            boulderDir = 'S'
-        } else if startWallDir == 'S' {
-            y = 1
-            boulderDir = 'N'
-        } else if startWallDir == 'W' {
-            x = -1
-            boulderDir = 'E'
-        } else if startWallDir == 'E' {
-            x = 1
-            boulderDir = 'W'
-        } else {
-            log.Fatalf("Direction must be one of N, E, S, W")
-        }
+        x, y := wallDir.XYDelta()
+        boulderDir := wallDir.Opposite()
 
         boardId, boulderX, boulderY := me.GetPosition()
         for ; me.Game.IsWall(boardId, boulderX, boulderY) == false; {
@@ -107,7 +91,7 @@ func NewBoulderTrap(g interfaces.Game, startWallDir byte) *Entity {
 
 /* Spawns a rolling boulder in a given direction, which is one of
  * N, E, S, or W */
-func NewBoulder(g interfaces.Game, travelDir byte) *Entity {
+func NewBoulder(g interfaces.Game, roll interfaces.Direction) *Entity {
     damage := 70
 
     me := newBasicMonster(g)
@@ -120,19 +104,7 @@ func NewBoulder(g interfaces.Game, travelDir byte) *Entity {
             return
         }
 
-        /* TODO this is real trashy code */
-        x, y := 0, 0
-        if travelDir == 'N' {
-            y = -1
-        } else if travelDir == 'S' {
-            y = 1
-        } else if travelDir == 'W' {
-            x = -1
-        } else if travelDir == 'E' {
-            x = 1
-        } else {
-            log.Fatalf("Direction must be one of N, E, S, W")
-        }
+        x, y := roll.XYDelta()
 
         boardId, myX, myY := me.GetPosition()
         myX += x
@@ -163,7 +135,7 @@ func NewBoulder(g interfaces.Game, travelDir byte) *Entity {
             return
         }
 
-        travelDir = util.PrimaryDirection(fromX, fromY, toX, toY)
+        roll = util.PrimaryDirection(fromX, fromY, toX, toY)
     }
 
     return me
