@@ -3,3 +3,4 @@ bin
 pkg
 *.css
 .DS_Store
+src/code.google.com

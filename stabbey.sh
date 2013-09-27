@@ -25,12 +25,24 @@ function stabbey_compile_css() {
 
 function stabbey_install() {
     pushd src/stabbey &> /dev/null
-    go install
+    go install $@
     popd &> /dev/null
 }
 
 function stabbey_run() {
     bin/stabbey
+}
+
+function stabbey_race() {
+    stabbey_install -race
+    echo "Build with race detector, running:"
+    stabbey_run
+}
+
+function stabbey_deps() {
+    go get code.google.com/p/go.net/websocket
+    echo "Installed websocket lib"
+    echo "All deps installed"
 }
 
 function stabbey_clean() {
@@ -44,12 +56,14 @@ function stabbey_usage() {
     echo "Usage: $MYNAME <command>"
     echo ""
     echo "Where <command> is one of:"
-    echo " - run:     builds and runs the stabbey server"
-    echo " - runloop: like run, but restarts on successful exit. This speeds up"
+    echo "   run:     builds and runs the stabbey server"
+    echo "   runloop: like run, but restarts on successful exit. This speeds up"
     echo "            the development loop, since Control-C exits with 0 (and"
     echo "            triggers a rebuild), while Control-\\ exits with 1 (and"
     echo "            terminates the rebuild-run loop)"
-    echo " - clean:   deletes currently built binaries and cache"
+    echo "   race:    builds and runs stabbey server with race detector"
+    echo "   deps:    installs necessary dependencies"
+    echo "   clean:   deletes currently built binaries and cache"
 }
 
 if [[ "$1" == "run" ]]; then
@@ -66,6 +80,10 @@ elif [[ "$1" == "runloop" ]]; then
         fi
         sleep 1
     done
+elif [[ "$1" == "race" ]]; then
+    stabbey_race
+elif [[ "$1" == "deps" ]]; then
+    stabbey_deps
 elif [[ "$1" == "clean" ]]; then
     stabbey_clean
 else
