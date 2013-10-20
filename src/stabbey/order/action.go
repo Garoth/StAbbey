@@ -4,7 +4,7 @@ package order
 
 import (
     "log"
-
+    "math/rand"
     "stabbey/interfaces"
 )
 
@@ -15,6 +15,7 @@ var ACTIONS = map[byte] func(partialAction *Action) {
     'p' : PushAction,
     '*' : PunchAction,
     'l' : LeapAction,
+    'd' : DrunkAction,
 }
 
 type Action struct {
@@ -179,6 +180,28 @@ func LeapAction(me *Action) {
             for _, entity := range g.GetEntitiesAtSpace(boardId, x, y) {
                 entity.Trodden(e);
             }
+        }
+    }
+}
+
+/* Drunk movement.  Whiskey!!! */
+func DrunkAction(me *Action) {
+    me.shortDesc = "Durnked "
+    me.longDesc  = "You confidently move with the grace of a hippo."
+    me.availableDirections = [5]bool{false, false, false, false, false}
+  
+    xOffset := rand.Intn(3) - 1;
+    yOffset := rand.Intn(3) - 1;
+      
+    me.act = func(e interfaces.Entity, g interfaces.Game) {
+        boardId, x, y := e.GetPosition()
+        x = x + xOffset;
+        y = y + yOffset;
+  
+        if g.CanMoveToSpace(boardId, x, y) {
+            e.SetPosition(boardId, x, y)
+        } else {
+            log.Printf("Couldn't %v", me.actionString)
         }
     }
 }
