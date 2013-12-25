@@ -35,7 +35,6 @@ func New(g interfaces.Game) *Player {
     p.AvailableActions = append(p.AvailableActions, order.NewAction("mu"))
     p.AvailableActions = append(p.AvailableActions, order.NewAction("*u"))
     p.AvailableActions = append(p.AvailableActions, order.NewAction("lu"))
-    p.AvailableActions = append(p.AvailableActions, order.NewAction("d"))
 
     /* Entity stuff */
     p.Entity = entity.New(entity.UIDG.NextUid(), g)
