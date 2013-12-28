@@ -183,6 +183,13 @@ window.loadTiles = function() {
     };
     tileImages.statue.src = imgPath + "Statue.png";
 
+    tileImages.shielder = new Image();
+    var shielderDef = $.Deferred();
+    tileImages.shielder.onload = function() {
+        shielderDef.resolve();
+    };
+    tileImages.shielder.src = imgPath + "Shielder.png";
+
     tileImages.stairsup = new Image();
     var stairsupDef = $.Deferred();
     tileImages.stairsup.onload = function() {
@@ -206,7 +213,7 @@ window.loadTiles = function() {
 
     $.when(floorDef, chestDef, wallDef, bluePlayerDef, treeDef, waterDef,
             carpetDef, greenPlayerDef, genericMonsterDef, grassDef,
-            statueDef, flowersDef, stairsupDef, stairsdownDef,
+            statueDef, shielderDef, flowersDef, stairsupDef, stairsdownDef,
             boulderDef).then(function() {
         IMAGES_LOADED = true;
         console.log("ALL IMAGES LOADED!");
@@ -316,6 +323,8 @@ window.drawBoard = function(serverState) {
                 entityImg = tileImages.chest;
             } else if (entity.Subtype === "boulder") {
                 entityImg = tileImages.boulder;
+            } else if (entity.Subtype === "shielder") {
+                entityImg = tileImages.shielder;
             }
 
         } else if (entity.Type === "player") {

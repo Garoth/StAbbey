@@ -13,6 +13,7 @@ const (
     ENTITY_SUBTYPE_UNKNOWN               = "unknown subtype"
 
     ENTITY_MONSTER_SUBTYPE_GARGOYLE      = "gargoyle"
+    ENTITY_MONSTER_SUBTYPE_SHIELDER      = "shielder"
     ENTITY_MONSTER_SUBTYPE_CHEST         = "chest"
     ENTITY_MONSTER_SUBTYPE_BOULDER       = "boulder"
 

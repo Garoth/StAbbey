@@ -142,7 +142,9 @@ func broadcastGamestate() {
 
 /* Generic action handler for any entity */
 func act(entity interfaces.Entity, action interfaces.Action) {
-    action.Act(entity, GAME)
+    if err := action.Act(entity, GAME); err != nil {
+        log.Printf("%v: %v", entity.GetName(), err)
+    }
 }
 
 /* Updates players' ticks and send out gamestate when everyone's ready */

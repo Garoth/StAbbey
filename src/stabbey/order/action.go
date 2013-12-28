@@ -3,6 +3,7 @@ package order
 /* Representation of player/monster abilities in the game */
 
 import (
+    "fmt"
     "log"
 
     "stabbey/interfaces"
@@ -27,7 +28,7 @@ type Action struct {
     /* How many times the action is to be repeated */
     count int
     /* Function that'll perform the action on the world state */
-    act func(e interfaces.Entity, g interfaces.Game)
+    act func(e interfaces.Entity, g interfaces.Game) error
 }
 
 /* Smartly creates a new action based on the given action string */
@@ -39,7 +40,9 @@ func NewAction(at string) interfaces.Action {
     me.longDesc = "MISSING LONG DESC"
     me.availableDirections = [5]bool{true, true, true, true, false}
     me.count = 0
-    me.act = func(e interfaces.Entity, g interfaces.Game) { }
+    me.act = func(e interfaces.Entity, g interfaces.Game) error {
+        return nil
+    }
     ACTIONS[at[0]](me)
 
     return me
@@ -62,8 +65,8 @@ func (a *Action) AvailableDirections() [5]bool {
 }
 
 /* Wrapper around the act member to work with interfaces */
-func (a *Action) Act(e interfaces.Entity, g interfaces.Game) {
-    a.act(e, g)
+func (a *Action) Act(e interfaces.Entity, g interfaces.Game) error {
+    return a.act(e, g)
 }
 
 /* Makes you do nothing for one turn */
@@ -78,15 +81,17 @@ func MoveAction(me *Action) {
     me.shortDesc = "Move"
     me.longDesc = "You bravely advance."
 
-    me.act = func(e interfaces.Entity, g interfaces.Game) {
+    me.act = func(e interfaces.Entity, g interfaces.Game) error {
         boardId, x, y := e.GetPosition()
         x2, y2 := getDirectionCoords(me.actionString[1], x, y, 1)
 
         if g.CanMoveToSpace(boardId, x2, y2) {
             e.SetPosition(boardId, x2, y2)
         } else {
-            log.Printf("Couldn't %v", me.actionString)
+            return fmt.Errorf("Couldn't %v", me.actionString)
         }
+
+        return nil
     }
 }
 
@@ -95,7 +100,7 @@ func PushAction(me *Action) {
     me.shortDesc = "Push"
     me.longDesc = "You put your weight into a mighty shove."
 
-    me.act = func(e interfaces.Entity, g interfaces.Game) {
+    me.act = func(e interfaces.Entity, g interfaces.Game) error {
         boardId, x, y := e.GetPosition()
         x2, y2 := getDirectionCoords(me.actionString[1], x, y, 1)
 
@@ -104,12 +109,14 @@ func PushAction(me *Action) {
             if g.CanMoveToSpace(boardId, x3, y3) {
                 entity.SetPosition(boardId, x3, y3)
             } else {
-                log.Printf("Couldn't push %v by %v", entity.GetName(),
+                return fmt.Errorf("Couldn't push %v by %v", entity.GetName(),
                     me.actionString)
             }
         } else {
-            log.Printf("Nothing to push with %v", me.actionString)
+            return fmt.Errorf("Nothing to push with %v", me.actionString)
         }
+
+        return nil
     }
 }
 
@@ -118,15 +125,17 @@ func PunchAction(me *Action) {
     me.shortDesc = "Punch"
     me.longDesc = "You punch wildly."
 
-    me.act = func(e interfaces.Entity, g interfaces.Game) {
+    me.act = func(e interfaces.Entity, g interfaces.Game) error {
         boardId, x, y := e.GetPosition()
         x2, y2 := getDirectionCoords(me.actionString[1], x, y, 1)
 
         if entity := getAliveTangibleEntity(boardId, x2, y2, g); entity != nil {
             entity.ChangeArdour(-10)
         } else {
-            log.Printf("Nothing to punch with %v", me.actionString)
+            return fmt.Errorf("Nothing to punch with %v", me.actionString)
         }
+
+        return nil;
     }
 }
 
@@ -135,7 +144,7 @@ func LeapAction(me *Action) {
     me.shortDesc = "Leap"
     me.longDesc = "You fall, but miss the ground for a while."
 
-    me.act = func(e interfaces.Entity, g interfaces.Game) {
+    me.act = func(e interfaces.Entity, g interfaces.Game) error {
         leapLength := 3
 
         boardId, xOrig, yOrig := e.GetPosition()
@@ -165,8 +174,8 @@ func LeapAction(me *Action) {
 
         /* Land there if possible */
         if xDest == -1 && yDest == -1 {
-            log.Println("Leap by", e.GetName(), "failed -- no available space")
-            return
+            return fmt.Errorf("Leap by %v failed -- no available space",
+                e.GetName())
         } else {
             log.Println(e.GetName(), "lept to", xDest, yDest)
             e.SetPosition(boardId, xDest, yDest)
@@ -180,6 +189,8 @@ func LeapAction(me *Action) {
                 entity.Trodden(e);
             }
         }
+
+        return nil
     }
 }
 

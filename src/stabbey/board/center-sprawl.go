@@ -1,4 +1,3 @@
-/* Static entrance level generator */
 package board
 
 import (
@@ -77,6 +76,8 @@ func (me *centerSprawlGen) LoadEntities(game interfaces.Game) {
 
     setEntity(game, entity.NewBoulderTrap(game,
         util.NewDirection(interfaces.UTIL_DIRECTION_NORTH)), me.Id, 7, 3)
+
+    setEntity(game, entity.NewShielder(game), me.Id, 8, 11)
 
     setEntity(game, entity.NewChest(game), me.Id, 9, 6)
 

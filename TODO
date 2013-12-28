@@ -1,4 +1,4 @@
-* Fix StatusNotModified thing in the webserver
+* Fix ardour to not have a "max value" (wtf is that even)
 * teleport traps under water are invisible (?)
 * intangible things shouldn't spawn on each other (ex. multiple traps, traps on
   the exit stairs, etc)
@@ -9,8 +9,3 @@
   thus making it reposition again in the original direction of travel.
   Unfortunately, this bug also produces the right behaviour, in that a
   teleport trap doesn't change the dir of travel.
-* There probably needs to be a more consistent ordering of when worldticks
-  happen for monsters. There also probably needs to be a better framework for
-  the "monster turn" that's not worldTick.
-* Make a "shield statue" that just pushes away anything that gets near it. Then,
-  it's possible to make a hallway of boulders just rolling in loops :)
