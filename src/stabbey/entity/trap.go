@@ -99,9 +99,9 @@ func NewBoulder(g interfaces.Game, roll interfaces.Direction) *Entity {
     me.SetName("Boulder " + strconv.Itoa(me.GetEntityId()))
     firstReposition := true
 
-    me.TickFunction = func(tick int) {
+    me.TurnFunction = func(tick int) bool {
         if me.IsDead() {
-            return
+            return false
         }
 
         x, y := roll.XYDelta()
@@ -122,6 +122,8 @@ func NewBoulder(g interfaces.Game, roll interfaces.Direction) *Entity {
                 me.Die()
             }
         }
+
+        return true
     }
 
     me.RepositionFunction = func(fromBId, fromX, fromY, toBId, toX, toY int) {

@@ -17,7 +17,7 @@ type Entity struct {
     DeathFunction func()
     TroddenFunction func(interfaces.Entity)
     RepositionFunction func(fromBId, fromX, fromY, toBId, toX, toY int)
-    TickFunction func(int)
+    TurnFunction func(int) bool
     ActionQueue []interfaces.Action
 }
 
@@ -41,7 +41,8 @@ func New(entid int, g interfaces.Game) *Entity {
     e.TroddenFunction = func(by interfaces.Entity) {
         log.Println(e.GetName(), "was stepped on")
     }
-    e.TickFunction = func(tick int) {
+    e.TurnFunction = func(tick int) bool {
+        return false
     }
     e.RepositionFunction = func(fromBId, fromX, fromY, toBId, toX, toY int) {
     }
@@ -233,6 +234,11 @@ func (e *Entity) PopAction() interfaces.Action {
     return nil
 }
 
-func (me *Entity) WorldTick(tick int) {
-    me.TickFunction(tick)
+/* Runs custom code for the entity's turn. Useful for programming monsters
+ * and the like.
+ *
+ * Returns true if it did something that should be announced to the players.
+ */
+func (me *Entity) RunTurn(tick int) bool {
+    return me.TurnFunction(tick)
 }

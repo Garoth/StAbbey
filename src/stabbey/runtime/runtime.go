@@ -84,11 +84,13 @@ func (r *Runtime) scheduleActions() {
 
     /* Thereafter, the players are only ready if they've a queue */
     for {
+        /* Ensure all players are ready */
         if allPlayersReady() == false {
             time.Sleep(TURN_DELAY)
             continue
         }
 
+        /* Do all the player actions */
         for i := 0; i < len(GAME.GetPlayers()); i++ {
             player := GAME.GetPlayer(i)
             entity := GAME.GetEntityByPlayer(player)
@@ -106,16 +108,15 @@ func (r *Runtime) scheduleActions() {
             time.Sleep(TURN_DELAY)
         }
 
-        worldTick()
-    }
-}
-
-/* Ticks when the players are done their round and other stuff can change */
-func worldTick() {
-    /* Inform entities on the same board */
-    for _, entity := range GAME.GetEntities() {
-        if bId, _, _ := entity.GetPosition(); bId == GAME.GetCurrentBoard() {
-            entity.WorldTick(GAME.GetLastTick())
+        /* Do all the other turns (mostly monster moves) */
+        for _, entity := range GAME.GetEntities() {
+            if bId, _, _ := entity.GetPosition(); bId == GAME.GetCurrentBoard() {
+                if entity.RunTurn(GAME.GetLastTick()) {
+                    GAME.SetLastTick(GAME.GetLastTick() + 1)
+                    broadcastGamestate()
+                    time.Sleep(TURN_DELAY)
+                }
+            }
         }
     }
 }

@@ -56,5 +56,5 @@ type Entity interface {
     GetStringActionQueue() []string
     SetActionQueue([]Action)
     PopAction() Action
-    WorldTick(tick int)
+    RunTurn(tick int) bool
 }

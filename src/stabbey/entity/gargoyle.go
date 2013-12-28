@@ -12,8 +12,5 @@ func NewGargoyle(g interfaces.Game) interfaces.Entity {
     me.SetMaxArdour(30)
     me.SetArdour(30)
 
-    me.TickFunction = func(tick int) {
-    }
-
     return me
 }

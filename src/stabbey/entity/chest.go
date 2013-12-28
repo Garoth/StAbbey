@@ -13,9 +13,6 @@ func NewChest(g interfaces.Game) interfaces.Entity {
     me.SetMaxArdour(10)
     me.SetArdour(10)
 
-    me.TickFunction = func(tick int) {
-    }
-
     me.DeathFunction = func() {
         log.Println(me.GetName(), "drops loot")
         loot := NewAbilityTrigger(me.Game, interfaces.TRIGGER_TYPE_ABILITY_PUSH)
