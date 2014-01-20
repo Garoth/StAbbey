@@ -1,12 +1,10 @@
 package player
 
 import (
-    "log"
     "strconv"
     "time"
 
-    "code.google.com/p/go.net/websocket"
-
+    "stabbey/spectator"
     "stabbey/entity"
     "stabbey/interfaces"
     "stabbey/order"
@@ -16,21 +14,23 @@ import (
 var uidg = uidgenerator.New()
 
 type Player struct {
+    *spectator.Spectator
     *entity.Entity
     PlayerId int
     AvailableActions []interfaces.Action
     PlayerLastTick int
     PlayerLastTickTime time.Time
-    WebSocketConnection *websocket.Conn
 }
 
 func New(g interfaces.Game) *Player {
     p := &Player{}
 
+    /* Spectator stuff */
+    p.Spectator = spectator.New()
+
     /* Player stuff */
     p.SetPlayerId(uidg.NextUid())
     p.SetLastTickTime(time.Now())
-    p.SetWebSocketConnection(nil)
     p.AvailableActions = append(p.AvailableActions, order.NewAction("."))
     p.AvailableActions = append(p.AvailableActions, order.NewAction("mu"))
     p.AvailableActions = append(p.AvailableActions, order.NewAction("*u"))
@@ -76,21 +76,4 @@ func (p *Player) GetLastTickTime() time.Time {
 
 func (p *Player) SetLastTickTime(t time.Time) {
     p.PlayerLastTickTime = t
-}
-
-func (p *Player) GetWebSocketConnection() *websocket.Conn {
-    return p.WebSocketConnection
-}
-
-func (p *Player) SetWebSocketConnection(conn *websocket.Conn) {
-    p.WebSocketConnection = conn
-}
-
-func (p *Player) SendMessage(json string) {
-    if p.WebSocketConnection != nil {
-        websocket.Message.Send(p.WebSocketConnection, json)
-    } else {
-        log.Printf("Attempt to use player %v's websocket before its ready",
-            p.GetPlayerId())
-    }
 }

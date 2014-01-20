@@ -138,6 +138,10 @@ func broadcastGamestate() {
     for _, player := range GAME.GetPlayers() {
         player.SendMessage(GAME.Json(player))
     }
+
+    for _, spectator := range GAME.GetSpectators() {
+        spectator.SendMessage(GAME.Json(nil))
+    }
 }
 
 /* Generic action handler for any entity */

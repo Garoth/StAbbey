@@ -1,6 +1,10 @@
 package interfaces
 
 type Game interface {
+    /*** Spectator Manipulation ***/
+    AddSpectator(spectator Spectator)
+    GetSpectators() map[int] Spectator
+
     /*** Player Manipulation ***/
     AddPlayer(player Player, entity Entity)
     GetPlayer(id int) Player

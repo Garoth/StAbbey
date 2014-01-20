@@ -31,6 +31,7 @@ import (
 
 type Game struct {
     Players map[int] interfaces.Player
+    Spectators map[int] interfaces.Spectator
     Boards map[int] interfaces.Board
     Entities map[int] interfaces.Entity
     PlayersToEntities map[interfaces.Player] interfaces.Entity
@@ -46,6 +47,7 @@ func NewGame(gamekey string) *Game {
     g.GameRunning = false
     g.Gamekey = gamekey
     g.Players = make(map[int] interfaces.Player, 10)
+    g.Spectators = make(map[int] interfaces.Spectator)
     g.Entities = make(map[int] interfaces.Entity, 100)
     g.PlayersToEntities = make(map[interfaces.Player] interfaces.Entity, 10)
     g.Boards = make(map[int] interfaces.Board, 10)
@@ -58,6 +60,14 @@ func NewGame(gamekey string) *Game {
     }
     g.NextBoard()
     return g
+}
+
+func (g *Game) AddSpectator(spec interfaces.Spectator) {
+    g.Spectators[len(g.Spectators)] = spec
+}
+
+func (g *Game) GetSpectators() map[int] interfaces.Spectator {
+    return g.Spectators
 }
 
 func (g *Game) AddPlayer(player interfaces.Player, entity interfaces.Entity) {
@@ -328,6 +338,7 @@ func (g *Game) SetLastTick(tick int) {
 
 /* Generates the gamestate for the given player's perspective */
 func (g *Game) Json(player interfaces.Player) string {
+    /* TODO information hiding per player for protocol security */
     b, e := json.Marshal(serializable.NewGame(g))
     if e != nil {
         log.Fatalf("Error serializing game: %v", e)

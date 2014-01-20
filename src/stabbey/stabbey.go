@@ -13,18 +13,20 @@ import (
     "stabbey/game"
     "stabbey/interfaces"
     "stabbey/order"
+    "stabbey/spectator"
     "stabbey/player"
     "stabbey/signalhandlers"
     "stabbey/runtime"
     "stabbey/serializable"
 )
 
-const FILE_SETUP_HTML string = "resources/html/setup.html"
-const FILE_MAIN_HTML string  = "resources/html/main.html"
-const HTTP_ROOT string       = "/"
-const HTTP_CONNECT string    = "/connect"
-const HTTP_WEBSOCKET string  = "/ws"
-const FORMVAL_GAMEKEY string = "gamekey"
+const FILE_SETUP_HTML string          = "resources/html/setup.html"
+const FILE_MAIN_HTML string           = "resources/html/main.html"
+const HTTP_ROOT string                = "/"
+const HTTP_CONNECT string             = "/connect"
+const HTTP_WEBSOCKET string           = "/ws"
+const HTTP_WEBSOCKET_SPECTATOR string = "/ws-spectate"
+const FORMVAL_GAMEKEY string          = "gamekey"
 
 var ADDR = flag.String("addr", ":8080", "http service address")
 var GAME *game.Game
@@ -49,7 +51,8 @@ func main() {
     http.HandleFunc("/resources/img/",      ImgHandler)
     http.HandleFunc(HTTP_ROOT,              InitSetup)
     http.HandleFunc(HTTP_CONNECT,           ConnectSetup)
-    http.Handle(HTTP_WEBSOCKET,             websocket.Handler(WebSocketConnect))
+    http.Handle(HTTP_WEBSOCKET,             websocket.Handler(PlayerConnect))
+    http.Handle(HTTP_WEBSOCKET_SPECTATOR,   websocket.Handler(SpectatorConnect))
 
     log.Println("Starting Server")
     if err := http.ListenAndServe(*ADDR, nil); err != nil {
@@ -96,8 +99,26 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
     }
 }
 
+/* Serve javascript files manually in order to set the content type */
+func JavascriptHandler(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "text/javascript")
+    http.ServeFile(w, r, r.URL.Path[1:])
+}
+
+/* Serve javascript files manually in order to set the content type */
+func CssHandler(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "text/css")
+    http.ServeFile(w, r, r.URL.Path[1:])
+}
+
+/* Serve image files manually in order to set the content type */
+func ImgHandler(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "image/png")
+    http.ServeFile(w, r, r.URL.Path[1:])
+}
+
 /* Initialize a websocket connection and pair it with the handshaking player */
-func WebSocketConnect(ws *websocket.Conn) {
+func PlayerConnect(ws *websocket.Conn) {
     websocketConnection := struct {
         CommandCode int
         Gamekey string
@@ -117,13 +138,13 @@ func WebSocketConnect(ws *websocket.Conn) {
             p := GAME.GetPlayer(playerId)
             p.SetWebSocketConnection(ws)
             p.SendMessage(serializable.NewGameInfo().Json())
-            KeepReading(p, ws)
+            PlayerKeepReading(p, ws)
         }
     }
 }
 
 /* Keep the player's websocket alive and continue reading from it forever */
-func KeepReading(p interfaces.Player, ws *websocket.Conn) {
+func PlayerKeepReading(p interfaces.Player, ws *websocket.Conn) {
     for {
         var message string
         playerOrder := struct {
@@ -150,20 +171,32 @@ func KeepReading(p interfaces.Player, ws *websocket.Conn) {
     ws.Close()
 }
 
-/* Serve javascript files manually in order to set the content type */
-func JavascriptHandler(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "text/javascript")
-    http.ServeFile(w, r, r.URL.Path[1:])
-}
+/* Initialize a websocket connection and pair it with the handshaking player */
+func SpectatorConnect(ws *websocket.Conn) {
+    var message string
+    if err := websocket.Message.Receive(ws, &message); err != nil {
+        log.Fatal("Reading Socket Error:", err)
+    } else {
+        spec := spectator.New()
+        spec.SetWebSocketConnection(ws)
+        spec.SendMessage(serializable.NewGameInfo().Json())
+        if GAME != nil {
+            GAME.AddSpectator(spec)
+            log.Println("Adding board spectator")
+        } else {
+            log.Println("Dropping spectator, game not ready yet.")
+        }
 
-/* Serve javascript files manually in order to set the content type */
-func CssHandler(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "text/css")
-    http.ServeFile(w, r, r.URL.Path[1:])
-}
+        /* Keep reading */
+        for {
+            if websocket.Message.Receive(ws, &message) != nil {
+                break
+            }
+        }
+    }
 
-/* Serve image files manually in order to set the content type */
-func ImgHandler(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "image/png")
-    http.ServeFile(w, r, r.URL.Path[1:])
+    /* TODO should probably remove spectators from the game, or limit how many
+     * can be added */
+    log.Printf("Closing spectator websocket")
+    ws.Close()
 }
