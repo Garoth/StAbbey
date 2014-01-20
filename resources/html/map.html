@@ -1,0 +1,19 @@
+<html>
+<head>
+  <title>St. Abbey Map</title>
+  <script src="/resources/js/common.js"></script>
+  <style>
+    body {
+      background: red;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    // Connect to the server via WebSocket.
+    st.connection = new st.Connection("ws://localhost:8080/ws-spectate");
+    //st.connection.sendStartGame();
+  </script>
+</body>
+</html>

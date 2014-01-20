@@ -5,7 +5,6 @@ import (
     "flag"
     "log"
     "net/http"
-    "strconv"
     "text/template"
 
     "code.google.com/p/go.net/websocket"
@@ -20,10 +19,14 @@ import (
     "stabbey/serializable"
 )
 
+const FILE_COMBINED_HTML string       = "resources/html/combined.html"
+const FILE_HAND_HTML string           = "resources/html/hand.html"
+const FILE_MAP_HTML string            = "resources/html/map.html"
 const FILE_SETUP_HTML string          = "resources/html/setup.html"
-const FILE_MAIN_HTML string           = "resources/html/main.html"
 const HTTP_ROOT string                = "/"
 const HTTP_CONNECT string             = "/connect"
+const HTTP_CONNECT_HAND string        = "/connect/hand"
+const HTTP_CONNECT_MAP string         = "/connect/map"
 const HTTP_WEBSOCKET string           = "/ws"
 const HTTP_WEBSOCKET_SPECTATOR string = "/ws-spectate"
 const FORMVAL_GAMEKEY string          = "gamekey"
@@ -32,8 +35,13 @@ var ADDR = flag.String("addr", ":8080", "http service address")
 var GAME *game.Game
 var RUNTIME *runtime.Runtime
 
-type MainPageTemplate struct {
+type HandPageTemplate struct {
     Me int
+    Gamekey string
+    Host string
+}
+
+type MapPageTemplate struct {
     Gamekey string
     Host string
 }
@@ -51,6 +59,8 @@ func main() {
     http.HandleFunc("/resources/img/",      ImgHandler)
     http.HandleFunc(HTTP_ROOT,              InitSetup)
     http.HandleFunc(HTTP_CONNECT,           ConnectSetup)
+    http.HandleFunc(HTTP_CONNECT_HAND,      ConnectHandSetup)
+    http.HandleFunc(HTTP_CONNECT_MAP,       ConnectMapSetup)
     http.Handle(HTTP_WEBSOCKET,             websocket.Handler(PlayerConnect))
     http.Handle(HTTP_WEBSOCKET_SPECTATOR,   websocket.Handler(SpectatorConnect))
 
@@ -66,36 +76,6 @@ func InitSetup(w http.ResponseWriter, req *http.Request) {
         log.Fatal("Parse error:", e)
     } else {
         tmpl.Execute(w, nil)
-    }
-}
-
-/* Create the game, add players as they join */
-func ConnectSetup(w http.ResponseWriter, r *http.Request) {
-    gamekey := r.FormValue(FORMVAL_GAMEKEY)
-    var curPlayer *player.Player
-
-    /* New game! */
-    if gamekey == "" && GAME == nil {
-        gamekey = "0"
-        GAME = game.NewGame(gamekey)
-    }
-
-    curPlayer = player.New(GAME)
-    pX, pY := GAME.GetRandomEmptySpace()
-    curPlayer.SetPosition(0, pX, pY)
-    GAME.AddPlayer(curPlayer, curPlayer)
-    log.Printf("Added player %v to game at %v, %v ", curPlayer.GetPlayerId(),
-        pX, pY)
-
-    if tmpl, e := template.ParseFiles(FILE_MAIN_HTML); e != nil {
-        log.Fatal("Parse error:", e)
-    } else {
-        tmpl.Execute(w, MainPageTemplate{curPlayer.GetPlayerId(), gamekey,
-            "ws://" + r.Host + "/ws"})
-    }
-
-    if RUNTIME == nil {
-        RUNTIME = runtime.New(GAME)
     }
 }
 
@@ -117,12 +97,62 @@ func ImgHandler(w http.ResponseWriter, r *http.Request) {
     http.ServeFile(w, r, r.URL.Path[1:])
 }
 
+/* Connecting to the combined map and hand view */
+func ConnectSetup(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "text/html")
+    http.ServeFile(w, r, FILE_COMBINED_HTML)
+}
+
+/* Create the game, add players as they join */
+func ConnectHandSetup(w http.ResponseWriter, r *http.Request) {
+    gamekey := r.FormValue(FORMVAL_GAMEKEY)
+    var curPlayer *player.Player
+
+    /* New game! */
+    if gamekey == "" && GAME == nil {
+        gamekey = "0"
+        GAME = game.NewGame(gamekey)
+    }
+
+    curPlayer = player.New(GAME)
+    pX, pY := GAME.GetRandomEmptySpace()
+    curPlayer.SetPosition(0, pX, pY)
+    GAME.AddPlayer(curPlayer, curPlayer)
+    log.Printf("Added player %v to game at %v, %v ", curPlayer.GetPlayerId(),
+        pX, pY)
+
+    if tmpl, e := template.ParseFiles(FILE_HAND_HTML); e != nil {
+        log.Fatal("Parse error:", e)
+    } else {
+        tmpl.Execute(w, HandPageTemplate{curPlayer.GetPlayerId(), gamekey,
+            "ws://" + r.Host + "/ws"})
+    }
+
+    if RUNTIME == nil {
+        RUNTIME = runtime.New(GAME)
+    }
+}
+
+/* Connecting to the map does not count as a player connecting */
+func ConnectMapSetup(w http.ResponseWriter, r *http.Request) {
+    gamekey := r.FormValue(FORMVAL_GAMEKEY)
+    if gamekey == "" && GAME == nil {
+        gamekey = "0"
+        GAME = game.NewGame(gamekey)
+    }
+    if tmpl, e := template.ParseFiles(FILE_MAP_HTML); e != nil {
+        log.Fatal("Parse error:", e)
+    } else {
+        tmpl.Execute(w, MapPageTemplate{gamekey, "ws://" + r.Host + "/ws"})
+    }
+}
+
 /* Initialize a websocket connection and pair it with the handshaking player */
 func PlayerConnect(ws *websocket.Conn) {
     websocketConnection := struct {
         CommandCode int
         Gamekey string
-        Player string
+        Player int
     }{}
 
     var message string
@@ -134,8 +164,7 @@ func PlayerConnect(ws *websocket.Conn) {
             log.Fatal("Decoding Message Error:", err)
         } else {
             log.Printf("WebSocket Connected: %+v", websocketConnection)
-            playerId, _ := strconv.Atoi(websocketConnection.Player)
-            p := GAME.GetPlayer(playerId)
+            p := GAME.GetPlayer(websocketConnection.Player)
             p.SetWebSocketConnection(ws)
             p.SendMessage(serializable.NewGameInfo().Json())
             PlayerKeepReading(p, ws)
