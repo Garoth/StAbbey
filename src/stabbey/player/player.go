@@ -38,7 +38,6 @@ func New(g interfaces.Game) *Player {
 
     /* Entity stuff */
     p.Entity = entity.New(entity.UIDG.NextUid(), g)
-    p.SetPosition(0, 8, 6)
     p.SetType(interfaces.ENTITY_TYPE_PLAYER)
     p.SetName("Player " + strconv.Itoa(p.GetPlayerId()))
     p.SetMaxArdour(100)

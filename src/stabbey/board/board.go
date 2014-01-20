@@ -52,7 +52,7 @@ func New(id int, game interfaces.Game) *Board {
 
 func (b *Board) pickGenerator() {
     if b.Id == 0 {
-        b.Generator = NewCenterSprawlGenerator(b)
+        b.Generator = NewShadowsLevelOneGenerator(b)
     } else if b.Id == 1 {
         b.Generator = NewEntranceGenerator(b)
     } else {
@@ -187,4 +187,30 @@ func (b *Board) GetHeight() int {
 
 func (b *Board) SetHeight(h int) {
     b.Height = h
+}
+
+
+func (b *Board) simpleAddRoom(startX, startY, width, height int) {
+    /* StartX, StartY, Left, Right, Top, Bottom, ... constraints */
+    b.RoomList[len(b.RoomList)] = &Room{startX, startY, 1, width, 1, height,
+        false, false, false, false}
+}
+
+func (b *Board) addDoor(x, y int) {
+    b.DoorList[len(b.DoorList)] = &Tile{x, y}
+}
+
+func (b *Board) addWater(x, y int) {
+    b.WaterList[len(b.WaterList)] = &Tile{x, y}
+}
+
+func (b *Board) addDecoration(x, y int, name string) {
+    var tileChar string
+
+    switch name {
+    case "grass": tileChar = "g"
+    case "carpet": tileChar = "c"
+    }
+
+    b.GroundDecorList[len(b.GroundDecorList)] = &GroundDecor{x, y, name, tileChar}
 }

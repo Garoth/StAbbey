@@ -2,6 +2,7 @@ package entity
 
 import (
     "log"
+    "runtime/debug"
 
     "stabbey/interfaces"
     "stabbey/uidgenerator"
@@ -83,6 +84,7 @@ func (e *Entity) SwapPositionWith(other interfaces.Entity) {
 
 func (e *Entity) SetPosition(boardId, x, y int) {
     if e.IsTangible() && !e.Game.CanMoveToSpace(boardId, x, y) {
+        debug.PrintStack()
         log.Fatalln("Can't move", e.GetName(), "to impossible place", x, y)
     }
 

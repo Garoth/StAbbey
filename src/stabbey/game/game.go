@@ -266,9 +266,6 @@ func (g *Game) NextBoard() {
     g.CurrentBoard++
     g.Boards[g.CurrentBoard].WarpPlayersToStart()
 
-    /* Spawn some starting monsters */
-    g.placeEntityRandomly(entity.NewGargoyle(g), g.CurrentBoard)
-
     /* Place some traps */
     for i := 0; i < 3; i++ {
         x, y := g.GetRandomEmptySpace()
