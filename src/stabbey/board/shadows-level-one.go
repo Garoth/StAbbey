@@ -76,8 +76,8 @@ func (me *shadowsOneGen) LoadEntities(game interfaces.Game) {
 
     /* antivenom necklace chest with shades */
     setEntity(game, entity.NewChest(game), me.Id, 1, 6)
-    setEntity(game, entity.NewGargoyle(game), me.Id, 2, 6)
-    setEntity(game, entity.NewGargoyle(game), me.Id, 2, 7)
+    setEntity(game, entity.NewShade(game), me.Id, 2, 6)
+    setEntity(game, entity.NewShade(game), me.Id, 2, 7)
 
     /* troll chest with teleport traps */
     setEntity(game, entity.NewChest(game), me.Id, 14, 10)

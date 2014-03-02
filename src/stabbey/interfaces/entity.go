@@ -13,6 +13,7 @@ const (
     ENTITY_SUBTYPE_UNKNOWN               = "unknown subtype"
 
     ENTITY_MONSTER_SUBTYPE_GARGOYLE      = "gargoyle"
+    ENTITY_MONSTER_SUBTYPE_SHADE         = "shade"
     ENTITY_MONSTER_SUBTYPE_SHIELDER      = "shielder"
     ENTITY_MONSTER_SUBTYPE_CHEST         = "chest"
     ENTITY_MONSTER_SUBTYPE_BOULDER       = "boulder"
@@ -25,7 +26,7 @@ const (
 
     ENTITY_INERT_SUBTYPE_TRAP            = "sprung trap"
     ENTITY_INERT_SUBTYPE_TREE            = "tree"
-    ENTITY_INERT_SUBTYPE_STATUE          = "inert statue"
+    ENTITY_INERT_SUBTYPE_STATUE          = "statue"
 
     TRIGGER_TYPE_ABILITY_PUSH            = "pu"
 )
