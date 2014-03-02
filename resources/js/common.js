@@ -49,24 +49,55 @@ st.removeElement = function(element) {
   }
 };
 
+// Adds a classname to an element if not already present.
+st.addClass = function(element, className) {
+  var classNames = element.className.split(' ');
+  if (!(className in classNames)) {
+    element.className += ' ' + className;
+  }
+};
+
+// Removes a classname from an element.
+st.removeClass = function(element, className) {
+  var classNames = element.className.split(' ');
+  var classIndex = classNames.indexOf(className);
+  if (classIndex >= 0) {
+    classNames.splice(classIndex, 1);
+    element.className = classNames.join(' ');
+  }
+};
+
+// Adds a class to an element if it's not there or removes it if it is.
+st.toggleClass = function(element, className) {
+  var classNames = element.className.split(' ');
+  var classIndex = classNames.indexOf(className);
+  if (classIndex >= 0) {
+    classNames.splice(classIndex, 1);
+  } else {
+    classNames.push(className);
+  }
+  element.className = classNames.join(' ');
+};
+
 // Class to encapsulate a WebSocket connection to the server.
-st.Connection = function(path, player, gamekey, onClientTick, onServerTick) {
+st.Connection = function(debugPrefix, path, player,
+    onClientTick, onServerTick, onConnect) {
   this.connection = new WebSocket(path);
   this.connection.onopen = this.onOpen.bind(this);
   this.connection.onclose = this.onClose.bind(this);
   this.connection.onerror = this.onError.bind(this);
   this.connection.onmessage = this.onMessage.bind(this);
-  this.gamekey = gamekey;
   this.player = player;
   this.onClientTick = onClientTick;
   this.onServerTick = onServerTick;
+  this.onConnect = onConnect;
   this.serverTick;
+  this.debugPrefix = debugPrefix;
 };
 st.Connection.prototype.send = function(object) {
-  object.Gamekey = this.gamekey;
   object.Player = this.player;
   var msg = JSON.stringify(object);
-  console.log("Sending message: " + msg);
+  console.log(this.debugPrefix + ": sending message " + msg);
   this.connection.send(msg);
 };
 
@@ -81,17 +112,17 @@ st.Connection.prototype.sendTick = function(tick) {
 };
 
 st.Connection.prototype.onOpen = function(event) {
-  console.log("Server: websocket connection opened\n", event);
+  console.log(this.debugPrefix + ": websocket connection opened ", event);
+  if (this.onConnect) this.onConnect();
 };
 st.Connection.prototype.onClose = function(event) {
-  console.log("Server: websocket connection closed\n", event);
+  console.log(this.debugPrefix + ": websocket connection closed ", event);
 };
 st.Connection.prototype.onError = function(event) {
-  console.log("Server: websocket connection error\n", event);
+  console.log(this.debugPrefix + ": websocket connection error ", event);
 };
 st.Connection.prototype.onMessage = function(event) {
   serverState = JSON.parse(event.data);
-  console.log("Server: websocket recieved message");
-  console.log(serverState);
-  this.onServerTick && this.onServerTick(serverState);
+  console.log(this.debugPrefix + ": websocket recieved message ", serverState);
+  if (this.onServerTick) this.onServerTick(serverState);
 };
