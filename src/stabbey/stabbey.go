@@ -29,7 +29,6 @@ const HTTP_CONNECT_HAND string        = "/connect/hand"
 const HTTP_CONNECT_MAP string         = "/connect/map"
 const HTTP_WEBSOCKET string           = "/ws"
 const HTTP_WEBSOCKET_SPECTATOR string = "/ws-spectate"
-const FORMVAL_GAMEKEY string          = "gamekey"
 
 var ADDR = flag.String("addr", ":8080", "http service address")
 var GAME *game.Game
@@ -37,12 +36,10 @@ var RUNTIME *runtime.Runtime
 
 type HandPageTemplate struct {
     Me int
-    Gamekey string
     Host string
 }
 
 type MapPageTemplate struct {
-    Gamekey string
     Host string
 }
 
@@ -65,6 +62,9 @@ func main() {
     http.Handle(HTTP_WEBSOCKET_SPECTATOR,   websocket.Handler(SpectatorConnect))
 
     log.Println("Starting Server")
+    GAME = game.NewGame()
+    RUNTIME = runtime.New(GAME)
+
     if err := http.ListenAndServe(*ADDR, nil); err != nil {
         log.Fatal("ListenAndServe:", err)
     }
@@ -105,14 +105,7 @@ func ConnectSetup(w http.ResponseWriter, r *http.Request) {
 
 /* Create the game, add players as they join */
 func ConnectHandSetup(w http.ResponseWriter, r *http.Request) {
-    gamekey := r.FormValue(FORMVAL_GAMEKEY)
     var curPlayer *player.Player
-
-    /* New game! */
-    if gamekey == "" && GAME == nil {
-        gamekey = "0"
-        GAME = game.NewGame(gamekey)
-    }
 
     curPlayer = player.New(GAME)
     pX, pY := GAME.GetRandomEmptySpace()
@@ -124,26 +117,17 @@ func ConnectHandSetup(w http.ResponseWriter, r *http.Request) {
     if tmpl, e := template.ParseFiles(FILE_HAND_HTML); e != nil {
         log.Fatal("Parse error:", e)
     } else {
-        tmpl.Execute(w, HandPageTemplate{curPlayer.GetPlayerId(), gamekey,
+        tmpl.Execute(w, HandPageTemplate{curPlayer.GetPlayerId(),
             "ws://" + r.Host + "/ws"})
-    }
-
-    if RUNTIME == nil {
-        RUNTIME = runtime.New(GAME)
     }
 }
 
 /* Connecting to the map does not count as a player connecting */
 func ConnectMapSetup(w http.ResponseWriter, r *http.Request) {
-    gamekey := r.FormValue(FORMVAL_GAMEKEY)
-    if gamekey == "" && GAME == nil {
-        gamekey = "0"
-        GAME = game.NewGame(gamekey)
-    }
     if tmpl, e := template.ParseFiles(FILE_MAP_HTML); e != nil {
         log.Fatal("Parse error:", e)
     } else {
-        tmpl.Execute(w, MapPageTemplate{gamekey, "ws://" + r.Host + "/ws"})
+        tmpl.Execute(w, MapPageTemplate{"ws://" + r.Host + "/ws"})
     }
 }
 
@@ -151,7 +135,6 @@ func ConnectMapSetup(w http.ResponseWriter, r *http.Request) {
 func PlayerConnect(ws *websocket.Conn) {
     websocketConnection := struct {
         CommandCode int
-        Gamekey string
         Player int
     }{}
 
@@ -209,12 +192,8 @@ func SpectatorConnect(ws *websocket.Conn) {
         spec := spectator.New()
         spec.SetWebSocketConnection(ws)
         spec.SendMessage(serializable.NewGameInfo().Json())
-        if GAME != nil {
-            GAME.AddSpectator(spec)
-            log.Println("Adding board spectator")
-        } else {
-            log.Println("Dropping spectator, game not ready yet.")
-        }
+        GAME.AddSpectator(spec)
+        log.Println("Adding board spectator")
 
         /* Keep reading */
         for {

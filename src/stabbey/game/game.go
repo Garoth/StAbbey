@@ -37,15 +37,12 @@ type Game struct {
     PlayersToEntities map[interfaces.Player] interfaces.Entity
     LastTick, CurrentBoard, NumBoards int
     GameRunning bool
-    Gamekey string
 }
 
-func NewGame(gamekey string) *Game {
-    log.Printf("Starting new game, %v", gamekey)
+func NewGame() *Game {
     rand.Seed(time.Now().Unix())
     g := &Game{}
     g.GameRunning = false
-    g.Gamekey = gamekey
     g.Players = make(map[int] interfaces.Player, 10)
     g.Spectators = make(map[int] interfaces.Spectator)
     g.Entities = make(map[int] interfaces.Entity, 100)
@@ -59,6 +56,7 @@ func NewGame(gamekey string) *Game {
         g.GetBoards()[i].LoadStartingEntities()
     }
     g.NextBoard()
+    log.Println("Game initalized")
     return g
 }
 
@@ -348,5 +346,5 @@ func (g *Game) Json(player interfaces.Player) string {
 
 func (g *Game) Run() {
     g.Boards[g.CurrentBoard].WarpPlayersToStart()
-    log.Printf("Game %v running", g.Gamekey)
+    log.Printf("Game running")
 }

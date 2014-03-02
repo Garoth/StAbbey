@@ -123,7 +123,14 @@ func (r *Runtime) scheduleActions() {
 
 /* Checks whether all players are ready (done queueing) */
 func allPlayersReady() bool {
-    for _, player := range GAME.GetPlayers() {
+    players := GAME.GetPlayers()
+
+    /* Has to be at least one ready player */
+    if len(players) == 0 {
+        return false
+    }
+
+    for _, player := range players {
         /* Ready players are 1 ahead of the game's tick */
         if player.GetLastTick() <= GAME.GetLastTick() {
             return false
