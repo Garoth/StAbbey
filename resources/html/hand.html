@@ -2,64 +2,17 @@
 <head>
   <title>St. Abbey Cards</title>
   <script src="/resources/js/common.js"></script>
-  <style>
-    body {
-      background: rgba(37,40,42,0.8);
-      margin: 0;
-    }
-    #start-link {
-      color: #eee;
-      display: block;
-      font: bold 13px sans-serif;
-      padding: 8px;
-      text-align: center;
-      text-decoration: none;
-    }
-
-    /* Card styles */
-    .card-wrapper {
-      position: absolute;
-      -webkit-transition: left 500ms, top 150ms;
-    }
-    .card {
-      cursor: default;
-      position: relative;
-      -webkit-transform: translate3d(0,0,0);
-    }
-    .card .count {
-      color: #25282a;
-      font: bold 45px 'Deja Vu Serif',serif;
-      left: 650px;
-      position: absolute;
-      text-align: center;
-      top: 40px;
-      width: 70px;
-    }
-    .card .mask {
-      left: 0;
-      position: absolute;
-    }
-    .card .art {
-      margin: 117px 0 0 161px;
-    }
-    .card .title {
-      color: white;
-      font: 40px 'Deja Vu Serif',serif;
-      left: 50px;
-      position: absolute;
-      top: 45px;
-    }
-    .card .button {
-      left: 50px;
-      position: absolute;
-    }
-  </style>
+  <link rel="stylesheet/less" href="/resources/css/hand.less" />
+  <!-- TODO should switch to compiled CSS for release -->
+  <script src="/resources/js/libs/less.1.7.3.min.js" type="text/javascript">
+  </script>
 </head>
 <body>
 <div id="cards"></div>
 <a id="start-link" href="javascript:st.startGame()">START GAME</a>
 <script>
 (function() {
+
   var BUTTON_PREFIX = '/resources/img/card/btn_';
   var PLAYER = {{.Me}};
   var containerDiv = st.getById('cards');
@@ -206,7 +159,9 @@
   // Connect to the server via WebSocket.
   st.connection = new st.Connection("Hand", "{{.Host}}", PLAYER,
       handleClientTick, handleServerTick);
+
 })();
 </script>
 </body>
 </html>
+<!-- vim: set ts=2 sw=2 sts=2: -->

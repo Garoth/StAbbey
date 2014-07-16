@@ -1,0 +1,61 @@
+@import "lib/base-import";
+
+body {
+  background: rgba(37,40,42,0.8);
+  margin: 0;
+}
+
+#start-link {
+  color: #eee;
+  display: block;
+  font: bold 13px sans-serif;
+  padding: 8px;
+  text-align: center;
+  text-decoration: none;
+}
+
+/* Card styles */
+.card-wrapper {
+  position: absolute;
+  -webkit-transition: left 500ms, top 150ms;
+
+  .card {
+    cursor: default;
+    position: relative;
+    -webkit-transform: translate3d(0,0,0);
+
+    .count {
+      color: #25282a;
+      font: bold 45px 'Deja Vu Serif',serif;
+      left: 650px;
+      position: absolute;
+      text-align: center;
+      top: 40px;
+      width: 70px;
+    }
+
+    .mask {
+      left: 0;
+      position: absolute;
+    }
+
+    .art {
+      margin: 117px 0 0 161px;
+    }
+
+    .title {
+      color: white;
+      font: 40px 'Deja Vu Serif',serif;
+      left: 50px;
+      position: absolute;
+      top: 45px;
+    }
+
+    .button {
+      left: 50px;
+      position: absolute;
+    }
+  }
+}
+
+/* vim: set ts=2 sw=2 sts=2: */

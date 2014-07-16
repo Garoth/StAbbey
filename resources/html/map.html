@@ -2,22 +2,10 @@
 <head>
   <title>St. Abbey Map</title>
   <script src="/resources/js/common.js"></script>
-  <style>
-    body {
-      background: #222;
-      margin: 0;
-      white-space: nowrap;
-    }
-    .debugEntity {
-      display: none;
-    }
-    .debugEntities .debugEntity {
-      color: white;
-      display: block;
-      font-size: 76px;
-      font-family: sans-serif;
-    }
-  </style>
+  <link rel="stylesheet/less" href="/resources/css/map.less" />
+  <!-- TODO should switch to compiled CSS for release -->
+  <script src="/resources/js/libs/less.1.7.3.min.js" type="text/javascript">
+  </script>
 </head>
 <body>
 <div id="entities"></div>
