@@ -4,3 +4,4 @@ pkg
 *.css
 .DS_Store
 src/code.google.com
+resources/js/*.js

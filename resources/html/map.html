@@ -1,7 +1,6 @@
 <html>
 <head>
   <title>St. Abbey Map</title>
-  <script src="/resources/js/common.js"></script>
   <link rel="stylesheet/less" href="/resources/css/map.less" />
   <!-- TODO should switch to compiled CSS for release -->
   <script src="/resources/js/libs/less.1.7.3.min.js" type="text/javascript">
@@ -10,6 +9,7 @@
 <body>
 <div id="entities"></div>
 <div id="map"></div>
+<!--
 <script>
 (function(){
   var ENTITY_NAME_TO_IMAGE = {
@@ -141,9 +141,6 @@
     }
   }
 
-  function handleClientTick() {
-  }
-
   function handleServerTick(serverState) {
     if (serverState.Boards)
       buildBoard(serverState.Boards[serverState.CurrentBoard].Layers[0]);
@@ -158,8 +155,9 @@
 
   // Connect to the server via WebSocket.
   st.connection = new st.Connection("Map", "ws://localhost:8080/ws-spectate",
-      null, handleClientTick, handleServerTick, handleConnect);
+      null, handleServerTick, handleConnect);
 })();
 </script>
+-->
 </body>
 </html>
