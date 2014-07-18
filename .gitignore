@@ -4,4 +4,6 @@ pkg
 *.css
 .DS_Store
 src/code.google.com
-resources/js/*.js
+*.pyc
+resources/js/closure-deps.js
+resources/js/compiled

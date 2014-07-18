@@ -1,11 +1,11 @@
 #!/bin/bash
 # Rebuilds & runs the server
 
-# TODO Figure out a good way to install dependencies with go get. Deps:
-#      - code.google.com/p/go.net/websocket
-
 export GOPATH="$(pwd)"
 export MYNAME="$0"
+
+JS_DIR="resources/js/"
+JS_BUILD_TARGETS=("hand.js" "map.js")
 
 function stabbey_compile_css() {
     # Disabled for now, since we're using the client-side less js script
@@ -31,6 +31,30 @@ function stabbey_install() {
 
 function stabbey_run() {
     bin/stabbey
+}
+
+function stabbey_build_js() {
+    local compilation_level="WHITESPACE_ONLY"
+    # local compilation_level="SIMPLE_OPTIMIZATIONS"
+    # local compilation_level="ADVANCED_OPTIMIZATIONS"
+
+    # Generating dependencies file
+    echo "Writing Dependency File"
+    python tools/closure/depswriter.py \
+        --root_with_prefix="resources/js ." \
+        --output_file="resources/js/closure-deps.js"
+
+    for target in ${JS_BUILD_TARGETS[*]}; do
+        # Running Google Closure Compiler
+        echo "Building file ${target}"
+        java -jar tools/closure/compiler.jar \
+            --compilation_level "${compilation_level}" \
+            --accept_const_keyword \
+            --language_in "ECMASCRIPT5" \
+            --summary_detail_level 3 \
+            --js_output_file "${JS_DIR}/compiled/${target}" \
+            --js "${JS_DIR}/${target}" ${JS_DIR}/lib/*
+    done
 }
 
 function stabbey_race() {
@@ -61,6 +85,7 @@ function stabbey_usage() {
     echo "            the development loop, since Control-C exits with 0 (and"
     echo "            triggers a rebuild), while Control-\\ exits with 1 (and"
     echo "            terminates the rebuild-run loop)"
+    echo "   js:      runs the javascript compiler only"
     echo "   race:    builds and runs stabbey server with race detector"
     echo "   deps:    installs necessary dependencies"
     echo "   clean:   deletes currently built binaries and cache"
@@ -80,6 +105,8 @@ elif [[ "$1" == "runloop" ]]; then
         fi
         sleep 1
     done
+elif [[ "$1" == "js" ]]; then
+    stabbey_build_js
 elif [[ "$1" == "race" ]]; then
     stabbey_race
 elif [[ "$1" == "deps" ]]; then
