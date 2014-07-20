@@ -30,19 +30,23 @@ function stabbey_install() {
 }
 
 function stabbey_run() {
-    bin/stabbey
+    bin/stabbey $@
 }
 
-function stabbey_build_js() {
-    local compilation_level="WHITESPACE_ONLY"
-    # local compilation_level="SIMPLE_OPTIMIZATIONS"
-    # local compilation_level="ADVANCED_OPTIMIZATIONS"
-
+function stabbey_build_js_deps() {
     # Generating dependencies file
     echo "Writing Dependency File"
     python tools/closure/depswriter.py \
-        --root_with_prefix="resources/js ." \
-        --output_file="resources/js/closure-deps.js"
+        --root_with_prefix="resources/js .." \
+        --output_file="resources/js/3rd-party/deps.js"
+}
+
+function stabbey_build_js() {
+    # local compilation_level="WHITESPACE_ONLY"
+    local compilation_level="SIMPLE_OPTIMIZATIONS"
+    # local compilation_level="ADVANCED_OPTIMIZATIONS"
+
+    stabbey_build_js_deps
 
     for target in ${JS_BUILD_TARGETS[*]}; do
         # Running Google Closure Compiler
@@ -80,12 +84,14 @@ function stabbey_usage() {
     echo "Usage: $MYNAME <command>"
     echo ""
     echo "Where <command> is one of:"
-    echo "   run:     builds and runs the stabbey server"
+    echo "   run:     builds and runs the stabbey server in JS compiled mode"
     echo "   runloop: like run, but restarts on successful exit. This speeds up"
     echo "            the development loop, since Control-C exits with 0 (and"
     echo "            triggers a rebuild), while Control-\\ exits with 1 (and"
-    echo "            terminates the rebuild-run loop)"
+    echo "            terminates the rebuild-run loop)."
+    echo "            Also runs the JS in uncompiled debugging mode"
     echo "   js:      runs the javascript compiler only"
+    echo "   jsdeps:  prepares the js dependencies file for closure"
     echo "   race:    builds and runs stabbey server with race detector"
     echo "   deps:    installs necessary dependencies"
     echo "   clean:   deletes currently built binaries and cache"
@@ -94,11 +100,13 @@ function stabbey_usage() {
 if [[ "$1" == "run" ]]; then
     stabbey_compile_css
     stabbey_install
-    stabbey_run
+    stabbey_build_js
+    stabbey_run -compiledjs
 elif [[ "$1" == "runloop" ]]; then
     while true; do
         stabbey_compile_css
         stabbey_install
+        stabbey_build_js_deps
         stabbey_run
         if [[ "$?" -ne "0" ]]; then
             break
@@ -107,6 +115,8 @@ elif [[ "$1" == "runloop" ]]; then
     done
 elif [[ "$1" == "js" ]]; then
     stabbey_build_js
+elif [[ "$1" == "jsdeps" ]]; then
+    stabbey_build_js_deps
 elif [[ "$1" == "race" ]]; then
     stabbey_race
 elif [[ "$1" == "deps" ]]; then

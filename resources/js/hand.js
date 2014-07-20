@@ -1,207 +1,194 @@
-// These values are filled in the HTML file
-goog.require("common");
-goog.provide("hand");
-// import Common = require("Common")
-// var DOM = Common.DOMRoutines
-// var Defines = Common.Definitions
+goog.require("st.define");
+goog.require("st.dom");
+goog.require("st.Connection");
 
-// var BUTTON_PREFIX = '/resources/img/card/btn_'
-// var HAND = []
+goog.provide("st.hand");
 
-// class CardButton {
+goog.scope(function() {
+    var BUTTON_PREFIX = '/resources/img/card/btn_';
+    var hand = [];
 
-//     buttonName: string
-//     pressed: boolean = false
-//     root: HTMLImageElement
+    st.hand.CardButton = function(type, onClick) {
+        var me = {};
+        me.buttonName = BUTTON_PREFIX + type;
+        me.root = null;
+        me.root = st.dom.createImg('', 'button', me.buttonName + '.png');
+        var pressed;
 
-//     constructor(type, onClick) {
-//         var buttonName = BUTTON_PREFIX + type
+        if (!onClick) {
+            me.root = st.dom.createImg('', 'button', me.buttonName + '_disable.png');
+            return me;
+        }
 
-//         if (!onClick) {
-//             this.root = DOM.CreateImg('', 'button', buttonName + '_disable.png')
-//             return
-//         }
+        me.root = st.dom.createImg('', 'button', me.buttonName + '.png');
 
-//         this.root = DOM.CreateImg('', 'button', buttonName + '.png')
+        me.root.onmousedown = function() {
+            me.root.src = me.buttonName + '_press.png';
+            pressed = true;
+        };
 
-//         this.root.onmousedown = function() {
-//             this.root.src = buttonName + '_press.png'
-//             this.pressed = true
-//         }
+        me.root.onmouseout = function() {
+            me.root.src = me.buttonName + '.png';
+            pressed = false;
+        };
 
-//         this.root.onmouseout = function() {
-//             this.root.src = buttonName + '.png'
-//             this.pressed = false
-//         }
+        me.root.onmouseup = function() {
+            if (pressed) {
+                pressed = false;
+                me.root.onmouseout();
+                onClick();
+            }
+        };
 
-//         this.root.onmouseup = function() {
-//             if (this.pressed) {
-//                 this.pressed = false
-//                 this.root.onmouseout()
-//                 onClick()
-//             }
-//         }
-//     }
-// }
+        return me;
+    };
 
-// class Card {
+    st.hand.Card = function(name, actions, image, count) {
 
-//     root: HTMLDivElement
-//     container: HTMLDivElement
-//     artImg: HTMLImageElement
-//     maskImg: HTMLImageElement
-//     cardTitle: HTMLDivElement
-//     cardCount: HTMLDivElement
-//     buttons: CardButton[] = []
+        var me = {};
+        me.root = st.dom.createDiv('', 'card-wrapper');
+        var container = st.dom.createDiv('', 'card');
+        var artImg = st.dom.createImg('', 'art', image);
+        var maskImg = st.dom.createImg('', 'mask', '/resources/img/card/card.png');
+        var cardTitle = st.dom.createDiv('', 'title');
+        var cardCount = st.dom.createDiv('', 'count');
+        var buttons = [];
 
-//     constructor(name, actions, image, count) {
+        me.root.appendChild(container);
+        cardTitle.innerHTML = name;
+        cardCount.innerHTML = count;
+        container.appendChild(artImg);
+        container.appendChild(maskImg);
+        container.appendChild(cardTitle);
+        container.appendChild(cardCount);
 
-//         this.root = DOM.CreateDiv('', 'card-wrapper')
-//         this.container = DOM.CreateDiv('', 'card')
-//         this.root.appendChild(this.container)
-//         this.artImg = DOM.CreateImg('', 'art', image)
-//         this.maskImg = DOM.CreateImg('', 'mask', '/resources/img/card/card.png')
-//         this.cardTitle = DOM.CreateDiv('', 'title')
-//         this.cardTitle.innerHTML = name
-//         this.cardCount = DOM.CreateDiv('', 'count')
-//         this.cardCount.innerHTML = count
-//         this.container.appendChild(this.artImg)
-//         this.container.appendChild(this.maskImg)
-//         this.container.appendChild(this.cardTitle)
-//         this.container.appendChild(this.cardCount)
+        me.clickLeft = function() {
+        };
 
-//         this.buttons.push(new CardButton('up',
-//             actions & Defines.CardActions.UP ? this.ClickUp : null))
-//         this.buttons.push(new CardButton('left',
-//             actions & Defines.CardActions.LEFT ? this.ClickLeft : null))
-//         this.buttons.push(new CardButton('right',
-//             actions & Defines.CardActions.RIGHT ? this.ClickRight : null))
-//         this.buttons.push(new CardButton('down',
-//             actions & Defines.CardActions.DOWN ? this.ClickDown : null))
-//         this.buttons.push(new CardButton('self',
-//             actions & Defines.CardActions.SELF ? this.ClickSelf : null))
-//         this.buttons.push(new CardButton('channel',
-//             actions & Defines.CardActions.CHANNEL ? this.ClickChannel : null))
+        me.clickDown = function() {
+        };
 
-//         for (var i = 0; i < this.buttons.length; i++) {
-//             var buttonRoot = this.buttons[i].root
-//             buttonRoot.style.top = (178 + 147 * i) + 'px'
-//             this.container.appendChild(buttonRoot)
-//         }
+        me.clickUp = function() {
+        };
 
-//         this.container.onclick = function() {
-//             if (HAND[HAND.length - 1] != self) {
-//                 var before = []
-//                 for (var i = 0; HAND[i] != self; i++) {
-//                     before.push(HAND[i])
-//                 }
+        me.clickRight = function() {
+        };
 
-//                 var after = []
-//                 for (i++; i < HAND.length; i++) {
-//                     after.push(HAND[i])
-//                 }
+        me.clickSelf = function() {
+        };
 
-//                 HAND = before.concat(after)
-//                 HAND.push(self)
-//                 this.ArrangeHand()
-//             }
-//         }
-//     }
+        me.clickChannel = function() {
+        };
 
-//     ClickLeft = () => {
-//     }
+        buttons.push(st.hand.CardButton('up',
+            actions & st.define.CARD_ACTIONS.UP ? me.clickUp : null));
+        buttons.push(st.hand.CardButton('left',
+            actions & st.define.CARD_ACTIONS.LEFT ? me.clickLeft : null));
+        buttons.push(st.hand.CardButton('right',
+            actions & st.define.CARD_ACTIONS.RIGHT ? me.clickRight : null));
+        buttons.push(st.hand.CardButton('down',
+            actions & st.define.CARD_ACTIONS.DOWN ? me.clickDown : null));
+        buttons.push(st.hand.CardButton('self',
+            actions & st.define.CARD_ACTIONS.SELF ? me.clickSelf : null));
+        buttons.push(st.hand.CardButton('channel',
+            actions & st.define.CARD_ACTIONS.CHANNEL ? me.clickChannel : null));
 
-//     ClickDown = () => {
-//     }
+        for (var i = 0; i < buttons.length; i++) {
+            var buttonRoot = buttons[i].root;
+            buttonRoot.style.top = (178 + 147 * i) + 'px';
+            container.appendChild(buttonRoot);
+        }
 
-//     ClickUp = () => {
-//     }
+        container.onclick = function() {
+            if (hand[hand.length - 1] !== me) {
+                var before = [];
+                for (var i = 0; hand[i] !== me; i++) {
+                    before.push(hand[i]);
+                }
 
-//     ClickRight = () => {
-//     }
+                var after = [];
+                for (i++; i < hand.length; i++) {
+                    after.push(hand[i]);
+                }
 
-//     ClickSelf = () => {
-//     }
+                hand = before.concat(after);
+                hand.push(me);
+                arrangeHand();
+            }
+        };
 
-//     ClickChannel = () => {
-//     }
-// }
+        return me;
+    };
 
-// class Main {
+    var handleServerTick = function(serverState) {
+        if (serverState.Players) {
+            hand = [];
+            var actions = serverState.Players[STABBEY.PLAYER].AvailableActions;
 
-//     clientTick: number = 0
-//     containerDiv: HTMLElement = DOM.GetById('cards')
-//     connection: Common.Connection
+            for (var i = 0; i < actions.length; i++) {
+                var action = actions[i];
+                var dirs = st.define.CARD_ACTIONS.CHANNEL;
 
-//     constructor() {
-//         this.connection = new Common.Connection("Hand",
-//             GAME.HOST, GAME.PLAYER, this.HandleServerTick, null)
+                if (action.AvailableDirections[0]) {
+                    dirs |= st.define.CARD_ACTIONS.LEFT;
+                }
 
-//         window.onresize = this.WindowOnResize
+                if (action.AvailableDirections[1]) {
+                    dirs |= st.define.CARD_ACTIONS.RIGHT;
+                }
 
-//         DOM.GetById("start-link").onclick = () => {
-//             this.WindowOnResize()
-//             DOM.RemoveElement(DOM.GetById("start-link"))
-//             this.connection.SendStartGame()
-//             this.connection.SendTick(++this.clientTick)
-//         }
-//     }
+                if (action.AvailableDirections[2]) {
+                    dirs |= st.define.CARD_ACTIONS.UP;
+                }
 
-//     WindowOnResize = () => {
-//         this.containerDiv.style.zoom = "" + window.innerWidth / 780.
-//     }
+                if (action.AvailableDirections[3]) {
+                    dirs |= st.define.CARD_ACTIONS.DOWN;
+                }
 
-//     BuildHand = () => {
-//         DOM.RemoveChildren(this.containerDiv)
-//         for (var i = 0; i < HAND.length; i++) {
-//             this.containerDiv.appendChild(HAND[i].root)
-//         }
-//         this.ArrangeHand()
-//     }
+                if (action.AvailableDirections[4]) {
+                    dirs |= st.define.CARD_ACTIONS.SELF;
+                }
 
-//     ArrangeHand = () => {
-//         for (var i = 0; i < HAND.length; i++) {
-//             var style = HAND[i].root.style
-//             style.left = (4 * i) + 'px'
-//             style.top = (90 * i) + 'px'
-//             style.zIndex = i
-//         }
-//     }
+                hand.push(st.hand.Card(action.ShortDescription, dirs,
+                    '/resources/img/card/card_art_001.png', '&infin;'));
+            }
+            buildHand();
+        }
+    };
 
-//     HandleServerTick = (serverState) => {
-//         if (serverState.Players) {
-//             HAND = []
-//             var actions = serverState.Players[GAME.PLAYER].AvailableActions
+    var clientTick = 0;
+    var containerDiv = st.dom.getById('cards');
+    var conn = st.Connection("Hand",
+        STABBEY.HOST, STABBEY.PLAYER, handleServerTick, null);
 
-//             for (var i = 0; i < actions.length; i++) {
-//                 var action = actions[i]
-//                 var dirs = Defines.CardActions.CHANNEL
+    window.onresize = windowOnResize;
 
-//                 if (action.AvailableDirections[0]) {
-//                     dirs |= Defines.CardActions.LEFT
-//                 }
+    st.dom.getById("start-link").onclick = function() {
+        windowOnResize();
+        st.dom.removeElement(st.dom.getById("start-link"));
+        conn.sendStartGame();
+        conn.sendTick(++clientTick);
+    };
 
-//                 if (action.AvailableDirections[1]) {
-//                     dirs |= Defines.CardActions.RIGHT
-//                 }
+    var windowOnResize = function() {
+        containerDiv.style.zoom = "" + window.innerWidth / 780;
+    };
 
-//                 if (action.AvailableDirections[2]) {
-//                     dirs |= Defines.CardActions.UP
-//                 }
+    var buildHand = function() {
+        st.dom.removeChildren(containerDiv);
+        for (var i = 0; i < hand.length; i++) {
+            containerDiv.appendChild(hand[i].root);
+        }
+        arrangeHand();
+    };
 
-//                 if (action.AvailableDirections[3]) {
-//                     dirs |= Defines.CardActions.DOWN
-//                 }
+    var arrangeHand = function() {
+        for (var i = 0; i < hand.length; i++) {
+            var style = hand[i].root.style;
+            style.left = (4 * i) + 'px';
+            style.top = (90 * i) + 'px';
+            style.zIndex = i;
+        }
+    };
 
-//                 if (action.AvailableDirections[4]) {
-//                     dirs |= Defines.CardActions.SELF
-//                 }
-
-//                 HAND.push(new Card(action.ShortDescription, dirs,
-//                     '/resources/img/card/card_art_001.png', '&infin'))
-//             }
-//             this.BuildHand()
-//         }
-//     }
-// }
-// new Main()
+});

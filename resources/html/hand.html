@@ -3,7 +3,7 @@
   <title>St. Abbey Cards</title>
   <link rel="stylesheet/less" href="/resources/css/hand.less" />
   <!-- TODO should switch to compiled CSS for release -->
-  <script src="/resources/js/libs/less.1.7.3.min.js"></script>
+  <script src="/resources/js/3rd-party/less.1.7.3.min.js"></script>
 </head>
 <body>
   <div id="cards"></div>
@@ -11,11 +11,11 @@
 
   <script>
     // These values are templated in by the server
-    GAME = {};
-    GAME.PLAYER = {{.Me}};
-    GAME.HOST = "{{.Host}}";
+    STABBEY = {};
+    STABBEY.PLAYER = {{.Me}};
+    STABBEY.HOST = "{{.Host}}";
   </script>
-  <script data-main="/resources/js/Hand.js" src="/resources/js/libs/require.js"></script>
+  {{.JsToLoad}}
 </body>
 </html>
 <!-- vim: set ts=2 sw=2 sts=2: -->

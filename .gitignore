@@ -5,5 +5,5 @@ pkg
 .DS_Store
 src/code.google.com
 *.pyc
-resources/js/closure-deps.js
+resources/js/3rd-party/deps.js
 resources/js/compiled

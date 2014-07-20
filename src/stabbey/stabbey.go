@@ -19,6 +19,7 @@ import (
 	"stabbey/spectator"
 )
 
+/* Constants */
 const FILE_COMBINED_HTML string = "resources/html/combined.html"
 const FILE_HAND_HTML string = "resources/html/hand.html"
 const FILE_MAP_HTML string = "resources/html/map.html"
@@ -30,17 +31,43 @@ const HTTP_CONNECT_MAP string = "/connect/map"
 const HTTP_WEBSOCKET string = "/ws"
 const HTTP_WEBSOCKET_SPECTATOR string = "/ws-spectate"
 
+/* JS to use for compiled mode of map.html */
+const SCRIPT_COMPILED_MAP string = "" +
+	"<script src=\"/resources/js/compiled/map.js\"></script>\n"
+
+/* JS to use for uncompiled mode of map.html */
+const SCRIPT_UNCOMPILED_MAP string = "" +
+	"<script src=\"/resources/js/3rd-party/base.js\"></script>\n" +
+	"<script type=\"text/javascript\"> goog.require(\"st.map\"); </script>\n"
+
+/* JS to use for compiled mode of hand.html */
+const SCRIPT_COMPILED_HAND string = "" +
+	"<script src=\"/resources/js/compiled/hand.js\"></script>\n"
+
+/* JS to use for uncompiled mode of hand.html */
+const SCRIPT_UNCOMPILED_HAND string = "" +
+	"<script src=\"/resources/js/3rd-party/base.js\"></script>\n" +
+	"<script type=\"text/javascript\"> goog.require(\"st.hand\"); </script>\n"
+
+/* CLI Flags */
 var ADDR = flag.String("addr", ":8080", "http service address")
+var COMPILED_JS = flag.Bool("compiledjs", false, "run JS in compiled mode")
+
+/* Important Globals */
 var GAME *game.Game
 var RUNTIME *runtime.Runtime
 
+/* Template for hand.html */
 type HandPageTemplate struct {
-	Me   int
-	Host string
+	Me       int
+	Host     string
+	JsToLoad string
 }
 
+/* Template for map.html */
 type MapPageTemplate struct {
-	Host string
+	Host     string
+	JsToLoad string
 }
 
 /* Start the server and connect url paths to functions */
@@ -117,8 +144,16 @@ func ConnectHandSetup(w http.ResponseWriter, r *http.Request) {
 	if tmpl, e := template.ParseFiles(FILE_HAND_HTML); e != nil {
 		log.Fatal("Parse error:", e)
 	} else {
+		var script string
+
+		if *COMPILED_JS {
+			script = SCRIPT_COMPILED_HAND
+		} else {
+			script = SCRIPT_UNCOMPILED_HAND
+		}
+
 		tmpl.Execute(w, HandPageTemplate{curPlayer.GetPlayerId(),
-			"ws://" + r.Host + "/ws"})
+			"ws://" + r.Host + HTTP_WEBSOCKET, script})
 	}
 }
 
@@ -127,7 +162,17 @@ func ConnectMapSetup(w http.ResponseWriter, r *http.Request) {
 	if tmpl, e := template.ParseFiles(FILE_MAP_HTML); e != nil {
 		log.Fatal("Parse error:", e)
 	} else {
-		tmpl.Execute(w, MapPageTemplate{"ws://" + r.Host + "/ws"})
+		var script string
+
+		if *COMPILED_JS {
+			script = SCRIPT_COMPILED_MAP
+		} else {
+			script = SCRIPT_UNCOMPILED_MAP
+		}
+
+		tmpl.Execute(w, MapPageTemplate{"ws://" +
+			r.Host + HTTP_WEBSOCKET_SPECTATOR,
+			script})
 	}
 }
 
@@ -183,7 +228,7 @@ func PlayerKeepReading(p interfaces.Player, ws *websocket.Conn) {
 	ws.Close()
 }
 
-/* Initialize a websocket connection and pair it with the handshaking player */
+/* Initialize a spectator connection; disconnected from players */
 func SpectatorConnect(ws *websocket.Conn) {
 	var message string
 	if err := websocket.Message.Receive(ws, &message); err != nil {
