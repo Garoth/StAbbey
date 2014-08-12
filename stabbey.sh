@@ -56,6 +56,7 @@ function stabbey_build_js() {
             --accept_const_keyword \
             --language_in "ECMASCRIPT5" \
             --summary_detail_level 3 \
+            --warning_level=VERBOSE \
             --js_output_file "${JS_DIR}/compiled/${target}" \
             --js "${JS_DIR}/${target}" ${JS_DIR}/lib/*
     done
