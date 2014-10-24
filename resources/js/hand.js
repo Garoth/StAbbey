@@ -4,69 +4,6 @@ goog.require("st.Connection");
 
 goog.provide("st.hand");
 
-goog.scope(function() {
-
-/**
- * @typedef {{
- *      ActionString: string,
- *      AvailableDirections: Array.<boolean>,
- *      LongDescription: string,
- *      ShortDescription: string
- * }}
- */
-st.hand.Action;
-
-/**
- * @typedef {{
- *      AvailableActions: Array.<st.hand.Action>,
- *      EntityId: number,
- *      Id: number
- * }}
- */
-st.hand.Player;
-
-/**
- * @typedef {{
- *      Layers: Array.<string>,
- *      Level: number
- * }}
- */
-st.hand.Board;
-
-/**
- * @typedef {{
- *      ActionQueue: Array.<string>,
- *      Ardour: number,
- *      BoardId: number,
- *      EntityId: number,
- *      MaxArdour: number,
- *      Name: string,
- *      Type: string,
- *      Subtype: string,
- *      X: number,
- *      Y: number
- * }}
- */
-st.hand.Entity;
-
-/**
- * @typedef {{
- *      Boards: Array.<st.hand.Board>,
- *      CurrentBoard: number,
- *      Entities: Array.<st.hand.Entity>,
- *      LastTick: number,
- *      Players: Array.<st.hand.Player>
- * }}
- */
-st.hand.WorldState;
-
-/**
- * @typedef {{
- *      Version: string
- * }}
- */
-st.hand.Version;
-
 (function() {
     var BUTTON_PREFIX = '/resources/img/card/btn_';
     var hand = [];
@@ -137,7 +74,7 @@ st.hand.Version;
     /**
      * Wrapper object for a card.
      *
-     * @param {st.hand.Action} action
+     * @param {st.define.Action} action
      */
     st.hand.Card = function(action) {
         var me = {};
@@ -264,7 +201,7 @@ st.hand.Version;
     /**
      * Handles the version message.
      *
-     * @param {st.hand.Version} serverState
+     * @param {st.define.Version} serverState
      */
     var handleVersionServerMessage = function(serverState) {
         console.log('Game version is', serverState.Version);
@@ -274,7 +211,7 @@ st.hand.Version;
      * Handles the general "world state changed" message and updates
      * everything.
      *
-     * @param {st.hand.WorldState} serverState
+     * @param {st.define.WorldState} serverState
      */
     var handleWorldTick = function(serverState) {
         var myEntity = null;
@@ -323,4 +260,3 @@ st.hand.Version;
     var conn = st.Connection("Hand", STABBEY.HOST, STABBEY.PLAYER,
             handleServerMessage, null);
 })();
-});
