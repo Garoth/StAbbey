@@ -8,6 +8,15 @@
 <body>
   <div id="cards"></div>
   <a id="start-link" href="#">START GAME</a>
+  <div id="top-level-buttons" class="hidden">
+    <div id="queue">
+      <span id="queue-label">Queue:</span>
+      <!-- Must be empty to start with & no spaces -->
+      <span id="queue-content"></span>
+    </div>
+    <div id="ready">Ready</div>
+    <div id="undo" class="disabled">Undo</div>
+  </div>
 
   <script>
     // These values are templated in by the server

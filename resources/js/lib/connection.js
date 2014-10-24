@@ -26,6 +26,11 @@ goog.scope(function() {
             me.send({CommandCode: 1, TickNum: tick});
         };
 
+        /* Sends an action queue with an updated tick to the server */
+        me.sendQueue = function(tick, actions) {
+            me.send({CommandCode: 2, TickNum: tick, Queue: actions});
+        };
+
         /* Is run when the websocket connection is opened */
         me.onOpen = function(event) {
             console.log(debugPrefix + ": websocket opened ", event);

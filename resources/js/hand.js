@@ -5,12 +5,103 @@ goog.require("st.Connection");
 goog.provide("st.hand");
 
 goog.scope(function() {
+
+/**
+ * @typedef {{
+ *      ActionString: string,
+ *      AvailableDirections: Array.<boolean>,
+ *      LongDescription: string,
+ *      ShortDescription: string
+ * }}
+ */
+st.hand.Action;
+
+/**
+ * @typedef {{
+ *      AvailableActions: Array.<st.hand.Action>,
+ *      EntityId: number,
+ *      Id: number
+ * }}
+ */
+st.hand.Player;
+
+/**
+ * @typedef {{
+ *      Layers: Array.<string>,
+ *      Level: number
+ * }}
+ */
+st.hand.Board;
+
+/**
+ * @typedef {{
+ *      ActionQueue: Array.<string>,
+ *      Ardour: number,
+ *      BoardId: number,
+ *      EntityId: number,
+ *      MaxArdour: number,
+ *      Name: string,
+ *      Type: string,
+ *      Subtype: string,
+ *      X: number,
+ *      Y: number
+ * }}
+ */
+st.hand.Entity;
+
+/**
+ * @typedef {{
+ *      Boards: Array.<st.hand.Board>,
+ *      CurrentBoard: number,
+ *      Entities: Array.<st.hand.Entity>,
+ *      LastTick: number,
+ *      Players: Array.<st.hand.Player>
+ * }}
+ */
+st.hand.WorldState;
+
+/**
+ * @typedef {{
+ *      Version: string
+ * }}
+ */
+st.hand.Version;
+
+(function() {
     var BUTTON_PREFIX = '/resources/img/card/btn_';
     var hand = [];
+    var clientTick = 0;
+    var containerDiv = st.dom.getById('cards');
+    var queueNode = document.querySelector('#queue-content');
+    var undoNode = document.querySelector('#undo');
+    var readyNode = document.querySelector('#ready');
 
-    st.hand.CardButton = function(type, onClick) {
+    var buildHand = function() {
+        st.dom.removeChildren(containerDiv);
+        for (var i = 0; i < hand.length; i++) {
+            containerDiv.appendChild(hand[i].root);
+        }
+        arrangeHand();
+    };
+
+    var arrangeHand = function() {
+        for (var i = 0; i < hand.length; i++) {
+            var style = hand[i].root.style;
+            style.left = (4 * i) + 'px';
+            style.top = (90 * i) + 'px';
+            style.zIndex = i;
+        }
+    };
+
+    /**
+     * Object wrapper for each of the buttons in each card.
+     *
+     * @param {string} dir
+     * @param {function(string)|null} onClick
+     */
+    st.hand.CardButton = function(dir, onClick) {
         var me = {};
-        me.buttonName = BUTTON_PREFIX + type;
+        me.buttonName = BUTTON_PREFIX + dir;
         me.root = null;
         me.root = st.dom.createImg('', 'button', me.buttonName + '.png');
         var pressed;
@@ -36,19 +127,27 @@ goog.scope(function() {
             if (pressed) {
                 pressed = false;
                 me.root.onmouseout();
-                onClick();
+                onClick(dir);
             }
         };
 
         return me;
     };
 
-    st.hand.Card = function(name, actions, image, count) {
-
+    /**
+     * Wrapper object for a card.
+     *
+     * @param {st.hand.Action} action
+     */
+    st.hand.Card = function(action) {
         var me = {};
+        var name = action.ShortDescription;
+        var count = '&infin;';
+
         me.root = st.dom.createDiv('', 'card-wrapper');
         var container = st.dom.createDiv('', 'card');
-        var artImg = st.dom.createImg('', 'art', image);
+        // TODO:athorp:2014-10-20 card art should be dynmaic when we have it
+        var artImg = st.dom.createImg('', 'art', '/resources/img/card/card_art_001.png');
         var maskImg = st.dom.createImg('', 'mask', '/resources/img/card/card.png');
         var cardTitle = st.dom.createDiv('', 'title');
         var cardCount = st.dom.createDiv('', 'count');
@@ -62,36 +161,46 @@ goog.scope(function() {
         container.appendChild(cardTitle);
         container.appendChild(cardCount);
 
-        me.clickLeft = function() {
+        // Generates the card buttons based on server data
+        var directions = ['up', 'left', 'down', 'right', 'self'];
+        var directionMap = {
+            'up': 'u',
+            'left': 'l',
+            'down': 'd',
+            'right': 'r',
+            'self': 's',
+            'channel': 'c'
         };
 
-        me.clickDown = function() {
+        /**
+         * Handles (custom) click events on card buttons to automatically
+         * append the correct action string to the action queue
+         *
+         * @param {string} dir One of up, down, left, right, self, channel
+         */
+        var cardButtonClickHandler = function(dir) {
+            var currentQueue = [];
+
+            if (queueNode.textContent !== '') {
+                currentQueue = queueNode.textContent.split(',');
+            }
+
+            currentQueue.push(action.ActionString + directionMap[dir]);
+            queueNode.textContent = currentQueue.join(',');
         };
 
-        me.clickUp = function() {
-        };
+        for (var i = 0; i < directions.length; i++) {
+            if (action.AvailableDirections[i] === true) {
+                buttons.push(st.hand.CardButton(directions[i],
+                            cardButtonClickHandler));
 
-        me.clickRight = function() {
-        };
+            } else {
+                buttons.push(st.hand.CardButton(directions[i], null));
+            }
+        }
 
-        me.clickSelf = function() {
-        };
-
-        me.clickChannel = function() {
-        };
-
-        buttons.push(st.hand.CardButton('up',
-            actions & st.define.CARD_ACTIONS.UP ? me.clickUp : null));
-        buttons.push(st.hand.CardButton('left',
-            actions & st.define.CARD_ACTIONS.LEFT ? me.clickLeft : null));
-        buttons.push(st.hand.CardButton('right',
-            actions & st.define.CARD_ACTIONS.RIGHT ? me.clickRight : null));
-        buttons.push(st.hand.CardButton('down',
-            actions & st.define.CARD_ACTIONS.DOWN ? me.clickDown : null));
-        buttons.push(st.hand.CardButton('self',
-            actions & st.define.CARD_ACTIONS.SELF ? me.clickSelf : null));
-        buttons.push(st.hand.CardButton('channel',
-            actions & st.define.CARD_ACTIONS.CHANNEL ? me.clickChannel : null));
+        // Channeling is always available
+        buttons.push(st.hand.CardButton('channel', cardButtonClickHandler));
 
         for (var i = 0; i < buttons.length; i++) {
             var buttonRoot = buttons[i].root;
@@ -120,75 +229,98 @@ goog.scope(function() {
         return me;
     };
 
-    var handleServerTick = function(serverState) {
-        if (serverState.Players) {
-            hand = [];
-            var actions = serverState.Players[STABBEY.PLAYER].AvailableActions;
-
-            for (var i = 0; i < actions.length; i++) {
-                var action = actions[i];
-                var dirs = st.define.CARD_ACTIONS.CHANNEL;
-
-                if (action.AvailableDirections[0]) {
-                    dirs |= st.define.CARD_ACTIONS.LEFT;
-                }
-
-                if (action.AvailableDirections[1]) {
-                    dirs |= st.define.CARD_ACTIONS.RIGHT;
-                }
-
-                if (action.AvailableDirections[2]) {
-                    dirs |= st.define.CARD_ACTIONS.UP;
-                }
-
-                if (action.AvailableDirections[3]) {
-                    dirs |= st.define.CARD_ACTIONS.DOWN;
-                }
-
-                if (action.AvailableDirections[4]) {
-                    dirs |= st.define.CARD_ACTIONS.SELF;
-                }
-
-                hand.push(st.hand.Card(action.ShortDescription, dirs,
-                    '/resources/img/card/card_art_001.png', '&infin;'));
-            }
-            buildHand();
-        }
-    };
-
-    var clientTick = 0;
-    var containerDiv = st.dom.getById('cards');
-    var conn = st.Connection("Hand",
-        STABBEY.HOST, STABBEY.PLAYER, handleServerTick, null);
-
-    window.onresize = windowOnResize;
-
-    st.dom.getById("start-link").onclick = function() {
-        windowOnResize();
-        st.dom.removeElement(st.dom.getById("start-link"));
-        conn.sendStartGame();
-        conn.sendTick(++clientTick);
-    };
-
     var windowOnResize = function() {
         containerDiv.style.zoom = "" + window.innerWidth / 780;
     };
 
-    var buildHand = function() {
-        st.dom.removeChildren(containerDiv);
-        for (var i = 0; i < hand.length; i++) {
-            containerDiv.appendChild(hand[i].root);
-        }
-        arrangeHand();
+    window.addEventListener('resize', windowOnResize);
+
+    st.dom.getById("start-link").onclick = function() {
+        windowOnResize();
+        st.dom.removeElement(st.dom.getById("start-link"));
+        st.dom.removeClass(st.dom.getById("top-level-buttons"), "hidden");
+        conn.sendStartGame();
+        conn.sendTick(++clientTick);
     };
 
-    var arrangeHand = function() {
-        for (var i = 0; i < hand.length; i++) {
-            var style = hand[i].root.style;
-            style.left = (4 * i) + 'px';
-            style.top = (90 * i) + 'px';
-            style.zIndex = i;
+    readyNode.addEventListener('click', function() {
+        if (queueNode.textContent === '') {
+            // TODO:athorp:2014-10-23 Make some user-facing UI.
+            // Disable/enable button visually?
+            console.log('Cant send empty queue');
+        } else {
+            conn.sendQueue(++clientTick, queueNode.textContent.split(','));
+        }
+    });
+
+    undoNode.addEventListener('click', function() {
+        if (queueNode.textContent !== '') {
+            var currentQueue = queueNode.textContent.split(',');
+            currentQueue.pop();
+            queueNode.textContent = currentQueue.join(',');
+        }
+    });
+
+    /**
+     * Handles the version message.
+     *
+     * @param {st.hand.Version} serverState
+     */
+    var handleVersionServerMessage = function(serverState) {
+        console.log('Game version is', serverState.Version);
+    };
+
+    /**
+     * Handles the general "world state changed" message and updates
+     * everything.
+     *
+     * @param {st.hand.WorldState} serverState
+     */
+    var handleWorldTick = function(serverState) {
+        var myEntity = null;
+        var myEntityID = serverState.Players[STABBEY.PLAYER].EntityId;
+        var myActions = serverState.Players[STABBEY.PLAYER].AvailableActions;
+
+        for (var i = 0; i < serverState.Entities.length; i++) {
+            if (serverState.Entities[i].EntityId === myEntityID) {
+                myEntity = serverState.Entities[i];
+            }
+        }
+
+        // Update available cards / abilities
+        hand = [];
+        for (var i = 0; i < myActions.length; i++) {
+            hand.push(st.hand.Card(myActions[i]));
+        }
+        buildHand();
+
+        // Update existing (running) queue for this player & do tick
+        var myServerQueue = myEntity.ActionQueue;
+        queueNode.textContent = myServerQueue.join(',');
+        if (myServerQueue.length > 0) {
+            conn.sendTick(++clientTick);
+            readyNode.classList.add('disabled');
+        } else {
+            readyNode.classList.remove('disabled');
         }
     };
 
+    /**
+     * Figures out the type of message that the server is sending and
+     * routes it to the correct function.
+     *
+     * @param {?} serverState
+     */
+    var handleServerMessage = function(serverState) {
+        if (serverState.Version) {
+            handleVersionServerMessage(serverState);
+        } else if (serverState.LastTick && serverState.Entities) {
+            handleWorldTick(serverState);
+        }
+    };
+
+    // Has to be defined at the end to have handleServerTick available
+    var conn = st.Connection("Hand", STABBEY.HOST, STABBEY.PLAYER,
+            handleServerMessage, null);
+})();
 });

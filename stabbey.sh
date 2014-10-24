@@ -24,9 +24,7 @@ function stabbey_compile_css() {
 }
 
 function stabbey_install() {
-    pushd src/stabbey &> /dev/null
-    go install $@
-    popd &> /dev/null
+    go install $@ stabbey
 }
 
 function stabbey_run() {
@@ -56,6 +54,7 @@ function stabbey_build_js() {
             --accept_const_keyword \
             --language_in "ECMASCRIPT5" \
             --summary_detail_level 3 \
+            --externs $JS_DIR/externs.js \
             --warning_level=VERBOSE \
             --js_output_file "${JS_DIR}/compiled/${target}" \
             --js "${JS_DIR}/${target}" ${JS_DIR}/lib/*

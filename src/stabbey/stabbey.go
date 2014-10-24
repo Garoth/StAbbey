@@ -213,9 +213,10 @@ func PlayerKeepReading(p interfaces.Player, ws *websocket.Conn) {
 		if e := websocket.Message.Receive(ws, &message); e != nil {
 			break
 		} else {
+			log.Println("Received message on websocket:", message)
 			err := json.Unmarshal([]byte(message), &playerOrder)
 			if err != nil {
-				log.Fatalf("Error Decoding Order: %v", e)
+				log.Fatalln("Error Decoding Order: ", string(message))
 				break
 			}
 

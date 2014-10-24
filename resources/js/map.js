@@ -5,6 +5,7 @@ goog.require("st.Connection");
 goog.provide("st.map");
 
 goog.scope(function() {
+(function() {
     var ENTITY_NAME_TO_IMAGE = {
         'monster': 'monster-shade',
         'player': 'monk',
@@ -179,4 +180,5 @@ goog.scope(function() {
                 conn.sendStartGame();
                 conn.sendTick(++clientTick);
             });
+})();
 });

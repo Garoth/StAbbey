@@ -5,6 +5,7 @@ body {
   margin: 0;
 }
 
+/* Static link to click to start game */
 #start-link {
   color: #eee;
   display: block;
@@ -14,7 +15,58 @@ body {
   text-decoration: none;
 }
 
-/* Card styles */
+/* Main buttons that are outside of cards */
+#top-level-buttons {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+
+  &.hidden {
+    display: none;
+  }
+
+  .button-style {
+    display: inline-block;
+    border: 1px solid #efefef;
+    padding: 4px;
+    width: 49%;
+    color: #efefef;
+    cursor: pointer;
+
+    &.disabled {
+      border-color: #343434;
+      color: #343434;
+    }
+  }
+
+  /* Probably temporary queue list in card view */
+  #queue {
+    border: 1px solid #efefef;
+    padding: 4px;
+    color: #efefef;
+    margin-bottom: 4px;
+
+    #queue-label {
+      margin-right: 4px;
+    }
+
+    #queue-content {
+      word-wrap: break-word;
+    }
+  }
+
+  /* Ready button to lock in queued actions */
+  #ready {
+    .button-style();
+  }
+
+  /* Undo button */
+  #undo {
+    .button-style();
+  }
+}
+
+/* Card styles (JavaScript generated) */
 .card-wrapper {
   position: absolute;
   -webkit-transition: left 500ms, top 150ms;
