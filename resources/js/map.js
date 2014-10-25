@@ -13,21 +13,27 @@ goog.provide("st.map");
 
     /**
      * Makes the canvas 'fit best' into the body element's size.
-     * See http://stackoverflow.com/a/4939066
      *
      * @param {Node} canvas
      */
     var fitCanvas = function(canvas) {
         var bodyWidth = document.body.clientWidth;
         var bodyHeight = document.body.clientHeight;
-        var canvasWidth = parseInt(canvas.getAttribute('width'), 10);
-        var canvasHeight = parseInt(canvas.getAttribute('height'), 10);
+        var canvasWidth = parseInt(canvas.getAttribute('data-width'), 10);
+        var canvasHeight = parseInt(canvas.getAttribute('data-height'), 10);
+        var newWidth = 0;
+        var newHeight = 0;
 
         if (bodyWidth / canvasWidth * canvasHeight > bodyHeight) {
-            canvas.style.height = '100%';
+            newHeight = bodyHeight;
+            newWidth = canvasWidth / canvasHeight * bodyWidth;
         } else {
-            canvas.style.width = '100%';
+            newHeight = canvasHeight / canvasWidth * bodyHeight;
+            newWidth = bodyWidth;
         }
+
+        canvas.setAttribute('width', newWidth);
+        canvas.setAttribute('height', newHeight);
     };
 
     /**
@@ -36,9 +42,9 @@ goog.provide("st.map");
      * @param {Array.<string>} layer
      */
     var drawBoard = function(layer) {
+        fitCanvas(mapCanvasNode);
         var canvasWidth = mapCanvasNode.getAttribute('width');
         var canvasHeight = mapCanvasNode.getAttribute('height');
-        fitCanvas(mapCanvasNode);
         var tileSize = Math.round(canvasHeight / (layer.length + 0.5));
         var borderX = tileSize * 0.32;
         var borderY = tileSize * 0.25;
@@ -72,26 +78,25 @@ goog.provide("st.map");
 
                 /* Draw water tiles */
                 if (row[i] === "~") {
-                    // TODO:athorp:2014-10-24 should be water instead
-                    ctx.drawImage(images['fire.png'], i * tileSize + borderX,
+                    ctx.drawImage(images['water.png'], i * tileSize + borderX,
                             x * tileSize + borderY, tileSize, tileSize);
                 }
 
                 /* Draw carpet tiles */
                 if (row[i] === "c") {
-                    ctx.drawImage(images['mia.png'], i * tileSize + borderX,
+                    ctx.drawImage(images['carpet.png'], i * tileSize + borderX,
                             x * tileSize + borderY, tileSize, tileSize);
                 }
 
                 /* Draw grass tiles */
                 if (row[i] === "g" || row[i] === "f") {
-                    ctx.drawImage(images['mia.png'], i * tileSize + borderX,
+                    ctx.drawImage(images['grass.png'], i * tileSize + borderX,
                             x * tileSize + borderY, tileSize, tileSize);
                 }
 
                 /* Draw flower overlays */
                 if (row[i] === "f") {
-                    ctx.drawImage(images['mia.png'], i * tileSize + borderX,
+                    ctx.drawImage(images['flowers.png'], i * tileSize + borderX,
                             x * tileSize + borderY, tileSize, tileSize);
                 }
 
@@ -114,9 +119,9 @@ goog.provide("st.map");
      * @param {st.define.WorldState} serverState
      */
     var drawEntities = function(serverState) {
+        fitCanvas(entityCanvasNode);
         var canvasWidth = entityCanvasNode.getAttribute('width');
         var canvasHeight = entityCanvasNode.getAttribute('height');
-        fitCanvas(entityCanvasNode);
         var layer = serverState.Boards[serverState.CurrentBoard].Layers[0];
         var tileSize = Math.round(canvasHeight / (layer.length + 0.5));
         var ctx = entityCanvasNode.getContext("2d");
@@ -143,9 +148,11 @@ goog.provide("st.map");
                     // TODO:athorp:2014-10-24 should be a gargoyle
                     entityImg = images['monster-shade.png'];
                 } else if (entity.Subtype === "chest") {
-                    entityImg = images['mia.png'];
+                    entityImg = images['monster-shade.png'];
+                } else if (entity.Subtype === "chest") {
+                    entityImg = images['chest.png'];
                 } else if (entity.Subtype === "boulder") {
-                    entityImg = images['mia.png'];
+                    entityImg = images['boulder.png'];
                 }
 
             } else if (entity.Type === "player") {
@@ -163,7 +170,7 @@ goog.provide("st.map");
                 } else if (entity.Subtype === "caltrop trap") {
                     entityPlaceholderText = "Caltrop";
                 } else if (entity.Subtype === "stairs up") {
-                    entityImg = images['mia.png'];
+                    entityImg = images['stairs-up.png'];
                 } else if (entity.Subtype === "boulder trap") {
                     entityPlaceholderText = "Bldr T.";
                 }
@@ -173,9 +180,9 @@ goog.provide("st.map");
                     entityPlaceholderText = "No Trap";
                     drawHealth = false;
                 } else if (entity.Subtype === "tree") {
-                    entityImg = images['mia.png'];
-                } else if (entity.Subtype === "inert statue") {
-                    entityImg = images['mia.png'];
+                    entityImg = images['tree.png'];
+                } else if (entity.Subtype === "statue") {
+                    entityImg = images['statue.png'];
                 }
             }
 
@@ -264,6 +271,9 @@ goog.provide("st.map");
         'monk-green.png', 'monk-red.png',
         'wall.png', 'wall-corner.png', 'wall-cross.png', 'wall-t.png',
         'monster-shade.png',
+        'boulder.png', 'carpet.png', 'stairs-down.png', 'stairs-up.png',
+        'wall-lamp.png', 'chest.png', 'statue.png', 'flowers.png',
+        'tree.png', 'water.png', 'grass.png',
         'mia.png'
     ];
     loadImages('/resources/img/tile/', imagesToLoad, function(loadedImages) {
