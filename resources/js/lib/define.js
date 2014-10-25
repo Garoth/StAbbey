@@ -22,7 +22,7 @@ st.define.Player;
 
 /**
  * @typedef {{
- *      Layers: Array.<string>,
+ *      Layers: Array.<Array.<string>>,
  *      Level: number
  * }}
  */
