@@ -4,6 +4,7 @@ pkg
 *.css
 .DS_Store
 src/code.google.com
+src/github.com
 *.pyc
 resources/js/3rd-party/deps.js
 resources/js/compiled

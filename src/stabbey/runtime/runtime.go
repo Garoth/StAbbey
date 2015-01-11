@@ -115,12 +115,21 @@ func (r *Runtime) scheduleActions() {
 
 		/* Do all the other turns (mostly monster moves) */
 		for _, entity := range GAME.GetEntities() {
-			if bId, _, _ := entity.GetPosition(); bId == GAME.GetCurrentBoard() {
-				if entity.RunTurn(GAME.GetLastTick()) {
-					GAME.SetLastTick(GAME.GetLastTick() + 1)
-					broadcastGamestate()
-					time.Sleep(TURN_DELAY)
-				}
+			// Don't trigger entities that are on different boards
+			if bId, _, _ := entity.GetPosition(); bId != GAME.GetCurrentBoard() {
+				continue
+			}
+
+			// Don't trigger dead entities
+			if entity.IsDead() {
+				continue
+			}
+
+			if entity.RunTurn(GAME.GetLastTick()) {
+				GAME.SetLastTick(GAME.GetLastTick() + 1)
+				broadcastGamestate()
+				log.Println(entity.GetName(), "did stuff. Broadcasting...")
+				time.Sleep(TURN_DELAY)
 			}
 		}
 	}

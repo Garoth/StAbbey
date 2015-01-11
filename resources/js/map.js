@@ -147,7 +147,7 @@ goog.provide("st.map");
                 if (entity.Subtype === "gargoyle") {
                     // TODO:athorp:2014-10-24 should be a gargoyle
                     entityImg = images['monster-shade.png'];
-                } else if (entity.Subtype === "chest") {
+                } else if (entity.Subtype === "shade") {
                     entityImg = images['monster-shade.png'];
                 } else if (entity.Subtype === "chest") {
                     entityImg = images['chest.png'];

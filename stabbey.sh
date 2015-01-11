@@ -69,7 +69,9 @@ function stabbey_race() {
 
 function stabbey_deps() {
     go get code.google.com/p/go.net/websocket
-    echo "Installed websocket lib"
+    echo "Installed go.net websocket lib"
+    go get github.com/oleiade/lane
+    echo "Installed oleiade's lane (data structures) lib"
     echo "All deps installed"
 }
 

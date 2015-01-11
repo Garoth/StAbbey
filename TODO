@@ -9,3 +9,6 @@
   thus making it reposition again in the original direction of travel.
   Unfortunately, this bug also produces the right behaviour, in that a
   teleport trap doesn't change the dir of travel.
+* Channeling leap crashes the game
+* Have to press ready twice sometimes
+* Player moves twice while monster moves once sometimes
