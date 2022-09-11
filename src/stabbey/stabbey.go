@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"text/template"
 
-	"code.google.com/p/go.net/websocket"
+	"golang.org/x/net/websocket"
 
 	"stabbey/game"
 	"stabbey/interfaces"

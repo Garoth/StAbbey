@@ -3,8 +3,8 @@ bin
 pkg
 *.css
 .DS_Store
-src/code.google.com
 src/github.com
+src/golang.org
 *.pyc
 resources/js/3rd-party/deps.js
 resources/js/compiled

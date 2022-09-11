@@ -44,6 +44,7 @@ function stabbey_build_js() {
     local compilation_level="SIMPLE_OPTIMIZATIONS"
     # local compilation_level="ADVANCED_OPTIMIZATIONS"
 
+    mkdir -p "${JS_DIR}/compiled"
     stabbey_build_js_deps
 
     for target in ${JS_BUILD_TARGETS[*]}; do
@@ -67,9 +68,11 @@ function stabbey_race() {
     stabbey_run
 }
 
+# TODO: needs go modules #
 function stabbey_deps() {
-    go get code.google.com/p/go.net/websocket
+    go get golang.org/x/net/websocket
     echo "Installed go.net websocket lib"
+
     go get github.com/oleiade/lane
     echo "Installed oleiade's lane (data structures) lib"
     echo "All deps installed"
